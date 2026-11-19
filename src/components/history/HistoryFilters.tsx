@@ -2,19 +2,22 @@
 
 import { useMemo } from 'react';
 import { usePgnumOptions } from '@/hooks/useRecentPredictions';
+import { useT } from '@/i18n/useT';
+import type { MessageKey } from '@/i18n/messages';
 import { useHistoryFilterStore, type RangePreset, type ResultFilter } from '@/stores/historyFilterStore';
 import type { MachineCar, Side } from '@/types/car';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { ExportCsvButton } from './ExportCsvButton';
 
-const PRESETS: { value: Exclude<RangePreset, 'custom'>; label: string }[] = [
-  { value: 'all', label: 'ทั้งหมด' },
-  { value: 'today', label: 'วันนี้' },
-  { value: '7d', label: '7 วัน' },
+const PRESETS: { value: Exclude<RangePreset, 'custom'>; key: MessageKey }[] = [
+  { value: 'all', key: 'common.all' },
+  { value: 'today', key: 'filter.today' },
+  { value: '7d', key: 'filter.7d' },
 ];
 
 export function HistoryFilters({ cars, note }: { cars: MachineCar[]; note: string }) {
+  const { t } = useT();
   const filters = useHistoryFilterStore((s) => s.filters);
   const setFilter = useHistoryFilterStore((s) => s.setFilter);
   const setPreset = useHistoryFilterStore((s) => s.setPreset);
@@ -35,7 +38,7 @@ export function HistoryFilters({ cars, note }: { cars: MachineCar[]; note: strin
           className="ctl"
           type="search"
           inputMode="numeric"
-          placeholder="ตัวเลข bn…"
+          placeholder={t('filter.bnPh')}
           autoComplete="off"
           value={filters.bn}
           onChange={(e) => setFilter({ bn: e.target.value.replace(/\D/g, '') })}
@@ -47,7 +50,7 @@ export function HistoryFilters({ cars, note }: { cars: MachineCar[]; note: strin
           className="ctl"
           type="search"
           inputMode="numeric"
-          placeholder="ตัวเลข asn…"
+          placeholder={t('filter.asnPh')}
           autoComplete="off"
           value={filters.asn}
           onChange={(e) => setFilter({ asn: e.target.value.replace(/\D/g, '') })}
@@ -59,7 +62,7 @@ export function HistoryFilters({ cars, note }: { cars: MachineCar[]; note: strin
           className="ctl"
           type="search"
           inputMode="numeric"
-          placeholder="ตัวเลข pgnum…"
+          placeholder={t('filter.pgnumPh')}
           autoComplete="off"
           list="t-pg-options"
           value={filters.pgnum}
@@ -71,7 +74,7 @@ export function HistoryFilters({ cars, note }: { cars: MachineCar[]; note: strin
           ))}
         </datalist>
       </Field>
-      <Field label="ฝั่ง" htmlFor="t-side">
+      <Field label={t('filter.side')} htmlFor="t-side">
         <select
           id="t-side"
           className="ctl !min-w-[90px]"
@@ -83,20 +86,20 @@ export function HistoryFilters({ cars, note }: { cars: MachineCar[]; note: strin
           <option>RH</option>
         </select>
       </Field>
-      <Field label="ผล" htmlFor="t-res">
+      <Field label={t('filter.result')} htmlFor="t-res">
         <select
           id="t-res"
           className="ctl !min-w-[120px]"
           value={filters.result}
           onChange={(e) => setFilter({ result: e.target.value as ResultFilter })}
         >
-          <option value="">ทั้งหมด</option>
-          <option value="pass">ผ่าน (PASS)</option>
-          <option value="ng">ไม่ผ่าน (NG)</option>
-          <option value="pending">รอ predict</option>
+          <option value="">{t('common.all')}</option>
+          <option value="pass">{t('filter.pass')}</option>
+          <option value="ng">{t('filter.ng')}</option>
+          <option value="pending">{t('common.pendingPredict')}</option>
         </select>
       </Field>
-      <Field label="ช่วงเวลา">
+      <Field label={t('filter.range')}>
         <div className="flex gap-1.5">
           {PRESETS.map((p) => (
             <button
@@ -104,14 +107,14 @@ export function HistoryFilters({ cars, note }: { cars: MachineCar[]; note: strin
               type="button"
               aria-pressed={filters.preset === p.value}
               onClick={() => setPreset(p.value)}
-              className="h-[38px] rounded-lg border border-border bg-surface-2 px-3 text-[12px] text-text-2 hover:border-muted aria-pressed:border-s1/55 aria-pressed:bg-s1/18 aria-pressed:text-white"
+              className="h-[38px] rounded-lg border border-border bg-surface-2 px-3 text-[12px] text-text-2 hover:border-muted aria-pressed:border-s1/55 aria-pressed:bg-s1/18 aria-pressed:text-text"
             >
-              {p.label}
+              {t(p.key)}
             </button>
           ))}
         </div>
       </Field>
-      <Field label="ตั้งแต่" htmlFor="t-from">
+      <Field label={t('filter.from')} htmlFor="t-from">
         <input
           id="t-from"
           className="ctl !min-w-[185px]"
@@ -120,7 +123,7 @@ export function HistoryFilters({ cars, note }: { cars: MachineCar[]; note: strin
           onChange={(e) => setFilter({ from: e.target.value, preset: 'custom' })}
         />
       </Field>
-      <Field label="ถึง" htmlFor="t-to">
+      <Field label={t('filter.to')} htmlFor="t-to">
         <input
           id="t-to"
           className="ctl !min-w-[185px]"
@@ -130,7 +133,7 @@ export function HistoryFilters({ cars, note }: { cars: MachineCar[]; note: strin
         />
       </Field>
       <Button variant="ghost" onClick={reset}>
-        ล้าง
+        {t('common.clear')}
       </Button>
       <ExportCsvButton cars={cars} note={note} />
     </div>

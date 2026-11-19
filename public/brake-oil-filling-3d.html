@@ -1,0 +1,2040 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brake Oil Filling Machine — 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:rgba(15,20,25,.88); --bg2:rgba(255,255,255,.04); --line:rgba(255,255,255,.09);
+  --fg:#e7ecef; --mute:#8f9ca6; --amber:#f2b632;
+  --vac:#3ecf6e; --fill:#ff4b3e; --top:#4ea3ff;
+  --mono:"IBM Plex Mono",ui-monospace,monospace; --sans:"IBM Plex Sans Thai",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#d7dde1;font-family:var(--sans);color:var(--fg)}
+#app{position:fixed;inset:0}
+#app canvas{display:block}
+.labels{position:absolute;inset:0;pointer-events:none}
+.tag{font-family:var(--mono);font-size:11px;line-height:1.25;background:rgba(15,20,25,.82);color:#fff;padding:4px 7px 4px 8px;border-left:3px solid var(--amber);border-radius:3px;white-space:nowrap;transform:translateY(-14px)}
+.tag span{display:block;color:#b9c4cc;font-size:10px}
+.glass{background:var(--bg);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+header.title{position:absolute;left:14px;top:14px;padding:12px 16px 12px;max-width:min(420px,calc(100vw - 380px))}
+.kicker{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--amber)}
+h1{margin:3px 0 2px;font-size:19px;font-weight:600;letter-spacing:.01em}
+.sub{font-size:12.5px;color:var(--mute)}
+#panel{position:absolute;right:14px;top:14px;bottom:14px;width:336px;overflow:auto;padding:14px 14px 10px}
+#panel::-webkit-scrollbar{width:6px}#panel::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}
+.sec{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+.sec:first-child{border-top:0;margin-top:0;padding-top:0}
+.h{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--mute);text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between}
+.row{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.chip{font-family:var(--mono);font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--amber);color:#1a1404}
+.mono{font-family:var(--mono)}
+.phase{font-size:22px;font-weight:600;margin:6px 0 2px;transition:color .2s}
+.small{font-size:11.5px;color:var(--mute)}
+.small b{color:var(--fg)}
+.timeline{position:relative;display:flex;height:10px;border-radius:5px;overflow:hidden;margin:10px 0 4px;background:#222}
+.timeline i{display:block;height:100%;opacity:.75}
+.timeline .cur{position:absolute;top:-3px;width:2px;height:16px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.4)}
+.tlabels{display:flex;font-family:var(--mono);font-size:9px;color:var(--mute)}
+.tlabels span{overflow:hidden;white-space:nowrap;text-overflow:clip}
+.alarm{margin-top:10px;padding:9px 10px;border-radius:8px;background:rgba(255,75,62,.16);border:1px solid rgba(255,75,62,.55);font-size:12.5px;line-height:1.45}
+.alarm b{color:#ff8278;font-family:var(--mono)}
+.hidden{display:none!important}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:8px 10px 6px;margin-bottom:8px}
+.card .top{display:flex;justify-content:space-between;align-items:baseline}
+.card .name{font-size:12px;color:var(--mute)}
+.card .name i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:0}
+.card .val{font-family:var(--mono);font-size:20px;font-weight:600}
+.card .val small{font-size:11px;color:var(--mute);font-weight:400;margin-left:3px}
+.card canvas{width:100%;height:104px;display:block;margin-top:2px}
+.legend-mini{font-size:10.5px;color:var(--mute);display:flex;gap:12px;margin:-2px 0 8px}
+.legend-mini span::before{content:"";display:inline-block;width:14px;height:0;border-top:2px dashed rgba(230,236,240,.5);vertical-align:3px;margin-right:5px}
+.legend-mini span.cur::before{border-top:2px solid var(--fg)}
+.btns{display:flex;flex-wrap:wrap;gap:6px}
+button{font-family:var(--sans);font-size:12.5px;color:var(--fg);background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:7px;padding:6px 10px;cursor:pointer;transition:background .15s,border-color .15s}
+button:hover{background:rgba(255,255,255,.13)}
+button.on{background:var(--amber);color:#1a1404;border-color:var(--amber);font-weight:600}
+button.warn{border-color:rgba(242,182,50,.55)}
+button.danger{background:#b3261e;border-color:#d8453b;font-weight:600}
+button.danger:hover{background:#c92f26}
+.seg{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.seg button{border:0;border-radius:0;padding:5px 9px;font-family:var(--mono);font-size:11.5px;background:transparent}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.on{background:var(--amber);color:#1a1404}
+.ctl-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px}
+.ctl-row label{font-size:12px;color:var(--mute)}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11.5px}
+td,th{padding:4px 2px;text-align:left;border-bottom:1px solid var(--line)}
+th{color:var(--mute);font-weight:400;font-size:10.5px}
+td.ok{color:var(--vac)} td.ng{color:#ff8278;font-weight:600}
+.empty{color:var(--mute);font-size:12px;padding:6px 0}
+#dock{position:absolute;left:14px;bottom:14px;padding:10px 12px;max-width:calc(100vw - 380px)}
+#dock .btns button{font-size:12px;padding:5px 9px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:9px;font-family:var(--mono);font-size:10.5px;color:var(--mute)}
+.legend i{display:inline-block;width:16px;height:4px;border-radius:2px;margin-right:5px;vertical-align:2px}
+#info{position:absolute;left:14px;bottom:150px;width:min(360px,calc(100vw - 380px));padding:12px 14px}
+#info h3{margin:0 0 6px;font-size:14px;font-family:var(--mono);color:var(--amber);padding-right:22px}
+#info p{margin:0;font-size:13px;line-height:1.55;color:#d5dde2}
+#info .x{position:absolute;right:8px;top:8px;padding:1px 7px;font-size:13px}
+.note{position:absolute;left:50%;transform:translateX(-50%);bottom:6px;font-size:10.5px;color:#3c4a54;background:rgba(255,255,255,.55);padding:2px 8px;border-radius:4px;pointer-events:none;white-space:nowrap}
+.hint{position:absolute;left:14px;top:112px;font-size:11px;color:#2d3a43;background:rgba(255,255,255,.6);padding:4px 8px;border-radius:5px;pointer-events:none}
+#panelToggle{display:none;position:absolute;right:12px;top:12px;z-index:5}
+#loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;color:#33414b;letter-spacing:.08em}
+.mc{background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:8px 10px 8px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
+.mc.sel{border-color:rgba(242,182,50,.7)}
+.mc .phase{font-size:17px;margin:4px 0 1px}
+.mc .timeline{margin:7px 0 0;height:8px}
+.chip.lh{background:#6fd3c7;color:#06201d}
+.h .seg button{padding:2px 8px;font-size:10.5px}
+#xhair{position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;pointer-events:none}
+#xhair::before,#xhair::after{content:"";position:absolute;background:rgba(255,255,255,.92);box-shadow:0 0 0 1px rgba(0,0,0,.35)}
+#xhair::before{left:8px;top:0;width:2px;height:18px}#xhair::after{top:8px;left:0;height:2px;width:18px}
+#xhair.hot::before,#xhair.hot::after{background:var(--amber)}
+#prompt{position:absolute;left:50%;top:calc(50% + 22px);transform:translateX(-50%);font-family:var(--mono);font-size:12px;padding:4px 9px;border-radius:5px;background:rgba(15,20,25,.82);color:#fff;pointer-events:none;white-space:nowrap}
+#prompt b{display:inline-block;background:var(--amber);color:#1a1404;border-radius:3px;padding:0 5px;margin-right:6px}
+#walkHelp{margin-top:8px;font-size:12px;line-height:1.7;color:#d5dde2}
+#walkHelp kbd{font-family:var(--mono);font-size:10.5px;background:rgba(255,255,255,.12);border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;margin:0 1px;color:#fff}
+#walkHelp .go{color:var(--amber);font-weight:600}
+#minimap{position:absolute;left:14px;top:112px;padding:6px;border-radius:10px}
+#minimap canvas{display:block;width:208px;height:120px}
+#joy{position:absolute;left:24px;bottom:24px;width:120px;height:120px;border-radius:50%;background:rgba(15,20,25,.35);border:2px solid rgba(255,255,255,.4);touch-action:none}
+#joy i{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px 0 0 -24px;border-radius:50%;background:rgba(255,255,255,.78)}
+#tbtns{position:absolute;right:20px;bottom:30px;display:flex;flex-direction:column;gap:10px}
+#tbtns button{width:62px;height:62px;border-radius:50%;font-size:12px;padding:0;background:rgba(15,20,25,.6);touch-action:none}
+#tbtns button.on{background:var(--amber);color:#1a1404}
+body.walking .hint{display:none}
+body.walking #dock .legend{display:none}
+body.hudoff #panel,body.hudoff header.title,body.hudoff #panelToggle,body.hudoff .hint,body.hudoff .note{display:none}
+.btns.vt{margin-top:7px;align-items:center}
+#proc{position:absolute;right:364px;top:14px;width:262px;padding:10px 12px 10px}
+body.hudoff #proc{right:14px}
+#proc .h{margin-bottom:4px;align-items:center}
+#proc .h .seg button{padding:2px 8px;font-size:10.5px}
+#pCar{margin-bottom:6px}
+#pcv{display:block;width:100%;height:auto;aspect-ratio:238/196;margin-top:4px}
+.psteps{display:flex;gap:3px;font-size:10.5px}
+.psteps span{flex:1;text-align:center;padding:3px 0;border-radius:4px;background:rgba(255,255,255,.06);color:var(--mute);white-space:nowrap;transition:background .2s}
+.psteps span.on{background:var(--pc,var(--amber));color:#10161a;font-weight:600}
+.psteps span.done{background:rgba(62,207,110,.2);color:#c4f2d3}
+.psteps span.bad{background:rgba(255,75,62,.45);color:#fff;font-weight:600}
+.pnums{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--mute);margin-top:2px}
+.pnums b{font-size:18px;color:var(--fg);margin:0 4px 0 0}
+.pnums small{display:block;font-family:var(--sans);font-size:10.5px}
+.pbar{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;margin:5px 0 8px}
+.pbar i{display:block;height:100%;width:0;background:#e0b43a}
+#proc p{margin:0;font-size:12.5px;line-height:1.5;color:#dfe6ea;min-height:56px}
+@media (max-width:1180px) and (min-width:821px){header.title{max-width:calc(100vw - 670px);min-width:200px}header.title .sub{display:none}}
+.vtl{font-family:var(--mono);font-size:10.5px;color:var(--mute);letter-spacing:.08em;margin-right:2px}
+@media (max-width:820px){
+  #minimap{display:none}
+  #walkHelp{font-size:11px;line-height:1.5}
+  header.title{max-width:calc(100vw - 110px);padding:9px 12px}
+  h1{font-size:16px}.sub{display:none}
+  #panelToggle{display:block}
+  #panel{left:10px;right:10px;top:auto;bottom:10px;width:auto;max-height:46vh}
+  #panel.collapsed{display:none}
+  #dock{left:10px;right:10px;bottom:auto;top:78px;max-width:none;padding:7px 9px}
+  #dock .legend{display:none}
+  #info{left:10px;right:10px;width:auto;bottom:calc(46vh + 20px)}
+  .note,.hint{display:none}
+  #proc{right:10px;top:auto;bottom:10px;width:200px;padding:8px 9px}
+  .psteps{font-size:9px}
+  #proc p{font-size:11px;min-height:0}
+  body.walking #proc{display:none}
+}
+body:not(.embedded) #modeRow, body:not(.embedded) #liveStat {display:none}
+body.live #segSpeed, body.live #simBtns, body.live #leakNote {display:none}
+body:not(.live) #prodSec{display:none}
+.pst{display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:9px;font-size:12px;color:var(--fg)}
+.pst span{display:flex;align-items:center;gap:6px}
+.pst i{display:block;width:8px;height:8px;border-radius:50%;background:#59626b}
+.pst i.on{background:var(--vac);box-shadow:0 0 0 3px rgba(62,207,110,.18)}
+.pst i.bad{background:var(--fill);box-shadow:0 0 0 3px rgba(255,75,62,.18)}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.pk{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:6px 9px}
+.pk small{display:block;font-size:10.5px;color:var(--mute)}
+.pk b{font-family:var(--mono);font-size:17px;font-weight:600}
+.pk .d{font-size:10.5px;font-family:var(--mono)} .pk .d.good{color:var(--vac)} .pk .d.crit{color:#ff8278}
+.pk.wide{grid-column:1 / -1}
+#liveStat{margin:-2px 0 8px;color:var(--mute)}
+#liveStat.ok{color:var(--vac)}
+</style>
+<script>
+/* โมเดล 3D โหลดไม่ขึ้น (เช่น เครื่องนี้เข้า cdn.jsdelivr.net ไม่ได้ → three.js โหลดไม่มา) → บอกสาเหตุแทนการแสดงหน้าว่าง */
+setTimeout(function () {
+  var l = document.getElementById('loading'); if (!l) return;
+  var en = new URLSearchParams(location.search).get('lang') === 'en';
+  l.style.cssText += ';flex-direction:column;justify-content:flex-start;align-items:flex-start;gap:8px;color:#c23030;letter-spacing:0;line-height:1.5;padding:230px 0 0 40px;font-size:15px';
+  l.innerHTML = (en ? 'Could not load the 3D model' : 'โหลดโมเดล 3D ไม่สำเร็จ') + '<small style="color:#4a5660;font-size:12.5px;max-width:480px">' +
+    (en ? 'three.js is loaded from cdn.jsdelivr.net (and fonts from Google Fonts) — this device needs internet access to them. Check the network / firewall, then reload.'
+        : 'ต้องใช้อินเทอร์เน็ตเพื่อโหลด three.js จาก cdn.jsdelivr.net (และฟอนต์จาก Google Fonts) — ตรวจสอบเครือข่าย/Firewall ของเครื่องนี้ แล้วรีเฟรช') + '</small>';
+}, 12000);
+</script>
+<script type="importmap">
+{"imports":{
+  "three":"/vendor/three/three.module.js",
+  "three/addons/":"/vendor/three/addons/"
+}}
+</script>
+</head>
+<body>
+<div id="app"><div id="loading">LOADING 3D MODEL…</div></div>
+
+<header class="title glass">
+  <div class="kicker">TMT BANPHO · BRAKE EVACUATION &amp; FILLING</div>
+  <h1>Brake Oil Filling Machine — 3D</h1>
+  <div class="sub">LH / RH ทำงานพร้อมกัน สลับกันคนละคัน · แต่ละเครื่อง ≈ 70 วินาที/คัน → รถเข้าทุก 35 วินาที</div>
+</header>
+<div class="hint">ลากเพื่อหมุน · scroll เพื่อซูม · คลิกที่ชิ้นส่วนเพื่อดูรายละเอียด · กด <b>🚶 เดินแบบเกม</b> เพื่อลงไปเดินในไลน์</div>
+
+<button id="panelToggle" class="glass">☰ แผงควบคุม</button>
+
+<div id="proc" class="glass">
+  <div class="h"><span>ข้างในกระปุกน้ำมันเบรก</span><div class="seg" id="segProc"><button data-v="RH" class="on">RH</button><button data-v="LH">LH</button></div></div>
+  <div class="small mono" id="pCar">—</div>
+  <div class="psteps" id="psteps"><span>1 สวมหัว</span><span>2 ดูดอากาศ</span><span>3 เติมน้ำมัน</span><span>4 ปรับระดับ</span></div>
+  <canvas id="pcv"></canvas>
+  <div class="pnums"><div><small>สุญญากาศในระบบ</small><b id="pVac">0.0</b>kPa</div><div style="text-align:right"><small>น้ำมันที่เติมแล้ว</small><b id="pVol">0</b>mL</div></div>
+  <div class="pbar"><i id="pBar"></i></div>
+  <p id="pTxt"></p>
+</div>
+
+<aside id="panel" class="glass">
+  <div class="sec">
+    <div class="h"><span>สถานะเครื่อง · ทำงานพร้อมกัน สลับคันละเครื่อง</span></div>
+    <div id="mcards"></div>
+    <div id="alarm" class="alarm hidden"></div>
+  </div>
+
+  <div class="sec" id="prodSec">
+    <div class="h"><span>ข้อมูลการผลิต · ข้อมูลจริง</span></div>
+    <div id="prodStatus" class="pst"></div>
+    <div id="prodKpi" class="pgrid"></div>
+  </div>
+
+  <div class="sec">
+    <div class="h"><span id="sigHead">สัญญาณ (1 sample/วินาที) · จำลอง</span>
+      <div class="seg" id="segView"><button data-v="RH" class="on">RH</button><button data-v="LH">LH</button></div></div>
+    <div class="legend-mini"><span class="cur">คันปัจจุบันของเครื่อง <b id="viewTag">RH</b></span><span>รูปแบบปกติ</span></div>
+    <div class="card"><div class="top"><span class="name"><i style="background:var(--vac)"></i>Vacuum (gun)</span><span class="val" id="vVac">0.0<small>kPa</small></span></div><canvas id="cVac"></canvas></div>
+    <div class="card"><div class="top"><span class="name"><i style="background:var(--fill)"></i>Filling pressure</span><span class="val" id="vPr">0<small>kPa</small></span></div><canvas id="cPr"></canvas></div>
+    <div class="card"><div class="top"><span class="name"><i style="background:var(--top)"></i>Filling volume</span><span class="val" id="vVol">0<small>mL</small></span></div><canvas id="cVol"></canvas></div>
+  </div>
+
+  <div class="sec">
+    <div class="h"><span>ควบคุม</span></div>
+    <div class="ctl-row"><button id="btnPlay" class="on">❚❚ หยุดชั่วคราว</button>
+      <div class="seg" id="segSpeed"><button data-v="1">1×</button><button data-v="2">2×</button><button data-v="4" class="on">4×</button><button data-v="8">8×</button></div></div>
+    <div class="ctl-row" id="modeRow"><label>โหมดข้อมูล</label>
+      <div class="seg" id="segMode"><button data-v="sim" class="on">จำลอง</button><button data-v="live">ข้อมูลจริง</button></div></div>
+    <div id="liveStat" class="small mono"></div>
+    <div class="ctl-row"><label>ประเภทรถ (ตำแหน่งกระปุก)</label>
+      <div class="seg" id="segCar"><button data-v="RHD" class="on">RHD</button><button data-v="LHD">LHD</button><button data-v="MIX">ผสม</button></div></div>
+    <div class="btns" id="simBtns">
+      <button id="btnLeak" class="warn">จำลอง vacuum รั่ว (<span id="leakSide">RH</span>)</button>
+      <button id="btnStop" class="danger">E-STOP</button>
+      <button id="btnReset">Reset</button>
+    </div>
+    <div id="leakNote" class="small" style="margin-top:6px"></div>
+  </div>
+
+  <div class="sec">
+    <div class="h"><span>ผลการเติมล่าสุด</span></div>
+    <div id="results"><div class="empty">ยังไม่มีรถที่เติมเสร็จ</div></div>
+  </div>
+</aside>
+
+<div id="dock" class="glass">
+  <div class="btns" id="cams">
+    <button data-cam="walk">🚶 เดินแบบเกม</button>
+    <button data-cam="overview" class="on">ภาพรวม</button>
+    <button data-cam="follow">ตาม Console</button>
+    <button data-cam="ls">LS rail</button>
+    <button data-cam="overhead">Carriage · VP2</button>
+    <button data-cam="pad">Insertion pad</button>
+    <button data-cam="main">Main unit</button>
+    <button data-cam="drum">ถังน้ำมัน</button>
+    <button data-cam="side">มุมข้างไลน์</button>
+  </div>
+  <div class="legend">
+    <span><i style="background:#3ecf6e"></i>G Vacuum</span>
+    <span><i style="background:#ff4b3e"></i>R Filling</span>
+    <span><i style="background:#4ea3ff"></i>BL Top-off</span>
+    <span><i style="background:#e9c84a"></i>Y Un-clamp</span>
+    <span><i style="background:#222"></i>B Clamp</span>
+    <span><i style="background:#f4f4f4"></i>W Air</span>
+  </div>
+  <div class="btns vt"><span class="vtl">แสดงผล</span><button id="btnPillars" class="on">เสา / โครงหลังคา</button><button id="btnLabels" class="on">ป้ายชื่อชิ้นส่วน</button><button id="btnHud" class="on">แผงข้อมูล production</button><button id="btnProc" class="on">ภาพอธิบายกระปุก</button></div>
+  <div id="walkHelp" class="hidden"></div>
+</div>
+
+<div id="xhair" class="hidden"></div>
+<div id="prompt" class="hidden"></div>
+<div id="minimap" class="glass hidden"><canvas id="mmc"></canvas></div>
+<div id="joy" class="hidden"><i></i></div>
+<div id="tbtns" class="hidden"><button id="tInfo">ⓘ ข้อมูล</button><button id="tJump">กระโดด</button><button id="tCrouch">ย่อตัว</button></div>
+
+<div id="info" class="glass hidden"><button class="x" id="infoX">✕</button><h3 id="infoT"></h3><p id="infoD"></p></div>
+<div class="note" id="noteTxt">v3.2 · โหมดเดิน · ขนาด/ตำแหน่งประมาณจากรูปถ่าย วิดีโอ และ system drawing · ค่าสัญญาณทั้งหมดเป็นข้อมูลจำลอง</div>
+
+<script type="module">
+/* ---- i18n: ?lang=th|en (ตั้งจากหน้า Dashboard; ค่าเริ่มต้นไทย) ---- */
+const LANG = new URLSearchParams(location.search).get('lang') === 'en' ? 'en' : 'th';
+const __t = (th, en) => (LANG === 'en' ? en : th);
+if (LANG === 'en') {
+  document.documentElement.lang = 'en';
+  const EN_STATIC = {
+    'LH / RH ทำงานพร้อมกัน สลับกันคนละคัน · แต่ละเครื่อง ≈ 70 วินาที/คัน → รถเข้าทุก 35 วินาที': 'LH / RH run at the same time, alternating cars · each machine ≈ 70 s/car → a car arrives every 35 s',
+    'ลากเพื่อหมุน · scroll เพื่อซูม · คลิกที่ชิ้นส่วนเพื่อดูรายละเอียด · กด': 'Drag to rotate · scroll to zoom · click a part for details · press',
+    '🚶 เดินแบบเกม': '🚶 Game walk',
+    'เพื่อลงไปเดินในไลน์': 'to walk down into the line',
+    '☰ แผงควบคุม': '☰ Control panel',
+    'ข้างในกระปุกน้ำมันเบรก': 'Inside the brake fluid reservoir',
+    '1 สวมหัว': '1 Clamp gun', '2 ดูดอากาศ': '2 Evacuate', '3 เติมน้ำมัน': '3 Fill', '4 ปรับระดับ': '4 Top off',
+    'สุญญากาศในระบบ': 'System vacuum', 'น้ำมันที่เติมแล้ว': 'Fluid filled',
+    'สถานะเครื่อง · ทำงานพร้อมกัน สลับคันละเครื่อง': 'Machine status · run together, alternating cars',
+    'สัญญาณ (1 sample/วินาที) · จำลอง': 'Signals (1 sample/s) · simulated',
+    'คันปัจจุบันของเครื่อง': 'Current car of machine', 'รูปแบบปกติ': 'Normal pattern',
+    'ควบคุม': 'Controls', '❚❚ หยุดชั่วคราว': '❚❚ Pause',
+    'ประเภทรถ (ตำแหน่งกระปุก)': 'Car type (reservoir position)', 'ผสม': 'Mixed',
+    'จำลอง vacuum รั่ว (': 'Simulate vacuum leak (',
+    'ผลการเติมล่าสุด': 'Latest fill results', 'ยังไม่มีรถที่เติมเสร็จ': 'No cars filled yet',
+    'ภาพรวม': 'Overview', 'ตาม Console': 'Follow console', 'ถังน้ำมัน': 'Fluid drum', 'มุมข้างไลน์': 'Line side view',
+    'แสดงผล': 'Show', 'เสา / โครงหลังคา': 'Pillars / roof frame', 'ป้ายชื่อชิ้นส่วน': 'Part labels',
+    'แผงข้อมูล production': 'Production data panel', 'ภาพอธิบายกระปุก': 'Reservoir diagram',
+    'ⓘ ข้อมูล': 'ⓘ Info', 'ข้อมูลการผลิต · ข้อมูลจริง': 'Production data · live', 'โหมดข้อมูล': 'Data mode', 'จำลอง': 'Simulation', 'ข้อมูลจริง': 'Live data', 'กระโดด': 'Jump', 'ย่อตัว': 'Crouch',
+    'v3.2 · โหมดเดิน · ขนาด/ตำแหน่งประมาณจากรูปถ่าย วิดีโอ และ system drawing · ค่าสัญญาณทั้งหมดเป็นข้อมูลจำลอง': 'v3.2 · walk mode · sizes/positions estimated from photos, video and the system drawing · all signal values are simulated',
+  };
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+    const k = n.nodeValue.trim();
+    if (k && EN_STATIC[k]) n.nodeValue = n.nodeValue.replace(k, EN_STATIC[k]);
+  }
+}
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+try {
+  await Promise.race([
+    Promise.all([document.fonts.load('600 40px "IBM Plex Mono"'), document.fonts.load('600 40px "IBM Plex Sans Thai"')]),
+    new Promise(r => setTimeout(r, 1800))
+  ]);
+} catch (e) {}
+
+/* ================= constants ================= */
+const CYCLE = 70;            // s per car, per machine
+const TAKT = 35;             // LH & RH alternate → a car every 35 s
+const OFFS = { RH: 0, LH: TAKT };
+const V = 0.18;              // line speed m/s (≈ 10.8 m/min, car pitch 6.3 m)
+const HOME_X = -2.5;         // carriage home position
+const RAIL_Z = 1.9;          // carriage centre distance from line centre
+const LSZ = RAIL_Z + .55;    // LS rail (behind the carriage)
+const CHZ = RAIL_Z + .85;    // cable carrier (drag chain)
+const RES_LX = 1.45, RES_TOP = 1.225, RES_LZ = 0.48;   // reservoir on car (local)
+const PAD_LX = 1.1;          // insertion pad ahead of console centre
+const X_ALIGN = HOME_X + PAD_LX - .03 - 2.14;          // car centre at t=4 (front tyre touches pad)
+const SIDES = { RH: 1, LH: -1 };
+const COL = { vac: 0x3ecf6e, fill: 0xff4b3e, top: 0x4ea3ff };
+const MONO = '"IBM Plex Mono", ui-monospace, monospace';
+const SANS = '"IBM Plex Sans Thai", system-ui, sans-serif';
+
+const PH = [
+  { key: 'wait',     th: __t('รอรถ · Insertion pad เข้า', 'Waiting · Insertion pad in'), en: 'WAIT / INSERT', t0: 0,  t1: 4,  step: 0, c: '#6b7882' },
+  { key: 'clamp',    th: __t('สวมหัวเติม · Clamp', 'Gun clamp'),      en: 'GUN CLAMP',     t0: 4,  t1: 9,  step: 0, c: '#c79a2f' },
+  { key: 'vacuum',   th: __t('ดูดสุญญากาศ', 'Evacuating'),            en: 'VACUUM',        t0: 9,  t1: 30, step: 1, c: '#3ecf6e' },
+  { key: 'filling',  th: __t('เติมน้ำมันเบรก', 'Filling brake fluid'),          en: 'FILLING',       t0: 30, t1: 52, step: 2, c: '#ff4b3e' },
+  { key: 'topoff',   th: __t('Top-off ปรับระดับ', 'Top-off · level adjust'),       en: 'TOP OFF',       t0: 52, t1: 57, step: 2, c: '#4ea3ff' },
+  { key: 'complete', th: __t('เสร็จ · Unclamp', 'Done · Unclamp'),         en: 'COMPLETE',      t0: 57, t1: 60, step: 0, c: '#b8e05a' },
+  { key: 'return',   th: __t('Carriage วิ่งกลับ', 'Carriage returning'),        en: 'RETURN',        t0: 60, t1: 70, step: 0, c: '#8796a2' },
+];
+const phaseAt = t => PH.find(p => t < p.t1) || PH[PH.length - 1];
+
+/* ================= renderer / scene ================= */
+const app = document.getElementById('app');
+document.getElementById('loading').remove();
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+app.appendChild(renderer.domElement);
+
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(innerWidth, innerHeight);
+labelRenderer.domElement.className = 'labels';
+app.appendChild(labelRenderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xd7dde1);
+scene.fog = new THREE.Fog(0xd7dde1, 26, 58);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+const camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, 0.05, 200);
+camera.position.set(8.5, 6.5, 11);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(-1.5, 1.6, 1.5);
+controls.enableDamping = true;
+controls.maxPolarAngle = Math.PI * 0.495;
+controls.minDistance = 0.5;
+controls.maxDistance = 45;
+
+scene.add(new THREE.HemisphereLight(0xf3f6ff, 0x6d7f8c, 0.55));
+const sun = new THREE.DirectionalLight(0xffffff, 1.7);
+sun.position.set(6, 14, 8);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, near: 1, far: 44 });
+sun.shadow.bias = -0.0003;
+sun.shadow.normalBias = 0.02;
+scene.add(sun);
+
+/* ================= helpers ================= */
+const mat = (color, roughness = .6, metalness = .1, extra = {}) => new THREE.MeshStandardMaterial({ color, roughness, metalness, ...extra });
+const M = {
+  cream: mat(0xe6e2cf, .75, .05), creamDark: mat(0xd2cdb6, .8, .05), wall: mat(0xf0f0ec, .9, 0),
+  alu: mat(0xc8cdd2, .35, .85), steel: mat(0x8f969d, .45, .75), darkSteel: mat(0x3d434a, .55, .6),
+  black: mat(0x18191b, .7, .1), rubber: mat(0x111214, .95, 0), yellow: mat(0xf0bf2a, .55, .05),
+  yellowFlat: mat(0xf0bf2a, .8, 0), blueTape: mat(0x2453b8, .6, 0), floor: mat(0x8b9399, .55, .05),
+  walk: mat(0x2c5d8e, .6, .05), copper: mat(0x9a6a48, .55, .55), engine: mat(0x2c2f33, .6, .5), bay: mat(0x1a1c1e, .9, .1),
+  greenHandle: mat(0x3cc251, .45, .05), white: mat(0xf2f2ee, .5, .05), chain: mat(0x26292d, .6, .3),
+  pumpBlue: mat(0x5d7286, .45, .45), drum: mat(0x1a4fb8, .35, .45), stainless: mat(0xd5d9dc, .22, .92),
+  red: mat(0xc0282a, .45, .1), valve: mat(0xb9bcbf, .45, .3), headlight: mat(0xe3ebf2, .15, .7),
+  brass: mat(0xb8913f, .4, .8), yellowHose: mat(0xe8b92a, .4, .05),
+  sleeveBlue: mat(0x23408f, .9, 0), sleeveTeal: mat(0x8cc4bd, .9, 0), sleeveTeal2: mat(0x6faaa6, .9, 0), sleeveSilver: mat(0xb8bdc2, .55, .5),
+  light: new THREE.MeshBasicMaterial({ color: 0xffffff }),
+  glass: new THREE.MeshPhysicalMaterial({ color: 0x1c262d, roughness: .06, metalness: .1, transparent: true, opacity: .82 }),
+  glassClear: new THREE.MeshPhysicalMaterial({ color: 0xcfe2ec, roughness: .05, metalness: 0, transparent: true, opacity: .16, depthWrite: false }),
+  hoseClear: new THREE.MeshStandardMaterial({ color: 0xece4a6, roughness: .35, transparent: true, opacity: .8 }),
+  fluid: mat(0xc9ae2e, .3, 0, { emissive: 0x3a2a00, emissiveIntensity: .4 }),
+  resBody: new THREE.MeshStandardMaterial({ color: 0xf1ead2, roughness: .4, transparent: true, opacity: .85 }),
+};
+
+function add(parent, mesh, x = 0, y = 0, z = 0) {
+  mesh.position.set(x, y, z); mesh.castShadow = true; mesh.receiveShadow = true; parent.add(mesh); return mesh;
+}
+const B = (w, h, d, m) => new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m);
+const RB = (w, h, d, r, m) => new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 3, r), m);
+const C = (rt, rb, h, m, seg = 24) => new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), m);
+const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+const tube = (pts, r, m, seg = 40, rad = 8) => new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), seg, r, rad), m);
+const hash = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const ease = x => { x = Math.min(1, Math.max(0, x)); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+const clamp01 = x => Math.min(1, Math.max(0, x));
+
+function canvasTex(w, h, draw) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d'); draw(g, w, h);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+}
+function textTex(lines, { w = 256, h = 96, bg = '#f5f3ea', fg = '#151515', font = `600 40px ${MONO}`, border = null, band = null } = {}) {
+  return canvasTex(w, h, g => {
+    g.fillStyle = bg; g.fillRect(0, 0, w, h);
+    let hh = h;
+    if (band) { g.fillStyle = band; g.fillRect(0, h * .72, w, h * .28); hh = h * .72; }
+    if (border) { const lw = Math.max(3, w / 60); g.strokeStyle = border; g.lineWidth = lw; g.strokeRect(lw / 2, lw / 2, w - lw, h - lw); }
+    g.fillStyle = fg; g.font = font; g.textAlign = 'center'; g.textBaseline = 'middle';
+    const lh = hh / lines.length;
+    lines.forEach((l, i) => g.fillText(l, w / 2, lh * (i + .5) + 2));
+  });
+}
+const texMat = (tex, rough = .7) => new THREE.MeshStandardMaterial({ map: tex, roughness: rough });
+function plate(lines, pw, ph, opts = {}) { return new THREE.Mesh(new THREE.PlaneGeometry(pw, ph), texMat(textTex(lines, opts), .75)); }
+function texPlane(pw, ph, w, h, draw, rough = .7) { return new THREE.Mesh(new THREE.PlaneGeometry(pw, ph), texMat(canvasTex(w, h, draw), rough)); }
+// put a plane on a face: dir = '-z' | '+z' | '-x' | '+x'
+function face(parent, mesh, x, y, z, dir = '-z') {
+  mesh.position.set(x, y, z);
+  mesh.rotation.y = { '-z': Math.PI, '+z': 0, '-x': -Math.PI / 2, '+x': Math.PI / 2 }[dir];
+  parent.add(mesh); return mesh;
+}
+function repTex(draw, size = 64) { const t = canvasTex(size, size, draw); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; }
+const slotDraw = (g, w, h) => { g.fillStyle = '#5a6067'; g.fillRect(0, 0, w, h); g.fillStyle = '#16181a'; g.fillRect(w * .22, h * .25, w * .56, h * .5); };
+const stripeDraw = (g, w, h) => { g.fillStyle = '#1b1b1b'; g.fillRect(0, 0, w, h); g.fillStyle = '#f0bf2a'; for (let i = -2; i < 3; i++) { g.beginPath(); g.moveTo(i * w / 2, h); g.lineTo(i * w / 2 + w / 4, h); g.lineTo(i * w / 2 + w / 4 + h, 0); g.lineTo(i * w / 2 + h, 0); g.closePath(); g.fill(); } };
+const slatDraw = (g, w, h) => { g.fillStyle = '#3f454b'; g.fillRect(0, 0, w, h); g.fillStyle = '#25292d'; g.fillRect(0, 0, 6, h); g.fillStyle = '#5b6268'; g.fillRect(6, 0, 2, h); };
+
+function lampMat(off, glow, k = 2.4) {
+  const m = new THREE.MeshStandardMaterial({ color: off, roughness: .3, metalness: 0, transparent: true, opacity: .93 });
+  m.userData = { glow, k }; return m;
+}
+function setLamp(m, on) {
+  if (on) { m.emissive.setHex(m.userData.glow); m.emissiveIntensity = m.userData.k; }
+  else { m.emissive.setHex(0); m.emissiveIntensity = 0; }
+}
+const OFF = { red: 0x6a1714, green: 0x175c33, clear: 0xc9ced1, amber: 0x5a3a12, white: 0xd8dcdc };
+const GLOW = { red: 0xff2a1e, green: 0x2bff6a, clear: 0xffffff, amber: 0xff8a1a, white: 0xffffff };
+
+const pickables = [];
+function info(obj, key) { obj.userData.info = key; pickables.push(obj); return obj; }
+const labelObjs = [];
+function tag(obj, text, sub, pos) {
+  const d = document.createElement('div'); d.className = 'tag';
+  d.innerHTML = `<b>${text}</b>${sub ? `<span>${sub}</span>` : ''}`;
+  const o = new CSS2DObject(d); o.position.copy(pos); obj.add(o); labelObjs.push(o); return o;
+}
+
+/* ================= gauge texture ================= */
+const gaugeTex = canvasTex(256, 256, g => {
+  g.fillStyle = '#f6f6f2'; g.beginPath(); g.arc(128, 128, 126, 0, Math.PI * 2); g.fill();
+  g.strokeStyle = '#d33'; g.lineWidth = 9; g.beginPath(); g.arc(128, 128, 104, 135 * Math.PI / 180, 180 * Math.PI / 180); g.stroke();
+  g.strokeStyle = '#222';
+  for (let i = 0; i <= 24; i++) {
+    const f = i / 24, a = (225 - 270 * f) * Math.PI / 180, r1 = i % 4 ? 102 : 92, r2 = 112;
+    g.lineWidth = i % 4 ? 2 : 4;
+    g.beginPath(); g.moveTo(128 + r1 * Math.cos(a), 128 - r1 * Math.sin(a)); g.lineTo(128 + r2 * Math.cos(a), 128 - r2 * Math.sin(a)); g.stroke();
+  }
+  g.fillStyle = '#222'; g.font = `600 20px ${MONO}`; g.textAlign = 'center'; g.textBaseline = 'middle';
+  ['-0.1', '0', '0.1', '0.2', '0.3', '0.4', '0.5'].forEach((s, i) => { const a = (225 - 270 * i / 6) * Math.PI / 180; g.fillText(s, 128 + 74 * Math.cos(a), 128 - 74 * Math.sin(a)); });
+  g.font = `600 18px ${MONO}`; g.fillText('MPa', 128, 186);
+});
+const gaugeAngle = v => { const f = clamp01((v + 100) / 600); return (225 - 270 * f) * Math.PI / 180 - Math.PI / 2; };
+function smallGauge(parent, x, y, z, dir, r = .04) {
+  const g = new THREE.Group(); face(parent, g, x, y, z, dir);
+  add(g, new THREE.Mesh(new THREE.CircleGeometry(r, 24), texMat(gaugeTex, .4)), 0, 0, .001);
+  add(g, new THREE.Mesh(new THREE.TorusGeometry(r + .002, .006, 8, 24), M.black), 0, 0, 0);
+  return g;
+}
+
+/* ================= plant: floor, conveyor, structure ================= */
+let conveyorMat;
+const structure = new THREE.Group(); scene.add(structure);   // white portal frames / roof beams / lights (toggleable)
+function buildPlant() {
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(64, 40), M.floor);
+  floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+  const flat = (w, d, m, x, z, y = .003) => { const p = new THREE.Mesh(new THREE.PlaneGeometry(w, d), m); p.rotation.x = -Math.PI / 2; p.position.set(x, y, z); p.receiveShadow = true; scene.add(p); return p; };
+  for (const z of [-4.15, 4.15]) flat(60, .1, M.yellowFlat, 0, z, .004);
+  for (const s of [1, -1]) {
+    // blue walkway under the console travel + hazard bands + position numbers
+    flat(13.6, 1.25, M.walk, 2.6, s * RAIL_Z, .003);
+    for (const zz of [RAIL_Z - .72, RAIL_Z + .72]) {
+      const tex = repTex(stripeDraw, 128); tex.repeat.set(13.6 / .5, 1);
+      flat(13.6, .22, texMat(tex, .8), 2.6, s * zz, .005);
+    }
+    for (let i = 0; i < 10; i++) {
+      const p = flat(.12, .12, texMat(textTex([String(i + 1)], { w: 64, h: 64, bg: '#f4f4f0', fg: '#111', font: `700 44px ${MONO}` })), HOME_X - .6 + i * 1.2, s * (RAIL_Z + .5), .006);
+      p.rotation.z = s > 0 ? Math.PI : 0;
+    }
+  }
+  // slat conveyor
+  const slat = repTex(slatDraw); slat.repeat.set(146, 1);
+  conveyorMat = new THREE.MeshStandardMaterial({ map: slat, roughness: .7, metalness: .3 });
+  const conv = add(scene, B(44, .06, 2.3, conveyorMat), 0, .03, 0); conv.castShadow = false;
+  info(conv, 'conv');
+  for (const s of [1, -1]) add(scene, B(44, .1, .08, M.darkSteel), 0, .05, s * 1.19);
+
+  // portal frames
+  for (const x of [-12, -6, 0, 6, 12]) {
+    for (const s of [1, -1]) {
+      add(structure, B(.26, 4.4, .26, M.cream), x, 2.2, s * 3.4);
+      add(structure, B(.34, 1.3, .34, M.yellow), x, .65, s * 3.4);
+      add(structure, B(.345, .1, .345, M.blueTape), x, 1.0, s * 3.4);
+      add(structure, B(.3, .4, .2, M.cream), x, 4.15, s * 3.3);
+    }
+    add(structure, B(.3, .4, 7.1, M.cream), x, 4.55, 0);
+  }
+  for (const s of [1, -1]) add(structure, B(30, .4, .3, M.cream), 0, 4.55, s * 3.4);
+  // light fixtures
+  for (let x = -10.5; x <= 10.5; x += 3) for (const z of [-1.3, 1.3]) {
+    add(structure, B(1.3, .05, .18, M.alu), x, 4.3, z).castShadow = false;
+    const t = add(structure, B(1.22, .02, .1, M.light), x, 4.27, z); t.castShadow = false;
+  }
+  // overhead carriage rails (per side) + toothed belt + drive
+  for (const s of [1, -1]) {
+    const g = new THREE.Group(); scene.add(g); info(g, 'rail');
+    for (const dz of [-.25, .25]) {
+      add(g, B(13.0, .08, .07, M.steel), 2.25, 4.14, s * RAIL_Z + dz);
+      add(g, B(13.0, .02, .14, M.steel), 2.25, 4.09, s * RAIL_Z + dz);
+      for (const x of [-4.1, 0, 6, 8.6]) add(g, B(.06, .19, .06, M.steel), x, 4.26, s * RAIL_Z + dz);
+    }
+    add(g, B(13.0, .012, .05, M.black), 2.25, 4.17, s * RAIL_Z);
+    for (const x of [-4.1, 8.6]) add(g, B(.08, .08, 1.95, M.cream), x, 4.31, s * 2.425);
+    add(g, B(.22, .22, .62, M.cream), -4.3, 4.12, s * RAIL_Z);
+    add(g, B(.22, .22, .62, M.cream), 8.8, 4.12, s * RAIL_Z);
+    const mot = add(g, C(.08, .08, .26, M.pumpBlue), 9.0, 4.05, s * RAIL_Z); mot.rotation.z = Math.PI / 2;
+  }
+}
+
+/* ================= LS rail (per side) ================= */
+const lsList = { RH: [], LH: [] };
+function buildLSRail(sd) {
+  const s = SIDES[sd];
+  const g = new THREE.Group(); scene.add(g); info(g, 'ls');
+  const slot = repTex(slotDraw); slot.repeat.set(2.3 / .06, 1);
+  add(g, B(2.3, .05, .045, new THREE.MeshStandardMaterial({ map: slot, roughness: .55, metalness: .6 })), -2.85, 3.5, s * LSZ);
+  for (const x of [-3.85, -3.0]) {
+    add(g, B(.03, .82, .03, M.steel), x, 3.93, s * LSZ);
+    add(g, B(.04, .03, 1.0, M.steel), x, 4.33, s * (LSZ + .48));
+  }
+  const fz = s * LSZ - s * .032, dir = s > 0 ? '-z' : '+z';
+  if (sd === 'RH') face(g, plate(['F3-20'], .34, .19, { w: 340, h: 190, bg: '#fbfbfb', fg: '#111', font: `500 96px ${SANS}`, band: '#1b4fb5', border: '#bbb' }), -3.95, 3.72, s * LSZ - s * .03, dir);
+  const defs = [
+    { x: -3.25, code: 'X4A3 LS', l: ['RETURN', 'OVER RUN'] },
+    { x: -2.9, prox: true },
+    { x: -2.5, code: 'X4A4 LS', l: ['SYNCRONIZ', 'INSERTION'] },
+    { x: -1.95, code: 'X4A5 LS', l: ['HIGH-SPEED'] },
+  ];
+  for (const d of defs) {
+    const z = s * LSZ;
+    if (d.prox) {
+      add(g, B(.05, .16, .04, M.steel), d.x, 3.4, z);
+      add(g, C(.012, .012, .12, M.darkSteel, 12), d.x, 3.27, z);
+      const led = lampMat(0x2a3a2a, 0x37ff6a); add(g, new THREE.Mesh(new THREE.SphereGeometry(.008, 8, 6), led), d.x, 3.21, z - s * .015);
+      lsList[sd].push({ x: d.x, led, lever: null, prox: true });
+      continue;
+    }
+    add(g, B(.1, .03, .05, M.steel), d.x, 3.465, z);
+    add(g, RB(.1, .26, .06, .006, M.copper), d.x, 3.335, z);
+    add(g, B(.065, .05, .05, M.darkSteel), d.x, 3.18, z);
+    const pivot = new THREE.Group(); pivot.position.set(d.x, 3.155, z); g.add(pivot);
+    add(pivot, B(.012, .1, .012, M.stainless), 0, -.05, 0);
+    add(pivot, C(.014, .014, .012, M.black, 12), 0, -.1, 0).rotation.x = Math.PI / 2;
+    const lines = sd === 'RH' ? [d.code, ...d.l] : d.l;
+    face(g, plate(lines, .085, .028 * lines.length, { w: 256, h: 76 * lines.length, font: `600 40px ${MONO}`, bg: '#f7f7f2', border: '#222' }), d.x, 3.3, fz, dir);
+    const led = lampMat(0x2a3a2a, 0x37ff6a);
+    add(g, new THREE.Mesh(new THREE.SphereGeometry(.01, 8, 6), led), d.x + .035, 3.43, fz);
+    lsList[sd].push({ x: d.x, led, lever: pivot });
+  }
+  if (sd === 'RH') tag(g, 'LS RAIL · F3-20', 'X4A3 / X4A4 / X4A5', V3(-2.6, 3.75, s * LSZ));
+}
+
+/* ================= main unit (Brake evacuation & filling equipment) ================= */
+let mainBeacon;
+function buildMainUnit() {
+  const g = new THREE.Group(); scene.add(g); info(g, 'main');
+  const z0 = 5.6, fz = z0 - .6 - .003;
+  // --- A: hydraulic cabinet with windows
+  const ax = -8.3;
+  add(g, B(2.02, .08, 1.22, M.darkSteel), ax, .04, z0);
+  add(g, B(2.0, 1.65, 1.2, M.cream), ax, .905, z0);
+  const winTex = canvasTex(256, 280, (c, w, h) => {
+    const gr = c.createLinearGradient(0, 0, w, h); gr.addColorStop(0, '#2c363c'); gr.addColorStop(1, '#141a1e'); c.fillStyle = gr; c.fillRect(0, 0, w, h);
+    c.fillStyle = 'rgba(160,170,175,.35)'; c.fillRect(30, 40, 60, 180); c.fillRect(120, 120, 110, 40); c.fillRect(150, 30, 26, 90);
+    c.strokeStyle = 'rgba(220,225,228,.5)'; c.lineWidth = 4; c.beginPath(); c.arc(190, 210, 22, 0, 7); c.stroke();
+    c.fillStyle = '#ff2a1e'; c.fillRect(100, 60, 14, 8);
+    c.fillStyle = 'rgba(255,255,255,.08)'; c.beginPath(); c.moveTo(0, 0); c.lineTo(90, 0); c.lineTo(0, 120); c.fill();
+  }, .1);
+  for (const [x, y, w, h] of [[-.62, 1.3, .55, .62], [-.02, 1.3, .55, .62], [-.62, .45, .55, .55], [-.02, .45, .55, .55]]) {
+    face(g, new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshStandardMaterial({ map: winTex, roughness: .12, metalness: .3 })), ax + x, y, fz, '-z');
+    add(g, B(.05, .1, .01, M.black), ax + x, y - h / 2 - .1, fz - .004);
+  }
+  // power panel corner
+  face(g, plate(['BRAKE EVACUATION&FILLING', 'EQUIPMENT  POWER PANEL'], .5, .09, { w: 500, h: 90, font: `600 26px ${MONO}`, bg: '#f4f4f0' }), ax + .66, 1.55, fz, '-z');
+  for (const dx of [.55, .68]) { const m = lampMat(OFF.amber, GLOW.amber, 2); setLamp(m, true); add(g, C(.022, .022, .02, m), ax + dx, 1.4, fz - .01).rotation.x = Math.PI / 2; }
+  add(g, B(.12, .14, .04, M.black), ax + .6, 1.15, fz - .02);
+  face(g, plate(['MUB-A', 'TEL. 2477'], .2, .09, { w: 200, h: 90, bg: '#2a3f8f', fg: '#fff', font: `700 30px ${SANS}` }), ax + .85, 1.5, fz, '-z');
+  face(g, plate(['A'], .1, .1, { w: 80, h: 80, bg: '#fff', fg: '#000', font: `700 56px ${SANS}`, border: '#000' }), ax + .45, 1.6, fz, '-z');
+  // hood + exhaust duct
+  const hood = add(g, C(.42, .72, .36, M.cream, 4), ax, 1.91, z0); hood.rotation.y = Math.PI / 4; hood.scale.set(1.35, 1, .85);
+  add(g, tube([V3(ax + .1, 2.05, z0), V3(ax + .1, 3.3, z0), V3(ax + .1, 3.55, z0 + .25), V3(ax + .1, 3.8, z0 + .4), V3(ax + .1, 5.2, z0 + .4)], .09, M.alu, 60, 14));
+  // --- B: control cabinet
+  const bx = -6.8;
+  add(g, B(1.0, .08, 1.22, M.darkSteel), bx, .04, z0);
+  add(g, B(1.0, 1.75, 1.2, M.cream), bx, .955, z0);
+  face(g, plate(['BRAKE EVACUATION & FILLING EQUIPMENT'], .56, .045, { w: 560, h: 45, font: `600 22px ${MONO}`, bg: '#fafaf6', border: '#999' }), bx + .16, 1.66, fz, '-z');
+  face(g, texPlane(.44, .34, 440, 340, (c, w, h) => {
+    c.fillStyle = '#1b1d1f'; c.fillRect(0, 0, w, h);
+    c.fillStyle = '#cfeec0'; c.fillRect(24, 24, w - 48, h - 48);
+    c.fillStyle = '#2b7a3a'; c.fillRect(24, 24, w - 48, 34);
+    c.fillStyle = '#fff'; c.font = `600 15px ${MONO}`; c.fillText('Direct circuit monitor', 34, 46);
+    c.fillStyle = '#3a8f4a'; for (let i = 0; i < 5; i++) c.fillRect(34 + i * 74, 66, 66, 18);
+    c.fillStyle = '#ffffff'; c.fillRect(34, 92, w - 68, h - 150);
+    c.strokeStyle = '#c9d6c3'; for (let i = 0; i < 12; i++) { c.beginPath(); c.moveTo(34, 104 + i * 14); c.lineTo(w - 34, 104 + i * 14); c.stroke(); }
+    c.fillStyle = '#56606a'; for (let i = 0; i < 12; i++) c.fillRect(40, 98 + i * 14, 80 + (i * 37) % 160, 5);
+    c.fillStyle = '#3a8f4a'; for (let i = 0; i < 6; i++) c.fillRect(34 + i * 62, h - 52, 56, 20);
+  }, .2), bx + .16, 1.3, fz, '-z');
+  face(g, texPlane(.22, .34, 220, 340, (c, w, h) => {
+    c.fillStyle = '#ebe7d6'; c.fillRect(0, 0, w, h);
+    const cols = ['#e5392b', '#36c25a', '#f39a2b', '#4a4d52', '#4a4d52', '#36c25a', '#4a4d52', '#e5392b'];
+    for (let r = 0; r < 4; r++) for (let k = 0; k < 4; k++) { c.fillStyle = cols[(r * 4 + k * 3) % 8]; c.fillRect(16 + k * 48, 12 + r * 36, 40, 28); }
+    for (let r = 0; r < 4; r++) for (let k = 0; k < 4; k++) { c.fillStyle = r === 0 && k < 2 ? '#36c25a' : r === 1 && k === 0 ? '#e5392b' : '#f7f7f4'; c.fillRect(16 + k * 48, 180 + r * 38, 40, 30); }
+  }), bx - .3, 1.3, fz, '-z');
+  add(g, C(.045, .045, .04, M.red), bx - .3, .95, fz - .02).rotation.x = Math.PI / 2;
+  add(g, C(.06, .06, .01, M.yellow), bx - .3, .95, fz - .002).rotation.x = Math.PI / 2;
+  add(g, C(.022, .022, .03, mat(0x2bb34a, .4)), bx - .08, 1.12, fz - .015).rotation.x = Math.PI / 2;
+  add(g, C(.022, .022, .03, M.red), bx - .08, 1.0, fz - .015).rotation.x = Math.PI / 2;
+  add(g, C(.028, .028, .03, M.white), bx + .16, .98, fz - .015).rotation.x = Math.PI / 2;
+  const pl = lampMat(OFF.amber, GLOW.amber, 2); setLamp(pl, true); add(g, C(.02, .02, .02, pl), bx - .3, 1.55, fz - .01).rotation.x = Math.PI / 2;
+  face(g, plate(['B'], .1, .1, { w: 80, h: 80, bg: '#fff', fg: '#000', font: `700 56px ${SANS}`, border: '#000' }), bx - .42, 1.62, fz, '-z');
+  for (const dx of [-.3, .2]) add(g, B(.04, .16, .03, M.black), bx + dx, .62, fz - .015);
+  mainBeacon = lampMat(0x7a1414, 0xff2a1e, 3);
+  add(g, C(.07, .09, .06, M.darkSteel), bx + .32, 1.86, z0 - .3);
+  add(g, new THREE.Mesh(new THREE.SphereGeometry(.09, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), mainBeacon), bx + .32, 1.89, z0 - .3);
+  add(g, C(.09, .09, .08, mainBeacon), bx + .32, 1.89, z0 - .3);
+  tag(g, 'MAIN UNIT', 'Brake evacuation & filling equipment', V3(-7.6, 2.5, z0));
+}
+
+/* ================= drum station ================= */
+function buildDrumStation() {
+  const g = new THREE.Group(); scene.add(g); info(g, 'drum');
+  const dx = -10.7, dz = 5.5;
+  // cart
+  add(g, B(.9, .05, .9, M.darkSteel), dx, .15, dz);
+  for (const [a, b] of [[-.4, -.4], [.4, -.4], [-.4, .4], [.4, .4]]) add(g, C(.05, .05, .04, M.rubber, 14), dx + a, .06, dz + b).rotation.x = Math.PI / 2;
+  add(g, C(.03, .03, 1.0, mat(0x2f8f4a, .5), 12), dx - .52, .9, dz).rotation.x = Math.PI / 2;
+  // railing
+  const rail = (pts) => add(g, tube(pts, .025, M.cream, 24, 10));
+  rail([V3(dx - .7, 0, dz - .7), V3(dx - .7, 1.05, dz - .7), V3(dx + .7, 1.05, dz - .7), V3(dx + .7, 0, dz - .7)].map(v => v));
+  for (const x of [-.7, 0, .7]) add(g, C(.025, .025, 1.05, M.cream, 10), dx + x, .525, dz - .7);
+  add(g, C(.025, .025, 1.4, M.cream, 10), dx, 1.03, dz - .7).rotation.z = Math.PI / 2;
+  add(g, C(.025, .025, 1.4, M.cream, 10), dx, .55, dz - .7).rotation.z = Math.PI / 2;
+  for (const x of [-.7, .7]) { add(g, C(.025, .025, 1.05, M.cream, 10), dx + x, .525, dz + .7); add(g, C(.025, .025, 1.4, M.cream, 10), dx + x, 1.03, dz).rotation.x = Math.PI / 2; }
+  // drum
+  add(g, C(.29, .29, .88, M.drum, 36), dx, .615, dz);
+  for (const y of [.42, .82]) add(g, new THREE.Mesh(new THREE.TorusGeometry(.292, .012, 6, 36), M.drum), dx, y, dz).rotation.x = Math.PI / 2;
+  const lbl = face(g, plate(['BRAKE & CLUTCH FLUID', '210 L'], .3, .2, { w: 300, h: 200, font: `600 22px ${MONO}`, bg: '#fbfbf8' }), dx, .7, dz - .292, '-z');
+  // suction pipe + card holder
+  add(g, C(.028, .028, .32, M.stainless), dx + .14, 1.2, dz);
+  add(g, new THREE.Mesh(new THREE.SphereGeometry(.035, 12, 8), M.stainless), dx + .14, 1.36, dz);
+  add(g, C(.028, .028, .16, M.stainless), dx + .22, 1.36, dz).rotation.z = Math.PI / 2;
+  const card = face(g, plate([__t('ถังใช้งาน', 'In-use drum'), 'YA No. 86400095'], .3, .2, { w: 300, h: 200, font: `600 28px ${SANS}`, bg: '#fff', border: '#2a62c9' }), dx - .1, 1.25, dz - .05, '-z');
+  card.rotation.x = -.5;
+  // hose to column & main unit, sight glasses on the column
+  add(g, tube([V3(dx + .3, 1.36, dz), V3(dx + .55, 1.3, dz + .3), V3(-11.35, .7, 6.05), V3(-11.45, 1.4, 6.15), V3(-11.45, 2.4, 6.15), V3(-10.2, 2.5, 6.1), V3(-9.35, 1.55, 5.95)], .02, M.rubber, 90));
+  for (const y of [1.55, 1.95]) { add(g, C(.03, .03, .14, M.glassClear, 14), -11.45, y, 6.15); add(g, C(.026, .026, .12, M.fluid, 12), -11.45, y, 6.15); add(g, C(.036, .036, .03, M.brass), -11.45, y + .085, 6.15); add(g, C(.036, .036, .03, M.brass), -11.45, y - .085, 6.15); }
+  // spare drum
+  add(g, C(.29, .29, .88, M.drum, 36), -10.0, .44, 6.55);
+  // building column + PDP panel + cable trough
+  add(structure, B(.8, 6, .8, M.wall), -12.0, 3, 6.6);
+  const pdp = add(g, RB(.55, .78, .18, .01, M.cream), -12.0, 1.55, 6.11);
+  face(g, plate(['PDP-F13'], .22, .06, { w: 220, h: 60, font: `600 36px ${MONO}` }), -11.95, 1.82, 6.018, '-z');
+  face(g, plate(['B'], .08, .08, { w: 80, h: 80, bg: '#fff', fg: '#000', font: `700 56px ${SANS}`, border: '#000' }), -12.18, 1.82, 6.018, '-z');
+  const trough = add(scene, tube([V3(-11.25, .6, 6.35), V3(-11.25, 3.9, 6.35), V3(-11.1, 4.55, 6.35), V3(-10.55, 4.85, 6.35), V3(-6, 4.85, 6.35)], .14, M.cream, 80, 4));
+  trough.rotation.set(0, 0, 0);
+  tag(g, 'BRAKE FLUID DRUM', __t('ถัง 210 L + ถังสำรอง', '210 L drum + spare drum'), V3(dx, 1.6, dz));
+}
+
+/* ================= cable carrier (drag chain) ================= */
+const chains = {};
+const CH_XF = 2.5;   // fixed end of the drag chain (middle of travel)
+function buildChain(sd) {
+  const s = SIDES[sd], N = 96;
+  const im = new THREE.InstancedMesh(new THREE.BoxGeometry(.058, .05, .12), M.chain, N);
+  im.castShadow = true; im.frustumCulled = false; scene.add(im); info(im, 'chain');
+  const jb = add(scene, RB(.32, .2, .18, .01, M.cream), CH_XF, 4.12, s * 2.98); info(jb, 'chain');
+  add(scene, B(.05, .05, .2, M.steel), CH_XF, 4.08, s * 2.83);
+  if (sd === 'RH') tag(jb, 'CABLE CARRIER', 'FILL / TOP OFF / air / signal', V3(0, .15, 0));
+  chains[sd] = { im, N, z: s * CHZ };
+}
+const _m = new THREE.Matrix4(), _v = new THREE.Vector3();
+function updChain(ch, xm) {
+  const R = .12, Lr = 5.4, xf = CH_XF, yu = 4.08, yl = 3.84, yc = 3.96;
+  const xb = (Lr + xf + xm) / 2, Lu = xb - xf, tot = Lr + Math.PI * R;
+  for (let i = 0; i < ch.N; i++) {
+    const sArc = (i + .5) / ch.N * tot; let x, y, r;
+    if (sArc < Lu) { x = xf + sArc; y = yu; r = 0; }
+    else if (sArc < Lu + Math.PI * R) { const th = (sArc - Lu) / R; x = xb + R * Math.sin(th); y = yc + R * Math.cos(th); r = -th; }
+    else { x = xb - (sArc - Lu - Math.PI * R); y = yl; r = -Math.PI; }
+    _m.makeRotationZ(r); _m.setPosition(x, y, ch.z); ch.im.setMatrixAt(i, _m);
+  }
+  ch.im.instanceMatrix.needsUpdate = true;
+}
+
+/* ================= brake gun ================= */
+function makeGun(sd) {
+  const g = new THREE.Group(); scene.add(g); info(g, 'gun');
+  add(g, RB(.085, .15, .08, .012, M.alu), 0, .11, 0);
+  add(g, C(.03, .03, .05, M.darkSteel), 0, .015, 0);
+  add(g, C(.03, .048, .035, M.rubber), 0, -.015, 0);
+  const h = add(g, C(.026, .026, .2, M.greenHandle), .11, .16, 0); h.rotation.z = -1.05;
+  add(g, B(.05, .035, .002, M.yellow), -.01, .12, -.041);
+  add(g, C(.02, .02, .06, M.darkSteel), 0, .215, 0);
+  g.rotation.y = sd === 'RH' ? 0 : Math.PI;
+  if (sd === 'RH') tag(g, 'BRAKE GUN', null, V3(0, .32, 0));
+  return g;
+}
+
+/* ================= tower lights ================= */
+function tower(parent, x, y, z, tiers, labels) {
+  const grp = new THREE.Group(); grp.position.set(x, y, z); parent.add(grp);
+  add(grp, C(.028, .042, .07, M.creamDark), 0, .035, 0);
+  let yy = .07; const mats = [];
+  tiers.forEach((t, i) => {
+    const m = lampMat(t[0], t[1], t[2] ?? 2.4); mats.push(m);
+    add(grp, C(.04, .04, .062, m, 28), 0, yy + .031, 0);
+    add(grp, C(.041, .041, .005, M.creamDark), 0, yy + .062, 0);
+    if (labels && labels[i]) face(grp, plate([labels[i]], .058, .017, { w: 200, h: 58, font: `600 32px ${MONO}`, bg: '#eeeeea' }), 0, yy + .031, -.0415, '-z');
+    yy += .067;
+  });
+  add(grp, C(.04, .04, .02, M.creamDark), 0, yy + .01, 0);
+  return { grp, mats };
+}
+
+/* ================= console: carriage + VP2 frame + hanging column ================= */
+const consoles = {};
+function buildConsole(sd) {
+  const s = SIDES[sd];
+  const g = new THREE.Group(); g.position.set(HOME_X, 0, s * RAIL_Z); g.rotation.y = s > 0 ? 0 : Math.PI;
+  scene.add(g); info(g, 'console');
+
+  // ---- trolley on the overhead rails
+  const tr = new THREE.Group(); g.add(tr); info(tr, 'rail');
+  add(tr, B(.9, .04, .66, M.steel), 0, 4.02, 0);
+  for (const x of [-.35, .35]) for (const z of [-.25, .25]) add(tr, C(.045, .045, .04, M.black, 16), x, 4.1, z).rotation.x = Math.PI / 2;
+  add(tr, B(.16, .05, .08, M.darkSteel), 0, 4.15, 0);
+  for (const x of [-.4, .4]) for (const z of [-.3, .3]) add(tr, B(.04, .1, .04, M.steel), x, 3.96, z);
+  add(tr, B(.05, .05, .45, M.steel), 0, 3.84, .635);          // drag-chain bracket
+
+  // ---- VP2 frame (vacuum pump, tank, FCM)
+  const vp = new THREE.Group(); g.add(vp); info(vp, 'overhead');
+  for (const x of [-.75, .75]) for (const z of [-.4, .4]) add(vp, B(.04, .7, .04, M.alu), x, 3.57, z);
+  for (const y of [3.22, 3.57, 3.92]) for (const z of [-.4, .4]) add(vp, B(1.54, .04, .04, M.alu), 0, y, z);
+  for (const y of [3.22, 3.92]) for (const x of [-.75, .75]) add(vp, B(.04, .04, .8, M.alu), x, y, 0);
+  add(vp, B(1.5, .02, .8, M.alu), 0, 3.235, 0);
+  add(vp, B(.4, .5, .02, M.cream), -.52, 3.5, -.395);
+  const mot = add(vp, C(.09, .09, .28, M.pumpBlue), -.2, 3.35, .05); mot.rotation.z = Math.PI / 2;
+  add(vp, RB(.2, .18, .2, .02, M.pumpBlue), .05, 3.33, .05);
+  add(vp, C(.035, .035, .12, M.stainless), .05, 3.46, .05);
+  add(vp, C(.1, .1, .42, M.stainless, 28), .3, 3.45, .2);
+  add(vp, RB(.26, .5, .18, .015, M.cream), .55, 3.49, -.2);
+  add(vp, C(.018, .018, .34, M.glassClear, 14), .5, 3.49, -.3);
+  const fluidGeo = new THREE.CylinderGeometry(.013, .013, 1, 12); fluidGeo.translate(0, .5, 0);
+  const fluid = add(vp, new THREE.Mesh(fluidGeo, M.fluid), .5, 3.32, -.3); fluid.scale.y = .3;
+  face(vp, plate(['FCM'], .07, .03, { w: 140, h: 60, font: `600 36px ${MONO}` }), .6, 3.68, -.292);
+  smallGauge(vp, -.62, 3.72, -.41, '-z'); smallGauge(vp, -.45, 3.72, -.41, '-z');
+  add(vp, B(.45, .05, .05, M.brass), .05, 3.62, -.37);
+  [[-.12, 0x3ecf6e], [.05, 0xff4b3e], [.22, 0x4ea3ff]].forEach(([x, c]) => add(vp, B(.09, .015, .02, mat(c, .5, .1)), x + .03, 3.66, -.39));
+  add(vp, tube([V3(.3, 3.67, .2), V3(.2, 3.85, 0), V3(-.1, 3.8, -.1), V3(-.2, 3.5, .05)], .02, M.yellowHose));
+  face(vp, plate([`CONSOLE UNIT ${sd}`], .44, .05, { w: 440, h: 50, font: `600 30px ${MONO}`, bg: '#1d2328', fg: '#f2b632' }), 0, 3.82, -.425);
+  // LS dog (strikes the limit switches behind the carriage)
+  add(g, B(.03, .03, .26, M.steel), 0, 2.95, .43);
+  add(g, B(.03, .12, .03, M.steel), 0, 3.0, .55);
+  add(g, B(.14, .02, .05, M.yellow), 0, 3.07, .55);
+
+  // ---- hanging column between VP2 frame and console body
+  add(g, B(.12, .62, .1, M.steel), .1, 2.92, .05);
+  add(g, B(.045, .62, .045, M.alu), -.55, 2.92, .32); add(g, B(.045, .62, .045, M.alu), .55, 2.92, .32);
+  const jbt = add(g, RB(.42, .3, .2, .012, M.cream), -.2, 3.05, .05); info(jbt, 'jb');
+  face(g, new THREE.Mesh(new THREE.PlaneGeometry(.06, .02), M.yellow), -.08, 2.95, -.051);
+  const tb = add(g, RB(.26, .36, .16, .012, M.cream), .3, 2.85, -.1); info(tb, 'jb');
+  face(g, plate(['TRANS BOX', 'Type2'], .16, .07, { w: 240, h: 104, font: `600 34px ${MONO}`, bg: '#f6f4ec' }), .3, 2.8, -.181);
+  const ig = lampMat(OFF.white, GLOW.white, 1.2); add(g, C(.016, .016, .015, ig), .3, 2.95, -.185).rotation.x = Math.PI / 2;
+  // spring balancers for the gun hoses
+  for (const x of [-.45, -.22]) { add(g, C(.07, .07, .05, M.cream, 20), x, 2.84, -.2).rotation.x = Math.PI / 2; add(g, B(.004, .5, .004, M.black), x, 2.55, -.2); }
+
+  // ---- console body: aluminium profile frame (hangs ~0.15 m above floor)
+  for (const [x, z] of [[-.55, -.32], [.55, -.32], [-.55, .32], [.55, .32]]) add(g, B(.045, 2.42, .045, M.alu), x, 1.41, z);
+  for (const y of [.22, .42, 1.3, 2.62]) {
+    add(g, B(1.145, .045, .045, M.alu), 0, y, -.32); add(g, B(1.145, .045, .045, M.alu), 0, y, .32);
+    add(g, B(.045, .045, .6, M.alu), -.55, y, 0); add(g, B(.045, .045, .6, M.alu), .55, y, 0);
+  }
+  add(g, B(.42, .5, .3, M.black), .05, .72, .1);
+  const slot = repTex(slotDraw); slot.repeat.set(1, 2.45 / .06);
+  add(g, B(.1, 2.45, .04, new THREE.MeshStandardMaterial({ map: slot, roughness: .5, metalness: .6 })), -.08, 1.42, -.3);
+
+  // JB10R
+  const jb = add(g, RB(.56, .46, .22, .015, M.cream), .25, 2.18, -.2); info(jb, 'jb');
+  face(g, texPlane(.42, .18, 256, 110, (c, w, h) => {
+    c.fillStyle = '#0e171c'; c.fillRect(0, 0, w, h);
+    for (let r = 0; r < 3; r++) for (let i = 0; i < 26; i++) { c.fillStyle = i % 7 === 3 ? '#c9d2d6' : '#2b8a4c'; c.fillRect(10 + i * 9, 18 + r * 30, 7, 18); }
+    c.fillStyle = '#ff8a1a'; for (let i = 0; i < 6; i++) c.fillRect(30 + i * 34, 98, 4, 4);
+  }, .15), .25, 2.26, -.312);
+  face(g, new THREE.Mesh(new THREE.CircleGeometry(.045, 24), M.black), .25, 2.07, -.312);
+  face(g, plate(['JB10R'], .14, .035, { w: 200, h: 50, font: `600 34px ${MONO}` }), .25, 2.385, -.312);
+  face(g, plate([sd], .06, .07, { w: 90, h: 105, font: `700 64px ${MONO}`, bg: '#fff', fg: '#000' }), .48, 2.0, -.312);
+  const jb6 = add(g, RB(.2, .26, .12, .01, M.cream), .02, 1.8, -.21); info(jb6, 'jb');
+  face(g, plate(['JB6'], .07, .03, { w: 140, h: 60, font: `600 36px ${MONO}` }), .02, 1.9, -.272);
+  face(g, new THREE.Mesh(new THREE.PlaneGeometry(.05, .08), mat(0xf6d64a, .8)), .07, 1.78, -.273);
+  // port strip (P / UC / S / D / FA / VA / PA)
+  const ps = new THREE.Group(); g.add(ps); info(ps, 'ports');
+  add(ps, B(.07, .5, .03, M.cream), .1, 1.38, -.335);
+  face(ps, texPlane(.065, .48, 64, 480, (c, w, h) => {
+    c.fillStyle = '#f2efe4'; c.fillRect(0, 0, w, h); c.fillStyle = '#222'; c.font = `600 14px ${MONO}`; c.textAlign = 'center';
+    ['(P)', '(UC)', '(S)', '(D)', '(FA)', '(VA)', '(PA)'].forEach((l, i) => c.fillText(l, w / 2, 40 + i * 64));
+  }), .1, 1.38, -.351);
+  for (let i = 0; i < 7; i++) add(ps, C(.012, .012, .04, M.brass, 10), .15, 1.38 + .24 - .035 - i * .064, -.34).rotation.z = Math.PI / 2;
+  smallGauge(ps, .1, 1.69, -.352, '-z', .03);
+
+  // E-stop box with sign
+  add(g, B(.2, .42, .14, M.steel), -.24, 1.72, -.2);
+  face(g, texPlane(.17, .24, 240, 340, (c, w, h) => {
+    c.fillStyle = '#fafaf6'; c.fillRect(0, 0, w, h); c.strokeStyle = '#111'; c.lineWidth = 6; c.strokeRect(8, 8, w - 16, 150);
+    c.fillStyle = '#111'; c.font = `600 19px ${MONO}`; c.textAlign = 'center';
+    ['WHEN YOU BLOCK THIS', 'EMERGENCY STOP', 'THE EQUIPMENT,', 'ENCIRCLED BY RED', 'LINE WILL STOP.'].forEach((l, i) => c.fillText(l, w / 2, 40 + i * 26));
+    c.strokeStyle = '#444'; c.lineWidth = 2; c.strokeRect(18, 180, w - 36, 140);
+    c.strokeRect(50, 230, 120, 50); c.beginPath(); c.arc(80, 290, 10, 0, 7); c.arc(140, 290, 10, 0, 7); c.stroke();
+    c.strokeStyle = '#d22'; c.lineWidth = 3; c.strokeRect(36, 200, 150, 104);
+  }), -.24, 1.77, -.272);
+  add(g, C(.024, .024, .025, M.red), -.24, 1.57, -.28).rotation.x = Math.PI / 2;
+
+  // signal towers
+  add(g, B(.36, .02, .1, M.steel), -.44, 1.96, -.42);
+  const poleP = add(g, C(.012, .012, .33, M.alu), -.34, 2.135, -.42);
+  const pat = tower(g, -.34, 2.3, -.42, [[0xf2f2ee, 0xf2f2ee, 0], [OFF.red, GLOW.red], [OFF.green, GLOW.green], [OFF.clear, GLOW.clear, 1.6]]);
+  const patlite = { red: pat.mats[1], green: pat.mats[2], white: pat.mats[3] };
+  add(g, C(.015, .015, .3, M.yellow), -.44, 2.12, -.42);
+  add(g, C(.015, .015, .3, M.white), -.54, 2.12, -.42);
+  const tiers = [[OFF.red, GLOW.red], [OFF.green, GLOW.green], [OFF.clear, GLOW.clear, 1.6], [OFF.clear, GLOW.clear, 1.6], [OFF.clear, GLOW.clear, 1.6]];
+  const tA = tower(g, -.44, 2.27, -.42, tiers, null);
+  const tB = tower(g, -.54, 2.27, -.42, tiers, ['Fault', 'Comp', 'Top off', 'Filling', 'Vacuum']);
+  face(g, plate(['A'], .022, .03, { w: 40, h: 56, font: `600 40px ${SANS}`, bg: '#f0bf2a', fg: '#c0282a' }), -.44, 2.06, -.4355);
+  face(g, plate(['B'], .022, .03, { w: 40, h: 56, font: `600 40px ${SANS}`, bg: '#f2f2ee', fg: '#c0282a' }), -.54, 2.06, -.4355);
+  for (const t of [pat, tA, tB]) info(t.grp, 'towers');
+  info(poleP, 'towers');
+
+  // gun clamp / unclamp valves
+  const vg = new THREE.Group(); g.add(vg); info(vg, 'valves');
+  add(vg, B(.22, .04, .07, M.steel), -.2, 1.36, -.36);
+  const vLabels = [['Y4CC', 'GUN', 'UNCLAMP'], ['Y4CB', 'GUN', 'CLAMP'], null];
+  const leds = [];
+  [-.13, -.2, -.27].forEach((x, i) => {
+    add(vg, B(.055, .14, .07, M.valve), x, 1.45, -.37);
+    if (vLabels[i]) face(vg, plate(vLabels[i], .045, .05, { w: 120, h: 132, font: `700 30px ${MONO}`, bg: '#f6d64a' }), x, 1.42, -.406);
+    const m = lampMat(OFF.amber, GLOW.amber, 3); leds.push(m);
+    add(vg, new THREE.Mesh(new THREE.SphereGeometry(.008, 10, 8), m), x, 1.5, -.406);
+  });
+  // pressure gauge with live needle
+  const gface = new THREE.Group(); face(g, gface, .47, 1.55, -.375); info(gface, 'gauge');
+  add(gface, new THREE.Mesh(new THREE.CircleGeometry(.055, 32), texMat(gaugeTex, .4)), 0, 0, 0);
+  add(gface, new THREE.Mesh(new THREE.TorusGeometry(.057, .008, 8, 32), M.black), 0, 0, 0);
+  add(gface, C(.058, .058, .03, M.stainless), 0, 0, -.017).rotation.x = Math.PI / 2;
+  const needle = new THREE.Group(); needle.position.z = .004; gface.add(needle);
+  add(needle, B(.004, .046, .002, M.red), 0, .019, 0);
+  add(g, B(.14, .03, .03, M.steel), .5, 1.55, -.34);
+
+  // gun holder
+  add(g, B(.04, .04, .22, M.steel), -.5, .97, -.42);
+  add(g, new THREE.Mesh(new THREE.TorusGeometry(.05, .008, 8, 24), M.steel), -.47, 1.0, -.5).rotation.x = Math.PI / 2;
+  // instruction sheet
+  face(g, texPlane(.36, .27, 360, 270, (c, w, h) => {
+    c.fillStyle = '#fbfbf8'; c.fillRect(0, 0, w, h); c.fillStyle = '#111'; c.font = `600 17px ${SANS}`; c.textAlign = 'center';
+    c.fillText(`Operation Fluid filling (M/C ${sd})`, w / 2, 26);
+    c.font = `600 14px ${MONO}`; c.fillText('RHD', w * .27, 50); c.fillText('LHD', w * .73, 50);
+    c.fillStyle = '#8b9096'; [[14, 60], [186, 60], [14, 165], [186, 165]].forEach(([x, y]) => c.fillRect(x, y, 160, 96));
+    c.fillStyle = '#3c4146'; [[40, 80], [210, 90], [50, 190], [230, 180]].forEach(([x, y]) => c.fillRect(x, y, 90, 50));
+  }, .8), .2, .62, -.345);
+  // cables + corrugated hose down the frame
+  for (let i = 0; i < 4; i++) {
+    const pts = [V3(.08 + i * .07, 1.95, -.26), V3(.14 + i * .05, 1.25, -.37), V3(.1 + i * .06, .65, -.3), V3(.02 + i * .05, .3, -.22)];
+    add(g, tube(pts, i === 2 ? .012 : .008, i === 2 ? M.hoseClear : M.black, 30));
+  }
+
+  // ---- operator panel (BRAKE / A/C 134a) on the -x end
+  const op = new THREE.Group(); g.add(op); info(op, 'oppanel');
+  add(op, B(.04, .44, .38, M.cream), -.6, 1.72, 0);
+  face(op, texPlane(.37, .43, 370, 430, (c, w, h) => {
+    c.fillStyle = '#e9e5d4'; c.fillRect(0, 0, w, h);
+    const bar = (y, t) => { c.fillStyle = '#fafaf6'; c.fillRect(20, y, w - 40, 26); c.fillStyle = '#222'; c.font = `600 17px ${MONO}`; c.textAlign = 'center'; c.fillText(t, w / 2, y + 19); };
+    const btn = (x, y, col, ring = '#222') => { c.fillStyle = ring; c.beginPath(); c.arc(x, y, 17, 0, 7); c.fill(); c.fillStyle = col; c.beginPath(); c.arc(x, y, 12, 0, 7); c.fill(); };
+    bar(12, 'BRAKE');
+    const row1 = ['#f2f2ee', '#f2f2ee', '#ffb21a', '#f2f2ee'], row2 = ['#222', '#f2f2ee', '#c0282a', '#f2f2ee'];
+    row1.forEach((col, i) => btn(60 + i * 84, 72, col)); row2.forEach((col, i) => btn(60 + i * 84, 122, col));
+    bar(160, 'A/C 134a');
+    const r3 = ['#f2f2ee', '#ffb21a', '#f2f2ee', '#f2f2ee'], r4 = ['#222', '#f2f2ee', '#c0282a', '#2bd15a'], r5 = ['#c0282a', '#ffcc22', '#7a1a1a', '#2bd15a'];
+    r3.forEach((col, i) => btn(60 + i * 84, 222, col)); r4.forEach((col, i) => btn(60 + i * 84, 276, col)); r5.forEach((col, i) => btn(60 + i * 84, 334, col));
+    c.fillStyle = '#c0282a'; c.beginPath(); c.arc(60, 334, 22, 0, 7); c.fill();
+    c.fillStyle = '#ffd400'; c.beginPath(); c.moveTo(300, 396); c.lineTo(322, 396); c.lineTo(311, 376); c.fill();
+  }), -.623, 1.72, 0, '-x');
+  add(op, C(.026, .026, .03, M.red), -.635, 1.53, .155).rotation.z = Math.PI / 2;
+  // cycle start + pairing OK
+  add(op, B(.05, .16, .14, M.creamDark), -.6, 1.33, .05);
+  face(op, plate(['Brake Filling', 'Cycle Start'], .12, .04, { w: 240, h: 80, font: `600 26px ${MONO}`, bg: '#f2f2ee' }), -.627, 1.38, .05, '-x');
+  add(op, C(.018, .018, .02, M.red), -.635, 1.3, .05).rotation.z = Math.PI / 2;
+  add(op, B(.05, .2, .14, M.creamDark), -.6, 2.12, .05);
+  face(op, plate(['PAIRING OK'], .1, .025, { w: 200, h: 50, font: `600 26px ${MONO}`, bg: '#f6d64a' }), -.627, 2.19, .05, '-x');
+  const pair = lampMat(OFF.white, GLOW.white, 1.5);
+  add(op, new THREE.Mesh(new THREE.SphereGeometry(.04, 18, 10, 0, Math.PI * 2, 0, Math.PI / 2), pair), -.625, 2.09, .05).rotation.z = Math.PI / 2;
+
+  // ---- solenoid valve bank Y720..Y727 + filter on the +x end
+  const vb = new THREE.Group(); g.add(vb); info(vb, 'valvebank');
+  add(vb, B(.02, .55, .4, M.steel), .6, 1.95, 0);
+  const bankLeds = [];
+  for (let i = 0; i < 8; i++) {
+    const y = 1.76 + i * .05;
+    add(vb, B(.05, .04, .2, M.valve), .635, y, -.02);
+    const m = lampMat(OFF.green, i % 3 === 1 ? GLOW.red : GLOW.green, 2); bankLeds.push(m);
+    add(vb, new THREE.Mesh(new THREE.SphereGeometry(.006, 8, 6), m), .662, y, -.11);
+    for (let k = 0; k < 2; k++) add(vb, C(.007, .007, .03, M.brass, 8), .64, y, .1 + k * .03).rotation.x = Math.PI / 2;
+  }
+  face(vb, plate(['Y720–Y727'], .12, .03, { w: 240, h: 60, font: `600 30px ${MONO}`, bg: '#f2f2ee' }), .662, 2.2, -.02, '+x');
+  add(vb, C(.06, .06, .24, M.stainless, 20), .67, 1.3, .1);
+  add(vb, new THREE.Mesh(new THREE.SphereGeometry(.06, 16, 8), M.stainless), .67, 1.18, .1);
+  add(vb, C(.03, .03, .08, M.brass, 12), .67, 1.46, .1);
+  add(vb, tube([V3(.67, 1.5, .1), V3(.7, 1.62, .12), V3(.66, 1.72, .16), V3(.64, 2.3, .16), V3(.5, 2.55, .2)], .016, M.yellowHose, 40));
+  add(vb, tube([V3(.67, 1.1, .1), V3(.72, .85, .12), V3(.62, .7, .2), V3(.5, .76, .25)], .016, M.yellowHose, 30));
+
+  // ---- insertion pad on ball screws (bottom, pointing downstream)
+  const arm = new THREE.Group(); arm.position.set(0, .38, -.28); g.add(arm); info(arm, 'pad');
+  const sx = s;          // rods point to world +x for both sides
+  add(arm, B(.14, .12, .22, M.steel), sx * .52, 0, 0);
+  const rods = [];
+  for (const dz of [-.06, .06]) {
+    const r = add(arm, C(.016, .016, 1, M.stainless, 12), sx * .8, 0, dz); r.rotation.z = Math.PI / 2; r.scale.y = .56; rods.push(r);
+  }
+  add(arm, B(.06, .1, .2, M.steel), sx * 1.06, 0, 0);
+  add(arm, B(.06, .17, .55, M.rubber), sx * PAD_LX, 0, -.2);
+  add(g, B(.06, .06, .5, M.alu), sx * .52, .3, -.1);
+
+  if (sd === 'RH') {
+    tag(g, 'CONSOLE RH', __t('แขวนจาก carriage · VP2 · FCM', 'Hung from carriage · VP2 · FCM'), V3(0, 4.25, 0));
+    tag(g, 'SIGNAL TOWER', 'A · B · 3-colour', V3(-.48, 2.75, -.42));
+    tag(arm, 'INSERTION PAD', 'X4A4 sync', V3(sx * PAD_LX, .2, -.2));
+    tag(op, 'OPERATOR PANEL', 'BRAKE · A/C 134a', V3(-.65, 2.0, 0));
+  } else tag(g, 'CONSOLE LH', null, V3(0, 4.25, 0));
+
+  // gun + hoses + flows
+  const gun = makeGun(sd);
+  const hoses = [
+    { tb: dynTube(M.sleeveBlue, .028), a: V3(-.36, 1.22, -.4), off: V3(0, 0, 0), sag: .12 },
+    { tb: dynTube(M.sleeveTeal, .03), a: V3(-.3, 1.18, -.4), off: V3(.05, 0, .03), sag: .2 },
+    { tb: dynTube(M.sleeveTeal2, .026), a: V3(-.42, 1.25, -.38), off: V3(-.05, 0, -.03), sag: .3 },
+    { tb: dynTube(M.sleeveSilver, .03), a: V3(-.2, 2.25, -.36), off: V3(.02, 0, .06), sag: .75, big: true },
+  ];
+  consoles[sd] = {
+    group: g, gun, hoses, patlite, towers: [tA, tB], led: { unclamp: leds[0], clamp: leds[1] }, needle, fluid, pair, bankLeds,
+    arm, rods, holderLocal: V3(-.47, 1.02, -.5), flowGun: new Flow(16, .034), needleA: gaugeAngle(0),
+  };
+}
+
+/* ================= dynamic tubes & flows ================= */
+function dynTube(m, r) {
+  const mesh = new THREE.Mesh(new THREE.BufferGeometry(), m); mesh.castShadow = true; scene.add(mesh);
+  return { mesh, r, key: '', curve: null };
+}
+function setTube(tb, key, makeCurve) {
+  if (key === tb.key) return;
+  tb.key = key; tb.curve = makeCurve();
+  tb.mesh.geometry.dispose();
+  tb.mesh.geometry = new THREE.TubeGeometry(tb.curve, 56, tb.r, 8, false);
+}
+const k3 = v => `${v.x.toFixed(3)},${v.y.toFixed(3)},${v.z.toFixed(3)}`;
+function hoseCurve(a, b, h) {
+  const d = a.distanceTo(b);
+  const mid = a.clone().lerp(b, .5).add(h.off);
+  mid.y = h.big ? Math.max(h.sag, Math.min(a.y, b.y) - .25) : Math.max(h.sag, Math.min(a.y, b.y) - .8 - .1 * d);
+  const p1 = a.clone(); p1.y -= h.big ? .1 : .25; p1.add(h.off);
+  const p3 = b.clone(); p3.y += .2; p3.add(h.off.clone().multiplyScalar(.5));
+  return new THREE.CatmullRomCurve3([a, p1, mid, p3, b], false, 'centripetal');
+}
+class Flow {
+  constructor(count = 14, r = .028) {
+    this.n = count; this.u = Math.random();
+    this.mesh = new THREE.InstancedMesh(new THREE.SphereGeometry(r, 10, 8), new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false }), count);
+    this.mesh.frustumCulled = false; this.mesh.visible = false; scene.add(this.mesh);
+  }
+  update(dt, curve, on, color, dir = 1, speed = .6) {
+    this.mesh.visible = !!(on && curve); if (!this.mesh.visible) return;
+    this.mesh.material.color.setHex(color);
+    const L = Math.max(curve.getLength(), .01);
+    this.u = (this.u + dir * dt * speed / L) % 1; if (this.u < 0) this.u += 1;
+    for (let i = 0; i < this.n; i++) {
+      const s = (i / this.n + this.u) % 1; curve.getPointAt(s, _v);
+      _m.makeTranslation(_v.x, _v.y, _v.z); this.mesh.setMatrixAt(i, _m);
+    }
+    this.mesh.instanceMatrix.needsUpdate = true;
+  }
+}
+
+/* ================= supply pipes main unit → cable carrier ================= */
+const pipes = {};
+function polyPath(pts) { const p = new THREE.CurvePath(); for (let i = 0; i < pts.length - 1; i++) p.add(new THREE.LineCurve3(pts[i], pts[i + 1])); return p; }
+function buildPipes() {
+  const routes = {
+    RH: { fill: [V3(-7.1, 1.83, 5.45), V3(-7.1, 4.2, 5.45), V3(-7.1, 4.2, 2.98), V3(2.4, 4.2, 2.98)],
+          top:  [V3(-6.95, 1.83, 5.45), V3(-6.95, 4.2, 5.45), V3(-6.95, 4.2, 3.04), V3(2.4, 4.2, 3.04)] },
+    LH: { fill: [V3(-6.8, 1.83, 5.45), V3(-6.8, 4.12, 5.45), V3(-6.8, 4.12, -2.98), V3(2.4, 4.12, -2.98)],
+          top:  [V3(-6.65, 1.83, 5.45), V3(-6.65, 4.04, 5.45), V3(-6.65, 4.04, -3.04), V3(2.4, 4.04, -3.04)] },
+  };
+  for (const sd of ['RH', 'LH']) {
+    pipes[sd] = {};
+    for (const k of ['fill', 'top']) {
+      const pts = routes[sd][k]; const curve = polyPath(pts);
+      for (let i = 0; i < pts.length - 1; i++) {
+        const a = pts[i], b = pts[i + 1], len = a.distanceTo(b);
+        const cyl = add(scene, C(.02, .02, len, M.stainless, 10), (a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2);
+        cyl.quaternion.setFromUnitVectors(V3(0, 1, 0), b.clone().sub(a).normalize());
+        info(cyl, 'pipe');
+      }
+      for (const p of pts.slice(1, -1)) add(scene, new THREE.Mesh(new THREE.SphereGeometry(.026, 10, 8), M.stainless), p.x, p.y, p.z);
+      pipes[sd][k] = { curve, flow: new Flow(Math.round(curve.getLength() / .35), .032) };
+    }
+  }
+}
+
+/* ================= cars ================= */
+const PALETTE = [0x121315, 0x121315, 0x121315, 0xf1f1ec, 0xc8ccd0, 0x5d6168];
+const cars = [];
+function buildCar() {
+  const g = new THREE.Group(); g.position.y = .06; scene.add(g); info(g, 'car');
+  const paint = new THREE.MeshPhysicalMaterial({ color: 0x121315, roughness: .28, metalness: .3, clearcoat: 1, clearcoatRoughness: .1 });
+  const shape = new THREE.Shape();
+  [[-.55, .48], [2.62, .48], [2.7, .62], [2.68, .95], [2.55, 1.04], [1.32, 1.06], [.72, 1.76], [-.42, 1.79], [-.55, 1.7]].forEach(([x, y], i) => i ? shape.lineTo(x, y) : shape.moveTo(x, y));
+  shape.closePath();
+  const bg = new THREE.ExtrudeGeometry(shape, { depth: 1.76, bevelEnabled: true, bevelThickness: .03, bevelSize: .03, bevelSegments: 2 }); bg.translate(0, 0, -.88);
+  add(g, new THREE.Mesh(bg, paint));
+  const gs = new THREE.Shape();
+  [[-.47, 1.13], [1.2, 1.13], [.71, 1.69], [-.38, 1.72]].forEach(([x, y], i) => i ? gs.lineTo(x, y) : gs.moveTo(x, y)); gs.closePath();
+  const gg = new THREE.ExtrudeGeometry(gs, { depth: 1.86, bevelEnabled: false }); gg.translate(0, 0, -.93);
+  add(g, new THREE.Mesh(gg, M.glass));
+  const ws = add(g, B(.86, .012, 1.56, M.glass), 1.03, 1.42, 0); ws.rotation.z = Math.atan2(.64, -.56);
+  add(g, B(.012, .42, 1.42, M.glass), -.575, 1.45, 0);
+  add(g, B(.08, .6, 1.87, paint), .42, 1.42, 0);
+  for (const z of [-.97, .97]) add(g, B(.12, .08, .04, M.black), 1.12, 1.22, z);
+  // wheel-arch flares
+  for (const x of [1.75, -1.65]) for (const z of [-.92, .92]) { const f = add(g, new THREE.Mesh(new THREE.TorusGeometry(.46, .05, 6, 20, Math.PI), M.black), x, .45, z); }
+  // bed
+  add(g, B(2.1, .34, 1.6, M.engine), -1.6, .65, 0);
+  add(g, B(2.1, .05, 1.66, paint), -1.6, .84, 0);
+  for (const z of [-.86, .86]) add(g, B(2.12, .64, .07, paint), -1.6, .8, z);
+  add(g, B(.07, .64, 1.79, paint), -2.66, .8, 0);
+  // nose
+  add(g, B(.04, .22, 1.0, M.black), 2.72, .8, 0);
+  add(g, B(.14, .13, 1.84, M.black), 2.72, .55, 0);
+  for (const z of [-.62, .62]) add(g, B(.06, .09, .34, M.headlight), 2.68, .93, z);
+  // engine bay (hood open)
+  add(g, B(1.18, .01, 1.62, M.bay), 1.93, 1.095, 0);
+  add(g, B(.62, .12, .86, M.engine), 2.02, 1.15, 0);
+  const res = {};
+  for (const sd of ['RH', 'LH']) {
+    const r = new THREE.Group(); r.position.set(RES_LX, 0, SIDES[sd] * RES_LZ); g.add(r); info(r, 'res');
+    add(r, B(.12, .02, .12, M.engine), 0, 1.1, 0);
+    add(r, C(.045, .045, .1, M.resBody), 0, 1.15, 0);
+    add(r, C(.04, .04, .025, M.black), 0, 1.2125, 0);
+    res[sd] = r;
+  }
+  const hp = new THREE.Group(); hp.position.set(1.32, 1.09, 0); g.add(hp);
+  add(hp, RB(1.3, .03, 1.7, .01, paint), .65, .015, 0);
+  hp.rotation.z = 1.0;
+  add(g, C(.006, .006, 1.14, M.steel), 2.225, 1.625, .7).rotation.z = .405;
+  for (const x of [1.75, -1.65]) for (const z of [-.8, .8]) {
+    const w = add(g, C(.39, .39, .26, M.rubber, 28), x, .39, z); w.rotation.x = Math.PI / 2;
+    const hub = add(g, C(.2, .2, .27, M.alu, 20), x, .39, z); hub.rotation.x = Math.PI / 2;
+  }
+  return { group: g, paint, res, k: null };
+}
+
+/* ================= build ================= */
+buildPlant();
+buildMainUnit();
+buildDrumStation();
+for (const sd of ['RH', 'LH']) { buildLSRail(sd); buildChain(sd); buildConsole(sd); }
+buildPipes();
+const NCARS = 6;
+for (let i = 0; i < NCARS; i++) cars.push(buildCar());
+tag(cars[0].group, __t('PICKUP บน CONVEYOR', 'PICKUP ON CONVEYOR'), __t('รถเข้าทุก 35 วินาที', 'A car arrives every 35 s'), V3(-.5, 2.1, 0));
+
+/* ================= simulation state ================= */
+// car k is filled by RH when k is even, by LH when k is odd; its machine cycle starts at T = k·TAKT
+const state = { playing: true, speed: 4, carMode: 'RHD', view: 'RH', fault: null, estop: false, leakArmed: { RH: false, LH: false }, labels: true };
+let T = .5;
+const carType = new Map(), cycles = new Map();
+const sideOf = k => (((k % 2) + 2) % 2 === 0 ? 'RH' : 'LH');
+const computeType = k => state.carMode === 'MIX' ? (hash(k * 9.17 + 2) < .3 ? 'LHD' : 'RHD') : state.carMode;
+function typeOf(k) { if (!carType.has(k)) carType.set(k, computeType(k)); return carType.get(k); }
+function machine(sd, TT = T) {        // current car index and in-cycle time of a machine
+  const m = Math.floor((TT - OFFS[sd]) / CYCLE);
+  return { k: 2 * m + (sd === 'LH' ? 1 : 0), t: TT - OFFS[sd] - m * CYCLE };
+}
+function cycle(k) {
+  if (!cycles.has(k)) {
+    const sd = sideOf(k);
+    cycles.set(k, { k, seed: k * 13.37 + 1, vt: 805 + hash(k * 7.3) * 40, vtop: 24 + hash(k * 3.1) * 10, leak: state.leakArmed[sd], ng: false, recorded: false });
+    state.leakArmed[sd] = false; updLeakNote();
+    for (const kk of [...cycles.keys()]) if (kk < k - 6) cycles.delete(kk);
+    for (const kk of [...carType.keys()]) if (kk < k - 8) carType.delete(kk);
+  }
+  return cycles.get(k);
+}
+const NOMINAL = { seed: -1, vt: 825, vtop: 29, leak: false, ng: false, nominal: true };
+function sig(cd, t) {
+  const nz = a => cd.nominal ? 0 : (hash(cd.seed + Math.floor(t * 3) * .731) - .5) * a;
+  let vac = 0, pr = 0, vol = 0;
+  const vT = cd.leak ? -55 : -98.2;
+  if (t >= 9 && t < 30) vac = vT * (1 - Math.exp(-(t - 9) / 2.6));
+  else if (t >= 30 && t < 57) vac = vT * (1 - Math.exp(-21 / 2.6)) * Math.exp(-(t - 30) / (cd.ng ? 2.5 : 1.4));
+  if (vac < -1) vac += nz(.8);
+  if (!cd.ng) {
+    if (t >= 30 && t < 52) pr = 330 * (1 - Math.exp(-(t - 30) / 2.2)) + 9 * Math.sin(t * 2.3) * clamp01(t - 31) + nz(6);
+    else if (t >= 52 && t < 57) pr = 140 * (1 - Math.exp(-(t - 52) / .7)) * (t > 56 ? 57 - t : 1) + nz(4);
+    if (t >= 30 && t < 52) vol = cd.vt * (1 - Math.exp(-(t - 30) / 6)) / (1 - Math.exp(-22 / 6));
+    else if (t >= 52 && t < 57) vol = cd.vt + cd.vtop * (t - 52) / 5;
+    else if (t >= 57) vol = cd.vt + cd.vtop;
+  }
+  return { vac, pr: Math.max(0, pr), vol };
+}
+const REF = { vac: [], pr: [], vol: [] };
+for (let i = 0; i <= CYCLE; i++) { const s = sig(NOMINAL, i); REF.vac.push(s.vac); REF.pr.push(s.pr); REF.vol.push(s.vol); }
+
+const results = [];
+
+/* ================= LIVE mode — ข้อมูลจริงจาก Dashboard (postMessage) =================
+   ใช้เมื่อเปิดผ่านหน้า /3d ของ Dashboard (iframe). stepnum จริง: 0 = รอ/สวมหัว, 1 = ดูดสุญญากาศ, 2 = เติม
+   ขั้นตอนในภาพ (t ในรอบ 70 วินาทีของโมเดล) แมปจาก stepnum + เวลาที่อยู่ใน step นั้นจริง; สัญญาณ/bn/ผล PASS-NG มาจาก API */
+const EMBEDDED = window.parent !== window;
+const VAC_CAP = 300;                                   // vacuumgun ค่าพุ่งเกินนี้แสดงเป็นเพดาน (เหมือน Dashboard)
+const LIVE = { on: false, userSim: false, lastMsgAt: 0, common: null, kpi: null, verdict: new Map(), rows: [], side: { RH: null, LH: null },
+  exp: { s0: 12, s1: 43, s2: 80, back: 12 } };         // เวลาโดยประมาณ (วินาที) ของ step 0 / 1 / 2 และช่วงกลับ — วัดจากข้อมูลจริง
+function liveNewSide(bn, pgnum, now) { return { bn, pgnum, step: null, stepAt: now, bnAt: now, afterAt: null, seen: { 1: false, 2: false }, samples: [], lastTs: 0, last: null, t: 0, target: 0 }; }
+function liveEnterStep(s, step, at) {
+  s.step = step; s.stepAt = at;
+  if (step === 1 || step === 2) s.seen[step] = true;
+  if (step === 0 && s.seen[2]) s.afterAt = at;
+}
+function liveFault(on) {
+  if (on && state.fault !== 'ALL') { state.fault = 'ALL'; showAlarm(__t('<b>MACHINE FAULT</b> · เครื่องแจ้ง fault (ข้อมูลจริง)', '<b>MACHINE FAULT</b> · the machine reports a fault (live data)')); }
+  else if (!on && state.fault === 'ALL') { state.fault = null; hideAlarm(); }
+}
+function liveFeed(msg) {
+  const now = performance.now();
+  LIVE.lastMsgAt = now;
+  if (!LIVE.userSim) setLive(true);
+  if (msg.common) { LIVE.common = msg.common; if (LIVE.on) { liveFault(!!msg.common.machine_fault); renderProd(); } }
+  const ts = Date.parse(msg.recorded_at);
+  for (const [key, sd] of [['lh', 'LH'], ['rh', 'RH']]) {
+    const m = msg[key]; if (!m) continue;
+    let s = LIVE.side[sd];
+    if (!s || s.bn !== m.bn) s = LIVE.side[sd] = liveNewSide(m.bn, m.pgnum, now);
+    s.pgnum = m.pgnum;
+    const step = Number.isFinite(m.stepnum) ? m.stepnum : null;
+    if (step !== s.step) liveEnterStep(s, step, now);
+    s.last = { vac: Math.min(m.vacuumgun, VAC_CAP), pr: m.filling_pressure, vol: m.filling_volume };
+    if (!(ts <= s.lastTs)) {                            // ข้ามข้อความซ้ำ (recorded_at เดิม)
+      if (ts) s.lastTs = ts;
+      s.samples.push({ el: (now - s.bnAt) / 1000, step, ...s.last });
+      if (s.samples.length > 400) s.samples.shift();
+    }
+  }
+}
+function liveHistory(d) {                               // ค่ารายวินาทีของ bn นี้ตั้งแต่เริ่ม → รู้ว่าแต่ละ step เริ่มเมื่อไหร่ แม้เปิดหน้ากลาง cycle
+  const s = LIVE.side[d.side]; if (!s || s.bn !== d.bn || !d.samples.length) return;
+  const now = performance.now(), arr = d.samples, t0 = arr[0].ts, tN = arr[arr.length - 1].ts;
+  const loc = ts => now - (tN - ts);                    // เวลาของ server → นาฬิกาเครื่องนี้ (อิงแถวล่าสุดของ bn)
+  s.bnAt = loc(t0);
+  s.samples = arr.map(r => ({ el: (r.ts - t0) / 1000, step: r.step, vac: Math.min(r.vac, VAC_CAP), pr: r.pr, vol: r.vol }));
+  s.lastTs = Math.max(s.lastTs, tN);
+  s.seen = { 1: false, 2: false }; s.afterAt = null;
+  let prev = 'x';
+  for (const r of arr) if (r.step !== prev) { liveEnterStep(s, r.step, loc(r.ts)); prev = r.step; }
+}
+let liveStepAt = performance.now();
+function liveStep() {                                   // แมป stepnum จริง → เวลา t ในรอบของโมเดล (ทุกเฟรม)
+  const now = performance.now(), E = LIVE.exp;
+  const dt = Math.min((now - liveStepAt) / 1000, 2); liveStepAt = now;   // ใช้เวลาจริง (ไม่ผูกกับ fps)
+  for (const sd of ['RH', 'LH']) {
+    const s = LIVE.side[sd]; if (!s) continue;
+    const el = (now - s.stepAt) / 1000;
+    let target;
+    if (s.step === 1) target = 9 + 21 * Math.min(el / E.s1, .985);                      // ดูดสุญญากาศ
+    else if (s.step === 2) target = 30 + 27 * Math.min(el / E.s2, .985);                // เติม + top-off
+    else if (s.seen[2]) target = 57 + 12.9 * Math.min((now - (s.afterAt ?? s.stepAt)) / 1000 / E.back, 1);   // เสร็จ → ปลด → กลับ
+    else target = el > E.s0 * 2.5 ? 1 : 9 * Math.min(el / E.s0, .97);                  // รอ → สวมหัว
+    s.target = target;
+    s.t = target < s.t - 1 ? target : Math.min(target, s.t + 12 * dt);                  // รถคันใหม่ = snap; เดินหน้า = ไม่เกิน 12 วิ/วิ
+  }
+  // นาฬิกาสายพาน T: ล็อกให้เครื่องอ้างอิง (ด้านที่กำลังดูอยู่) ตรงกับเฟสจริง → รถทุกคันเรียงห่างเท่ากัน (35 วิ) เสมอ ไม่มีวันทับกัน
+  // อีกเครื่องใช้ตำแหน่งตามแนวสายพาน (เหลื่อม 35 วิ) ส่วนไฟ/ค่า/ภาพอธิบายยังเป็นเฟสจริงของมัน
+  const ref = liveRef();
+  if (ref) {
+    const base = OFFS[ref], m = Math.round((T - base - LIVE.side[ref].t) / CYCLE), target = base + m * CYCLE + LIVE.side[ref].t;
+    T += Math.max(-12 * dt, Math.min(12 * dt, target - T));                             // ไหลเข้าหาเป้า ไม่กระโดด (เปลี่ยนด้านที่ดู/รถคันใหม่)
+  } else T += dt;
+}
+function liveRef() {
+  const v = state.view;
+  return LIVE.side[v] ? v : LIVE.side.RH ? 'RH' : LIVE.side.LH ? 'LH' : null;
+}
+function liveMachine(sd) {
+  const s = LIVE.side[sd];
+  return { k: (s ? s.bn : 0) * 2 + (sd === 'LH' ? 1 : 0), t: s ? s.t : 0, bn: s ? s.bn : null, pgnum: s ? s.pgnum : null,
+    step: s ? s.step : null, el: s ? (performance.now() - s.bnAt) / 1000 : 0, last: s ? s.last : null, samples: s ? s.samples : [] };
+}
+function renderLiveResults() {
+  const rows = LIVE.rows;
+  $('results').innerHTML = rows.length
+    ? `<table><tr><th>bn</th><th>${__t('เครื่อง', 'Machine')}</th><th>pg</th><th>Vol Δ%</th><th>${__t('ผล', 'Result')}</th></tr>${rows.map(r =>
+        `<tr><td>#${r.bn}</td><td>${r.side}</td><td>${r.pgnum}</td><td>${r.volPct.toFixed(1)}%</td><td class="${r.ok ? 'ok' : 'ng'}">${r.ok ? 'PASS' : 'NG'}</td></tr>`).join('')}</table>`
+    : `<div class="empty">${__t('ยังไม่มีผลตรวจ', 'No results yet')}</div>`;
+}
+function renderProd() {                                 // แผงข้อมูลการผลิต: สถานะเครื่อง + สรุปผลตรวจวันนี้ (ข้อมูลจริง)
+  if (!LIVE.on) return;
+  const c = LIVE.common, k = LIVE.kpi;
+  const dot = (cls, label) => `<span><i class="${cls}"></i>${label}</span>`;
+  $('prodStatus').innerHTML = c
+    ? dot(c.continue ? 'on' : '', 'continue') + dot(c.master_on ? 'on' : '', 'Master on') + dot(c.machine_fault ? 'bad' : '', __t('เครื่อง fault', 'machine fault'))
+    : `<span class="small">${__t('รอสถานะเครื่อง…', 'waiting for machine status…')}</span>`;
+  if (!k) { $('prodKpi').innerHTML = `<div class="pk wide"><small>${__t('กำลังโหลดสรุปการผลิต…', 'Loading production summary…')}</small></div>`; return; }
+  const pct = k.carsYesterday > 0 ? (k.carsToday - k.carsYesterday) / k.carsYesterday * 100 : 0, L = k.latest;
+  $('prodKpi').innerHTML =
+    `<div class="pk"><small>${__t('ผลตรวจวันนี้', 'Results today')}</small><b>${k.carsToday}</b> <span class="d ${pct >= 0 ? 'good' : 'crit'}">${pct >= 0 ? '▲' : '▼'} ${Math.abs(pct).toFixed(0)}%</span></div>` +
+    `<div class="pk"><small>Pass rate</small><b>${k.passRate.toFixed(1)}%</b></div>` +
+    `<div class="pk"><small>NG ${__t('วันนี้', 'today')}</small><b>${k.ngToday}</b></div>` +
+    `<div class="pk"><small>${__t('ผลล่าสุด', 'Latest')}</small><b>${L ? L.verdict : '—'}</b> <span class="d ${L && L.verdict === 'NG' ? 'crit' : ''}">${L ? `${L.side} · bn ${L.bn}` : ''}</span></div>`;
+}
+function advance(dts) {
+  let Tn = T + dts;
+  for (const sd of ['RH', 'LH']) {
+    const { k, t: t0 } = machine(sd), cd = cycle(k), t1 = t0 + (Tn - T);
+    if (cd.leak && !cd.ng && t0 < 30 && t1 >= 30) {
+      Tn = Math.min(Tn, T + (30 - t0)); state.fault = sd; cd.ng = true;
+      showAlarm(__t(`<b>VACUUM NG · ${sd}</b> · สุญญากาศไม่ถึงเกณฑ์ (≈ −55 kPa จากปกติ ≈ −98 kPa) สายการผลิตหยุดรอ — กด <b>Reset</b> เพื่อ unclamp และปล่อยรถคันนี้ผ่านเป็น NG`, `<b>VACUUM NG · ${sd}</b> · vacuum below spec (≈ −55 kPa vs. normal ≈ −98 kPa), line stopped — press <b>Reset</b> to unclamp and release this car as NG`));
+    }
+  }
+  for (const sd of ['RH', 'LH']) {
+    const { k, t: t0 } = machine(sd), cd = cycle(k), t1 = t0 + (Tn - T);
+    if (t0 < 57 && t1 >= 57 && !cd.recorded) {
+      cd.recorded = true;
+      results.unshift({ n: k + 1, side: sd, type: typeOf(k), vol: cd.ng ? null : cd.vt + cd.vtop, ok: !cd.ng });
+      if (results.length > 8) results.length = 8;
+      renderResults();
+    }
+  }
+  T = Tn;
+}
+
+/* ================= camera presets ================= */
+let tween = null, camMode = 'overview', followX = null, followSide = null;
+const FOLLOW = new Set(['follow', 'overhead', 'pad']);
+function preset(name, side) {
+  const s = SIDES[side] || 1, cx = consoles[side || 'RH'].group.position.x;
+  switch (name) {
+    case 'follow': return [V3(cx - 1.25, 2.45, s * .2), V3(cx - .05, 1.7, s * 1.75)];
+    case 'overhead': return [V3(cx + 1.5, 2.7, s * .25), V3(cx, 3.6, s * 1.95)];
+    case 'pad': return [V3(cx + 2.3, 1.1, s * .2), V3(cx + 1.0, .45, s * 1.3)];
+    case 'ls': return [V3(-1.0, 2.75, .7), V3(-2.7, 3.3, 2.45)];
+    case 'main': return [V3(-4.1, 2.7, 2.2), V3(-7.8, 1.1, 5.4)];
+    case 'drum': return [V3(-8.3, 2.3, 3.2), V3(-10.9, 1.0, 5.8)];
+    case 'side': return [V3(2.5, 3.2, -11), V3(2, 1.5, 0)];
+    default: return [V3(10.5, 7, 12.5), V3(0, 1.6, 1.2)];
+  }
+}
+function goCam(name) {
+  if (name === 'walk') { enterWalk(); return; }
+  if (walk.on) exitWalk();
+  camMode = name; const side = state.view;
+  const [p, t] = preset(name, side);
+  tween = { fp: camera.position.clone(), ft: controls.target.clone(), tp: p, tt: t, k: 0 };
+  followX = consoles[side].group.position.x; followSide = side;
+  document.querySelectorAll('#cams button').forEach(b => b.classList.toggle('on', b.dataset.cam === name));
+}
+controls.addEventListener('start', () => { tween = null; });
+
+/* ================= HUD ================= */
+const $ = id => document.getElementById(id);
+const cards = {};
+for (const sd of ['RH', 'LH']) {
+  const el = document.createElement('div'); el.className = 'mc' + (sd === state.view ? ' sel' : '');
+  el.innerHTML = `<div class="row"><span class="chip ${sd === 'LH' ? 'lh' : ''}">${sd}</span><span class="mono small car"></span><span class="mono small"><b class="tt">0.0</b><span class="ttu"> / 70 s</span></span></div>
+    <div class="phase">—</div>
+    <div class="row small"><span class="mono en"></span><span class="mono">stepnum <b class="st">0</b></span></div>
+    <div class="timeline">${PH.map(p => `<i style="width:${(p.t1 - p.t0) / CYCLE * 100}%;background:${p.c}"></i>`).join('')}<div class="cur"></div></div>`;
+  el.onclick = () => setView(sd);
+  $('mcards').appendChild(el);
+  cards[sd] = { el, car: el.querySelector('.car'), tt: el.querySelector('.tt'), ttu: el.querySelector('.ttu'), ph: el.querySelector('.phase'), en: el.querySelector('.en'), st: el.querySelector('.st'), cur: el.querySelector('.cur') };
+}
+function setView(sd) {
+  state.view = sd;
+  for (const k of ['RH', 'LH']) cards[k].el.classList.toggle('sel', k === sd);
+  document.querySelectorAll('#segView button, #segProc button').forEach(x => x.classList.toggle('on', x.dataset.v === sd));
+  $('viewTag').textContent = sd; $('leakSide').textContent = sd;
+  if (FOLLOW.has(camMode)) goCam(camMode);
+  updLeakNote();
+}
+function showAlarm(html) { const a = $('alarm'); a.innerHTML = html; a.classList.remove('hidden'); }
+function hideAlarm() { $('alarm').classList.add('hidden'); }
+function renderResults() {
+  if (LIVE.on) return renderLiveResults();
+  if (!results.length) return;
+  $('results').innerHTML = `<table><tr><th>${__t('คัน','Car')}</th><th>${__t('เครื่อง','Machine')}</th><th>${__t('รถ','Type')}</th><th>Volume</th><th>${__t('ผล','Result')}</th></tr>${results.map(r =>
+    `<tr><td>#${r.n}</td><td>${r.side}</td><td>${r.type}</td><td>${r.vol == null ? '—' : r.vol.toFixed(0) + ' mL'}</td><td class="${r.ok ? 'ok' : 'ng'}">${r.ok ? 'OK' : 'NG · vacuum'}</td></tr>`).join('')}</table>`;
+}
+function updLeakNote() {
+  const el = $('leakNote'); if (!el) return;
+  const a = ['RH', 'LH'].filter(sd => state.leakArmed[sd]);
+  el.textContent = a.length ? __t(`ตั้งค่าแล้ว: vacuum จะรั่วในคันถัดไปของเครื่อง ${a.join(', ')}`, `Armed: vacuum will leak on the next car of machine ${a.join(', ')}`) : '';
+}
+const charts = [
+  { cv: $('cVac'), key: 'vac', min: -105, max: 8, col: '#3ecf6e' },
+  { cv: $('cPr'), key: 'pr', min: 0, max: 380, col: '#ff4b3e' },
+  { cv: $('cVol'), key: 'vol', min: 0, max: 920, col: '#4ea3ff' },
+];
+function sizeCharts() { const dpr = Math.min(devicePixelRatio, 2); for (const c of charts) { c.cv.width = Math.max(10, c.cv.clientWidth * dpr); c.cv.height = 104 * dpr; c.dpr = dpr; } }
+sizeCharts();
+const PRES_REFS = [250, 300];                            // เส้นประอ้างอิงของกราฟ filling pressure (ตรงกับ Dashboard)
+function drawRefLines(g, c, Y, x0, x1, d, lo, hi) {
+  if (c.key !== 'pr') return;
+  g.save(); g.setLineDash([5 * d, 4 * d]); g.lineWidth = 1.3 * d; g.strokeStyle = '#f2b632'; g.fillStyle = '#f2b632';
+  g.font = `600 ${8.5 * d}px ${MONO}`; g.textAlign = 'right'; g.textBaseline = 'bottom';
+  for (const v of PRES_REFS) {
+    if (v < lo || v > hi) continue;                       // นอกช่วงของกราฟ = ไม่วาด (ไม่ซูม/ไม่ขยายแกนเพื่อเส้นนี้)
+    const y = Y(v); g.beginPath(); g.moveTo(x0, y); g.lineTo(x1, y); g.stroke(); g.fillText(v, x1 - 2 * d, y - 1.5 * d); }
+  g.restore();
+}
+function drawCharts(cd, t) {
+  for (const c of charts) {
+    const g = c.cv.getContext('2d'), W = c.cv.width, H = c.cv.height, d = c.dpr, pad = 3 * d;
+    g.clearRect(0, 0, W, H);
+    const X = i => pad + i / CYCLE * (W - 2 * pad), Y = v => H - pad - (v - c.min) / (c.max - c.min) * (H - 2 * pad);
+    g.strokeStyle = 'rgba(255,255,255,.06)'; g.lineWidth = d;
+    for (const p of PH) { g.beginPath(); g.moveTo(X(p.t0), 0); g.lineTo(X(p.t0), H); g.stroke(); }
+    g.beginPath(); g.moveTo(0, Y(0)); g.lineTo(W, Y(0)); g.stroke();
+    drawRefLines(g, c, Y, 0, W, d, c.min, c.max);
+    g.setLineDash([3 * d, 3 * d]); g.strokeStyle = 'rgba(230,236,240,.38)'; g.lineWidth = 1.2 * d; g.beginPath();
+    REF[c.key].forEach((v, i) => i ? g.lineTo(X(i), Y(v)) : g.moveTo(X(i), Y(v))); g.stroke(); g.setLineDash([]);
+    g.strokeStyle = c.col; g.lineWidth = 1.8 * d; g.beginPath();
+    const last = Math.floor(t);
+    for (let i = 0; i <= last; i++) { const v = sig(cd, i)[c.key]; i ? g.lineTo(X(i), Y(v)) : g.moveTo(X(i), Y(v)); }
+    g.lineTo(X(t), Y(sig(cd, t)[c.key])); g.stroke();
+    g.fillStyle = c.col; g.beginPath(); g.arc(X(t), Y(sig(cd, t)[c.key]), 2.6 * d, 0, 7); g.fill();
+  }
+}
+
+const LMINSPAN = { vac: 20, pr: 40, vol: 100 };       // ช่วงแกน Y ขั้นต่ำ (กันสัญญาณรบกวนเล็กน้อยถูกขยายเกินจริง)
+function drawChartsLive(lm) {                             // กราฟค่าจริงของ bn ปัจจุบัน: แกน X = วินาทีนับจากเริ่มรถคันนี้, แกน Y ปรับตามช่วงข้อมูลจริง
+  const smp = lm.samples, maxEl = Math.max(150, (smp.length ? smp[smp.length - 1].el : 0) * 1.05);
+  for (const c of charts) {
+    const g = c.cv.getContext('2d'), W = c.cv.width, H = c.cv.height, d = c.dpr, padL = 30 * d, padR = 4 * d, padT = 7 * d, padB = 4 * d;
+    g.clearRect(0, 0, W, H);
+    // แกน Y ปรับตามข้อมูลจริง โดยตัดค่าพุ่ง/ตกสุดโต่ง (5%–95%) ออกจากการคำนวณช่วง → เห็นความต่างของช่วงปกติชัดขึ้น
+    // ค่านอกช่วงยังถูกวาด (ชิดขอบบน/ล่าง) และตัวเลขบนแกนบอกช่วงที่แสดงอยู่
+    const vals = smp.map(p => p[c.key]).filter(Number.isFinite).sort((a, b) => a - b);
+    const q = f => vals[Math.min(vals.length - 1, Math.max(0, Math.round(f * (vals.length - 1))))];
+    let lo = vals.length ? q(.05) : 0, hi = vals.length ? q(.95) : LMINSPAN[c.key];
+    const span = Math.max(hi - lo, LMINSPAN[c.key]), mid = (hi + lo) / 2;
+    lo = mid - span * .58; hi = mid + span * .58;         // เว้นขอบบน-ล่างเล็กน้อย
+    const X = e => padL + e / maxEl * (W - padL - padR), Y = v => H - padB - (Math.min(Math.max(v, lo), hi) - lo) / (hi - lo) * (H - padT - padB);
+    g.font = `500 ${9 * d}px ${MONO}`; g.textBaseline = 'middle'; g.textAlign = 'right';
+    for (const f of [0, .5, 1]) {                         // เส้นกริด + ตัวเลขแกน Y (ล่าง / กลาง / บน)
+      const v = lo + (hi - lo) * f, y = Y(v);
+      g.strokeStyle = 'rgba(255,255,255,.08)'; g.lineWidth = d; g.beginPath(); g.moveTo(padL, y); g.lineTo(W - padR, y); g.stroke();
+      g.fillStyle = 'rgba(200,210,218,.75)'; g.fillText(Math.round(v), padL - 4 * d, Math.min(Math.max(y, padT + 4 * d), H - padB - 4 * d));
+    }
+    drawRefLines(g, c, Y, padL, W - padR, d, lo, hi);
+    g.strokeStyle = 'rgba(255,255,255,.13)'; g.lineWidth = d;
+    let prev = 'x';
+    for (const p of smp) if (p.step !== prev) { g.beginPath(); g.moveTo(X(p.el), padT); g.lineTo(X(p.el), H - padB); g.stroke(); prev = p.step; }   // เส้นแบ่งตามการเปลี่ยน step
+    if (!smp.length) continue;
+    g.strokeStyle = c.col; g.lineWidth = 2 * d; g.lineJoin = 'round'; g.beginPath();
+    smp.forEach((p, i) => { const x = X(p.el), y = Y(p[c.key]); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke();
+    const l = smp[smp.length - 1]; g.fillStyle = c.col; g.beginPath(); g.arc(X(l.el), Y(l[c.key]), 3 * d, 0, 7); g.fill();
+  }
+}
+
+/* ================= visitor graphic: what happens inside the reservoir ================= */
+const procEl = $('proc'), pcv = $('pcv'), PW = 238, PHh = 196, FL = '#e0b43a', AIRC = '170,205,225';
+const PMAIN = [[66, 126], [66, 150], [226, 150]], PWH = [104, 144, 184, 224], PML = 184;
+const pSteps = [...document.querySelectorAll('#psteps span')];
+let procT = 0, pN = 0;
+function sizeProc() { const d = Math.min(devicePixelRatio, 2); pcv.width = PW * d; pcv.height = PHh * d; pcv._d = d; }
+sizeProc();
+function polyTo(g, pts, len) {
+  g.beginPath(); g.moveTo(pts[0][0], pts[0][1]); let acc = 0;
+  for (let i = 1; i < pts.length; i++) {
+    const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], L = Math.hypot(x1 - x0, y1 - y0);
+    if (acc + L >= len) { const f = (len - acc) / L; g.lineTo(x0 + (x1 - x0) * f, y0 + (y1 - y0) * f); return; }
+    g.lineTo(x1, y1); acc += L;
+  }
+}
+function rrect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+function resShape(g) {   // reservoir body + filler neck
+  g.beginPath(); g.moveTo(58, 44); g.lineTo(58, 52); g.lineTo(38, 52); g.arcTo(30, 52, 30, 60, 8); g.lineTo(30, 104); g.arcTo(30, 112, 38, 112, 8);
+  g.lineTo(94, 112); g.arcTo(102, 112, 102, 104, 8); g.lineTo(102, 60); g.arcTo(102, 52, 94, 52, 8); g.lineTo(74, 52); g.lineTo(74, 44); g.closePath();
+}
+function procModel(v) {
+  const { t, cd, ph, s } = v;
+  const vacMax = t >= 9 ? Math.max(0, -sig(cd, Math.min(t, 29.99)).vac) : 0;
+  const air = 1 - clamp01(vacMax / 98.2);           // share of air still inside the brake system
+  const vf = s.vol / cd.vt;
+  let lp = 0, lvl = 0;                               // lp: how far the fluid has reached along the lines, lvl: reservoir level (target = .833)
+  if (!cd.ng && t >= 30) {
+    lp = clamp01(vf / .85);
+    if (ph.key === 'filling') lvl = .6 * clamp01((vf - .8) / .2);
+    else if (ph.key === 'topoff') lvl = .6 + .233 * clamp01((t - 52) / 5);
+    else lvl = .833;
+  }
+  let f = 0; if (t >= 4 && t < 7) f = ease((t - 4) / 3); else if (t >= 7 && t < 58) f = 1; else if (t >= 58 && t < 60) f = 1 - ease((t - 58) / 2);
+  return { air, lp, lvl, f };
+}
+function drawProc(v) {
+  if (procEl.classList.contains('hidden')) return;
+  const g = pcv.getContext('2d'), d = pcv._d; g.setTransform(d, 0, 0, d, 0, 0); g.clearRect(0, 0, PW, PHh);
+  const { t, cd, ph, s } = v, ng = cd.ng, { air, lp, lvl, f } = procModel(v), T2 = procT;
+  const vacOn = ph.key === 'vacuum' && !state.estop, fillOn = (ph.key === 'filling' || ph.key === 'topoff') && !ng && !state.estop;
+  const branch = x => [[x, 150], [x, 170]];
+  g.lineCap = 'round'; g.lineJoin = 'round'; g.textBaseline = 'middle';
+  // brake lines to the 4 wheels
+  g.strokeStyle = '#2a3138'; g.lineWidth = 8;
+  polyTo(g, PMAIN, 1e9); g.stroke();
+  for (const x of PWH) { polyTo(g, branch(x), 1e9); g.stroke(); }
+  for (const x of PWH) { g.fillStyle = '#59626b'; rrect(g, x - 7, 168, 14, 14, 3); g.fill(); g.fillStyle = '#8f969d'; g.fillRect(x - 1.5, 170, 3, 10); }
+  if (air > .02) { g.strokeStyle = `rgba(${AIRC},${.65 * air})`; g.lineWidth = 4; polyTo(g, PMAIN, 1e9); g.stroke(); for (const x of PWH) { polyTo(g, branch(x), 1e9); g.stroke(); } }
+  const S = lp * 206, bf = PWH.map(x => clamp01((S - (24 + x - 66)) / 20));
+  g.strokeStyle = FL; g.lineWidth = 4;
+  if (S > 0) { polyTo(g, PMAIN, Math.min(S, PML)); g.stroke(); }
+  PWH.forEach((x, i) => { if (bf[i] > 0) { polyTo(g, branch(x), 20 * bf[i]); g.stroke(); } });
+  g.lineWidth = 2; g.setLineDash([3, 7]);
+  if (vacOn && air > .02) {         // air pulled back from the wheels towards the reservoir
+    g.strokeStyle = `rgba(62,207,110,${.45 + .55 * air})`;
+    g.lineDashOffset = T2 * 26; polyTo(g, PMAIN, 1e9); g.stroke();
+    g.lineDashOffset = -T2 * 26; for (const x of PWH) { polyTo(g, [[x, 170], [x, 150]], 1e9); g.stroke(); }
+  }
+  if (fillOn && S > 0 && lp < 1) {   // fluid running out to the wheels
+    g.strokeStyle = 'rgba(255,245,200,.85)'; g.lineDashOffset = -T2 * 36;
+    polyTo(g, PMAIN, Math.min(S, PML)); g.stroke();
+    PWH.forEach((x, i) => { if (bf[i] > 0) { polyTo(g, branch(x), 20 * bf[i]); g.stroke(); } });
+  }
+  g.setLineDash([]);
+  // master cylinder
+  g.fillStyle = '#3d434a'; rrect(g, 40, 112, 52, 15, 3); g.fill();
+  g.fillStyle = '#c9d2d8'; g.font = `500 8.5px ${SANS}`; g.textAlign = 'center'; g.fillText(__t('แม่ปั๊มเบรก', 'Master cyl.'), 66, 120);
+  // reservoir contents
+  g.save(); resShape(g); g.clip();
+  g.fillStyle = 'rgba(255,255,255,.05)'; g.fillRect(28, 40, 76, 74);
+  if (air > .02 && lvl === 0) { g.fillStyle = `rgba(${AIRC},${.32 * air})`; g.fillRect(28, 40, 76, 74); }
+  if (lvl > 0) {
+    const y0 = 112 - lvl * 60, gr = g.createLinearGradient(0, y0, 0, 112);
+    gr.addColorStop(0, '#f0c955'); gr.addColorStop(1, '#b8871c'); g.fillStyle = gr;
+    g.beginPath(); g.moveTo(28, 114);
+    for (let x = 28; x <= 104; x += 4) g.lineTo(x, y0 + (fillOn ? Math.sin(x * .25 + T2 * 6) * 1.4 : 0));
+    g.lineTo(104, 114); g.closePath(); g.fill();
+  }
+  if (vacOn && air > .03) {          // bubbles of air being drawn out through the gun
+    const n = 3 + Math.round(6 * air);
+    g.lineWidth = 1.2; g.strokeStyle = `rgba(220,240,250,${.2 + .8 * air})`;
+    for (let i = 0; i < n; i++) {
+      const u = (T2 * .55 + i / n) % 1, y = 110 - u * 70, x = 66 + Math.sin(i * 2.1 + u * 6) * (u < .8 ? 26 * (1 - u) : 4);
+      g.beginPath(); g.arc(x, y, 2 + (i % 3), 0, 7); g.stroke();
+    }
+  }
+  if (fillOn) {                       // stream from the gun into the reservoir
+    const y1 = lvl > 0 ? 112 - lvl * 60 : 112;
+    g.fillStyle = FL; g.fillRect(64, 44, 4, y1 - 44);
+    g.fillStyle = 'rgba(255,245,200,.8)'; for (let y = 44 + ((T2 * 60) % 10); y < y1 - 3; y += 10) g.fillRect(64.5, y, 3, 4);
+  }
+  g.restore();
+  g.strokeStyle = 'rgba(230,236,240,.85)'; g.lineWidth = 1.5; resShape(g); g.stroke();
+  g.lineWidth = 1; g.strokeStyle = 'rgba(230,236,240,.6)'; g.textAlign = 'left'; g.font = `600 8.5px ${MONO}`; g.fillStyle = '#b9c4cc';
+  // brake gun on the filler neck
+  const gy = 4 + 18 * f;
+  g.strokeStyle = '#23408f'; g.lineWidth = 6; g.beginPath(); g.moveTo(66, -2); g.lineTo(66, gy + 2); g.stroke();
+  g.strokeStyle = '#3cc251'; g.lineWidth = 4; g.beginPath(); g.moveTo(76, gy + 6); g.lineTo(88, gy - 4); g.stroke();
+  g.fillStyle = '#c8cdd2'; rrect(g, 54, gy, 24, 16, 3); g.fill();
+  g.fillStyle = '#111214'; rrect(g, 58, gy + 15, 16, 7, 2); g.fill();
+  if (t >= 7 && t < 57) { g.fillStyle = '#f0bf2a'; g.fillRect(55, gy + 6, 3, 5); g.fillRect(74, gy + 6, 3, 5); }
+  g.font = `600 10px ${SANS}`;
+  const lbl = state.estop ? null : ng && t >= 30 ? [__t('✕ ไม่เติม (NG)', '✕ No fill (NG)'), '#ff8278'] : vacOn ? [__t('↑ ดูดอากาศออก', '↑ Air out'), '#3ecf6e'] : ph.key === 'filling' ? [__t('↓ น้ำมันเข้า', '↓ Fluid in'), FL] : ph.key === 'topoff' ? [__t('↓ เติมเพิ่ม', '↓ Top off'), '#4ea3ff'] : null;
+  if (lbl) { g.fillStyle = lbl[1]; g.fillText(lbl[0], 92, 10); }
+  g.fillStyle = '#8f9ca6'; g.font = `500 8.5px ${SANS}`; g.fillText(__t('ท่อเบรก →', 'Brake line →'), 74, 141);
+  // pressure gauge
+  const cx = 182, cy = 66, r = 34, gv = s.vac < -1 ? s.vac : s.pr;
+  const ang = x => (135 + 270 * clamp01((x + 100) / 600)) * Math.PI / 180;
+  g.fillStyle = 'rgba(255,255,255,.06)'; g.beginPath(); g.arc(cx, cy, r + 4, 0, 7); g.fill();
+  g.lineCap = 'butt'; g.lineWidth = 5; g.strokeStyle = 'rgba(255,255,255,.14)'; g.beginPath(); g.arc(cx, cy, r, ang(-100), ang(500)); g.stroke();
+  g.strokeStyle = '#3ecf6e'; g.beginPath(); g.arc(cx, cy, r, ang(-100), ang(-80)); g.stroke();
+  g.fillStyle = '#8f9ca6'; g.font = `500 8px ${MONO}`; g.textAlign = 'center';
+  g.fillText('0', cx - r + 11, cy); g.fillText('-100', cx - 26, cy + 34); g.fillText('+500', cx + 26, cy + 34);
+  pN += (gv - pN) * .2; const na = ang(pN);
+  g.lineCap = 'round'; g.strokeStyle = '#ff4b3e'; g.lineWidth = 2; g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + Math.cos(na) * (r - 5), cy + Math.sin(na) * (r - 5)); g.stroke();
+  g.fillStyle = '#e7ecef'; g.beginPath(); g.arc(cx, cy, 3, 0, 7); g.fill();
+  g.font = `600 12px ${MONO}`; g.fillText(`${gv > 0 ? '+' : ''}${gv.toFixed(Math.abs(gv) < 100 ? 1 : 0)}`, cx, cy + 15);
+  g.fillStyle = '#8f9ca6'; g.font = `500 8px ${MONO}`; g.fillText('kPa', cx, cy + 25);
+  g.font = `500 9.5px ${SANS}`; g.fillText(__t('แรงดันในระบบเบรก', 'Brake system pressure'), cx, 111);
+  let badge;
+  if (state.estop) badge = ['E-STOP', '#b3261e'];
+  else if (ng && t >= 30) badge = [__t('✕ NG · สุญญากาศไม่ถึง', '✕ NG · low vacuum'), '#b3261e'];
+  else if (ph.key === 'vacuum') badge = air < .04 ? [__t('✓ เป็นสุญญากาศแล้ว', '✓ Vacuum reached'), '#23864a'] : [__t('กำลังดูดอากาศ…', 'Evacuating…'), '#2b5d3c'];
+  else if (ph.key === 'filling') badge = [__t('กำลังเติมน้ำมัน…', 'Filling…'), '#8a6512'];
+  else if (ph.key === 'topoff') badge = [__t('ปรับถึงระดับที่กำหนด', 'Level reached'), '#2457a0'];
+  else if (t >= 57) badge = [__t(`✓ เติมครบ ${(cd.vt + cd.vtop).toFixed(0)} mL`, `✓ Filled ${(cd.vt + cd.vtop).toFixed(0)} mL`), '#23864a'];
+  else if (ph.key === 'clamp') badge = [__t('สวมหัวเติม', 'Gun clamping'), '#6b5a1e'];
+  else badge = [__t('รอรถคันถัดไป', 'Waiting for next car'), '#3a444c'];
+  g.fillStyle = badge[1]; rrect(g, 126, 120, 110, 18, 9); g.fill();
+  g.fillStyle = '#fff'; g.font = `600 9.5px ${SANS}`; g.fillText(badge[0], 181, 129.5);
+  // legend
+  g.textAlign = 'left'; g.font = `500 9px ${SANS}`;
+  g.fillStyle = `rgba(${AIRC},.8)`; g.fillRect(2, 188, 10, 5); g.fillStyle = '#b9c4cc'; g.fillText(__t('อากาศ', 'Air'), 15, 191);
+  g.fillStyle = FL; g.fillRect(48, 188, 10, 5); g.fillStyle = '#b9c4cc'; g.fillText(__t('น้ำมันเบรก', 'Brake fluid'), 61, 191);
+  g.textAlign = 'center'; g.fillText(__t('ไปยังเบรกทั้ง 4 ล้อ', 'To all 4 wheel brakes'), 164, 191);
+}
+const PTXT = {
+  wait: __t('รอรถคันถัดไปเข้าสถานี ระบบเบรกของรถใหม่ยังว่าง ข้างในมีแต่อากาศ', 'Waiting for the next car to enter the station. The new car\'s brake system is empty — only air inside.'),
+  clamp: __t('สวมหัวเติมลงบนปากกระปุก แล้วล็อกด้วยลมให้แน่น อากาศจะได้ไม่รั่วเข้า', 'The filling gun is placed on the reservoir neck and air-locked tight so no air leaks in.'),
+  vacuum: __t('ดูดอากาศออกจากกระปุก แม่ปั๊ม และท่อเบรกทั้ง 4 ล้อ จนเกือบเป็นสุญญากาศ ถ้ามีอากาศค้างในท่อ เบรกจะนิ่มและหยุดรถได้ไม่ดี', 'Air is pulled out of the reservoir, master cylinder and all 4 brake lines until it is almost a vacuum. Air left in the lines makes the brakes spongy and stops the car poorly.'),
+  filling: __t('ปล่อยน้ำมันเบรกเข้าไป สุญญากาศจะดึงน้ำมันให้ไหลเต็มทุกท่อจนถึงล้อ โดยไม่มีฟองอากาศค้าง', 'Brake fluid is released; the vacuum draws it through every line to the wheels with no trapped air bubbles.'),
+  topoff: __t('เติมเพิ่มอีกเล็กน้อย ให้ระดับน้ำมันในกระปุกขึ้นถึงระดับที่กำหนด', 'A little more fluid is added so the level in the reservoir reaches the target.'),
+  complete: __t('ปลดหัวเติมออก รถคันนี้เติมน้ำมันเบรกเสร็จแล้ว', 'The gun is released. This car\'s brake fluid fill is complete.'),
+  return: __t('เครื่องเติมวิ่งกลับไปรอรถคันถัดไป', 'The filler carriage runs back to wait for the next car.'),
+  ng: __t('ดูดสุญญากาศไม่ถึงเกณฑ์ แปลว่ามีจุดรั่ว เครื่องจึงไม่เติมน้ำมันและหยุดแจ้งเตือน รถคันนี้ต้องแยกไปตรวจ', 'Vacuum did not reach spec, meaning there is a leak. The machine skips filling and raises an alarm. This car must be set aside for inspection.'),
+  estop: __t('กดปุ่มหยุดฉุกเฉินอยู่ ทุกอย่างหยุดทำงาน', 'The emergency stop is pressed. Everything is stopped.'),
+};
+const PIDX = { wait: -1, clamp: 0, vacuum: 1, filling: 2, topoff: 3, complete: 4, return: 4 };
+function updProcText(v) {
+  if (procEl.classList.contains('hidden')) return;
+  const { k, t, cd, ph, s, lm } = v, bad = cd.ng && t >= 30, idx = PIDX[ph.key];
+  const rv = lm && lm.last ? lm.last : null;   // live: ค่าจริงล่าสุด
+  $('pCar').textContent = lm ? __t(`เครื่อง ${state.view} · bn ${lm.bn ?? '—'} · ข้อมูลจริง`, `Machine ${state.view} · bn ${lm.bn ?? '—'} · live data`) : __t(`เครื่อง ${state.view} · คัน #${k + 1} · ${typeOf(k)} · ค่าจำลอง`, `Machine ${state.view} · car #${k + 1} · ${typeOf(k)} · simulated`);
+  pSteps.forEach((el, i) => {
+    const on = !bad && i === idx, done = !bad ? i < idx : i < 1;
+    el.classList.toggle('on', on); el.classList.toggle('done', done); el.classList.toggle('bad', bad && i === 1);
+    el.style.setProperty('--pc', on ? ph.c : '');
+  });
+  $('pVac').textContent = rv ? rv.vac.toFixed(0) : (s.vac < -1 ? s.vac : 0).toFixed(1);
+  $('pVol').textContent = (rv ? rv.vol : s.vol).toFixed(0);
+  $('pBar').style.width = (100 * clamp01((rv ? rv.vol : s.vol) / (cd.vt + cd.vtop))).toFixed(1) + '%';
+  $('pTxt').textContent = state.estop ? PTXT.estop : bad ? PTXT.ng : PTXT[ph.key];
+}
+$('btnProc').onclick = () => { const hide = !procEl.classList.toggle('hidden'); $('btnProc').classList.toggle('on', hide); };
+
+/* controls */
+$('btnPlay').onclick = () => { state.playing = !state.playing; $('btnPlay').textContent = state.playing ? __t('❚❚ หยุดชั่วคราว', '❚❚ Pause') : __t('▶ เล่นต่อ', '▶ Resume'); $('btnPlay').classList.toggle('on', state.playing); };
+document.querySelectorAll('#segSpeed button').forEach(b => b.onclick = () => { state.speed = +b.dataset.v; document.querySelectorAll('#segSpeed button').forEach(x => x.classList.toggle('on', x === b)); });
+document.querySelectorAll('#segView button, #segProc button').forEach(b => b.onclick = () => setView(b.dataset.v));
+document.querySelectorAll('#segCar button').forEach(b => b.onclick = () => {
+  state.carMode = b.dataset.v; document.querySelectorAll('#segCar button').forEach(x => x.classList.toggle('on', x === b));
+  // only re-type cars whose gun has not been applied yet
+  for (const k of [...carType.keys()]) if (T - k * TAKT < 3.5) carType.set(k, computeType(k));
+});
+$('btnLeak').onclick = () => {
+  const sd = state.view, { k, t } = machine(sd), cd = cycle(k);
+  if (t < 29 && !cd.ng) { cd.leak = true; $('leakNote').textContent = __t(`vacuum รั่วในคัน #${k + 1} ของเครื่อง ${sd} — ดูกราฟ Vacuum เทียบเส้นปกติ`, `Vacuum leak on car #${k + 1} of machine ${sd} — compare the Vacuum chart with the normal line`); }
+  else { state.leakArmed[sd] = true; updLeakNote(); }
+};
+$('btnStop').onclick = () => { state.estop = true; showAlarm(__t('<b>E-STOP</b> · สายการผลิตและเครื่องเติมทั้ง LH/RH หยุด — กด <b>Reset</b> เพื่อเดินต่อ', '<b>E-STOP</b> · the line and both LH/RH fillers are stopped — press <b>Reset</b> to resume')); };
+$('btnReset').onclick = () => { state.fault = null; state.estop = false; hideAlarm(); updLeakNote(); };
+$('btnLabels').onclick = () => { state.labels = !state.labels; $('btnLabels').classList.toggle('on', state.labels); labelRenderer.domElement.style.display = state.labels ? '' : 'none'; };
+document.querySelectorAll('#cams button').forEach(b => b.onclick = () => goCam(b.dataset.cam));
+$('btnPillars').onclick = () => { structure.visible = !structure.visible; $('btnPillars').classList.toggle('on', structure.visible); };
+function toggleHud() { const off = document.body.classList.toggle('hudoff'); $('btnHud').classList.toggle('on', !off); }
+$('btnHud').onclick = toggleHud;
+addEventListener('keydown', e => { if (!walk.on && e.code === 'KeyH' && e.target === document.body) toggleHud(); });
+$('panelToggle').onclick = () => { $('panel').classList.toggle('collapsed'); sizeCharts(); };
+addEventListener('keydown', e => { if (e.code === 'Space' && e.target === document.body && !walk.on) { e.preventDefault(); $('btnPlay').click(); } });
+
+/* picking */
+const INFO = {
+  main: ['MAIN UNIT · BRAKE EVACUATION & FILLING EQUIPMENT', __t('ตู้ไฮดรอลิก (ป้าย A) มีหน้าต่างกระจกมองเห็นปั๊ม ถัง และเกจ ด้านบนมี hood กับท่อ exhaust ขึ้นเพดาน ต่อกับตู้ควบคุม (ป้าย B) ที่มีจอ HMI Direct circuit monitor, แผงไฟสถานะ, ปุ่ม Start/Stop, E-stop ES1 และไฟหมุนสีแดงด้านบน (ในโมเดลไฟหมุนกะพริบตอน Fault / E-stop) ท่อ FILL และ TOP OFF ขึ้นจากตู้ไปยัง cable carrier ของทั้งสองฝั่ง', 'Hydraulic cabinet (label A) with a glass window showing the pump, tank and gauges; a hood and exhaust duct rise to the ceiling. It connects to the control cabinet (label B) with the HMI Direct circuit monitor, status lamp panel, Start/Stop buttons, E-stop ES1 and a red beacon on top (the beacon flashes on Fault / E-stop in the model). The FILL and TOP OFF hoses run from the cabinet up to the cable carriers on both sides.')],
+  drum: ['BRAKE FLUID DRUM', __t('ถังน้ำมันเบรกและคลัตช์ 210 ลิตร ตั้งบนรถเข็นในคอกราว มีท่อดูดสแตนเลสต่อสายสีดำ ไต่ขึ้นเสาผ่าน sight glass แล้วเข้า Main unit มีป้าย "ถังใช้งาน" และถังสำรองวางข้างกัน ใกล้ ๆ มีตู้ไฟ PDP-F13 และรางสายไฟโค้งขึ้นเพดาน', 'A 210-litre brake & clutch fluid drum on a trolley in a railed pen. A stainless suction pipe with a black hose climbs the column past a sight glass into the Main unit. The "In-use drum" tag and a spare drum sit side by side; nearby are the PDP-F13 electrical cabinet and a cable tray curving up to the ceiling.')],
+  chain: ['CABLE CARRIER (DRAG CHAIN)', __t('พาท่อ FILL / TOP OFF, ลม และสายสัญญาณ จากกล่องคงที่ไปยัง carriage ที่วิ่งไปมา ส่วนโค้งของโซ่จะเลื่อนตามตำแหน่ง carriage', 'Carries the FILL / TOP OFF hoses, air and signal cables from the fixed box to the moving carriage. The chain\'s bend slides along with the carriage position.')],
+  rail: ['OVERHEAD CARRIAGE RAIL', __t('รางคู่ด้านบนพร้อมสายพานฟัน และมอเตอร์ขับที่ปลายราง carriage วิ่งบนรางนี้และแบก VP2 frame กับ console ที่ห้อยลงมา ช่วงเติมเครื่องเดินตามรถ (ในโมเดลประมาณ 10 ม.) แล้วมอเตอร์ดึงกลับจุดเริ่มด้วยความเร็วสูง', 'A twin overhead rail with a toothed belt and a drive motor at the end. The carriage runs on this rail carrying the VP2 frame and the console hanging below. During filling the machine follows the car (about 10 m in the model), then the motor pulls it back to the start at high speed.')],
+  overhead: ['CONSOLE UNIT · VP2 / FCM', __t('โครงอะลูมิเนียมบน carriage มีปั๊มสุญญากาศ VP2, vacuum tank, FCM พร้อมหลอดดูระดับ และวาล์ว เคลื่อนที่ไปพร้อม console ระดับน้ำมันในหลอดลดลงตอน Filling', 'An aluminium frame on the carriage holding the VP2 vacuum pump, vacuum tank, FCM with level tubes, and valves, moving together with the console. The fluid level in the tube drops during Filling.')],
+  console: ['HANGING CONSOLE', __t('LH และ RH ทำงานพร้อมกันแต่สลับกันคนละคัน: รถคันคู่เติมด้วย RH คันคี่เติมด้วย LH แต่ละเครื่องใช้รอบประมาณ 70 วินาที ทำให้มีรถเข้าสถานีทุก 35 วินาที ตัว console ห้อยจาก carriage ลอยจากพื้นประมาณ 15 ซม. ด้านหน้ามี JB10R, JB6, แถบพอร์ต, ป้าย E-stop, ทาวเวอร์ไลท์, วาล์ว gun clamp และที่แขวนหัวเติม', 'LH and RH work at the same time but alternate cars: even cars are filled by RH, odd cars by LH. Each machine cycles in about 70 seconds, so a car enters the station every 35 seconds. The console hangs from the carriage about 15 cm above the floor. On its front are JB10R, JB6, the port strip, the E-stop label, the tower light, the gun clamp valve and the gun holder.')],
+  towers: ['SIGNAL TOWER', __t('ทาวเวอร์ 3 สี (ขาว/เขียว/แดง) บอกสถานะเครื่อง และทาวเวอร์ A/B 5 ชั้น: Vacuum · Filling · Top off · Comp (เขียว) · Fault (แดง) — ในโมเดลให้ A กับ B แสดงขั้นตอนเหมือนกัน เพราะยังไม่ได้ยืนยันว่า A/B ใช้ต่างกันอย่างไร', 'A 3-colour tower (white/green/red) shows machine status, plus 5-tier A/B towers: Vacuum · Filling · Top off · Comp (green) · Fault (red). In the model A and B show the same steps, since how A and B differ has not been confirmed.')],
+  jb: ['JUNCTION BOX / TRANS BOX', __t('JB10R, JB6 และ TRANS BOX Type2 (มีปุ่ม IG) รวมสายสัญญาณ I/O ของ console', 'JB10R, JB6 and TRANS BOX Type2 (with an IG button) gather the console\'s I/O signal cables.')],
+  ports: ['PORT STRIP', __t('แถบพอร์ตลม/ไฮดรอลิก (P) (UC) (S) (D) (FA) (VA) (PA) พร้อมเกจด้านบน ตามป้ายบนเครื่องจริง ส่วนความหมายของแต่ละตัวอักษรยังไม่ได้ยืนยัน', 'A strip of air/hydraulic ports (P) (UC) (S) (D) (FA) (VA) (PA) with a gauge on top, as labelled on the real machine. The meaning of each letter has not been confirmed.')],
+  valves: ['SOLENOID VALVE · GUN CLAMP', __t('Y4CB = Gun clamp, Y4CC = Gun unclamp — LED สีส้มติดเมื่อวาล์วทำงาน', 'Y4CB = Gun clamp, Y4CC = Gun unclamp — the orange LED lights when the valve is active.')],
+  valvebank: ['SOLENOID VALVE BANK Y720–Y727', __t('ชุดวาล์ว 8 ตัวด้านข้าง console พร้อม filter canister และท่อ corrugated สีเหลือง ในโมเดล LED ติดตามขั้นตอน (เป็นการแสดงผลเชิงภาพ ไม่ได้ map ตาม I/O จริง)', 'A bank of 8 valves beside the console with a filter canister and yellow corrugated hose. In the model the LEDs follow the process steps (visual only, not mapped to real I/O).')],
+  oppanel: ['OPERATOR PANEL', __t('แผงปุ่มกดสำหรับ operator แบ่งเป็นส่วน BRAKE กับ A/C 134a (สถานีนี้มีงานเติมน้ำยาแอร์ร่วมด้วย) มีปุ่ม Brake Filling Cycle Start และไฟ PAIRING OK ซึ่งในโมเดลให้ติดช่วงที่หัวเติมสวมกับรถอยู่', 'The operator\'s push-button panel, split into BRAKE and A/C 134a sections (this station also charges A/C refrigerant). It has the Brake Filling Cycle Start button and the PAIRING OK lamp, which lights in the model while the gun is clamped on the car.')],
+  pad: ['INSERTION PAD (บอลสกรู + แผ่นยาง)', __t('แผ่นยางดำบนบอลสกรูคู่ด้านล่าง console ในโมเดลตีความว่าช่วงรอรถจะเลื่อนเข้าไปรออยู่หน้าล้อหน้า พอล้อมาชนแผ่นนี้ console ก็ถูกพาไปพร้อมรถ (X4A4 Synchronize insertion) แล้วถอยออกก่อนวิ่งกลับ — เป็นการตีความจากรูป ยังไม่ได้ยืนยันกับเครื่องจริง', 'A black rubber pad on twin ball screws below the console. The model interprets that while waiting it slides in front of the front wheel; when the wheel hits the pad the console is carried along with the car (X4A4 Synchronize insertion), then it retracts before returning — an interpretation from photos, not confirmed on the real machine.')],
+  gauge: ['PRESSURE GAUGE', __t('เกจแบบ compound −0.1 ถึง 0.5 MPa เข็มแสดงค่าสุญญากาศตอน Vacuum และแรงดันตอน Filling (ค่าจำลอง)', 'A compound gauge from −0.1 to 0.5 MPa. The needle shows vacuum during Vacuum and pressure during Filling (simulated values).')],
+  gun: ['BRAKE GUN', __t('หัวเติมสวมปากกระปุกน้ำมันเบรก แล้ว clamp ด้วยลม สายที่ต่อเข้าหัวหุ้มปลอกสีน้ำเงิน/เขียวอมฟ้า และปลอกเงิน ห้อยลงถึงพื้น ตาม drawing มีสาย Vacuum G · Filling R · Top-off BL · Clamp B · Un-clamp Y · Air W', 'The filling gun fits onto the brake fluid reservoir neck and is clamped with air. The hoses to the gun are sleeved in blue/teal and silver and hang down to the floor. Per the drawing the lines are Vacuum G · Filling R · Top-off BL · Clamp B · Un-clamp Y · Air W.')],
+  ls: ['LIMIT SWITCH RAIL · F3-20', __t('X4A3 LS = Return over-run (กันวิ่งเลย ปกติไม่ควรโดน), X4A4 LS = Synchronize insertion, X4A5 LS = High-speed ไฟเขียวที่สวิตช์ติดเมื่อแขน dog สีเหลืองด้านหลัง carriage ชน', 'X4A3 LS = Return over-run (prevents overtravel; normally never hit), X4A4 LS = Synchronize insertion, X4A5 LS = High-speed. The green light on a switch comes on when the yellow dog arm at the back of the carriage hits it.')],
+  car: [__t('รถบน CONVEYOR', 'CAR ON CONVEYOR'), __t('กระบะเปิดฝากระโปรงหน้า วิ่งต่อเนื่องบน slat conveyor รถเข้าทุก 35 วินาที (ระยะห่างประมาณ 6.3 ม. ที่ 0.18 ม./วินาที ในโมเดล) คันคู่เติมด้วยเครื่อง RH คันคี่เติมด้วยเครื่อง LH', 'Pickups with the hood open run continuously on the slat conveyor. A car arrives every 35 seconds (about 6.3 m apart at 0.18 m/s in the model). Even cars are filled by the RH machine, odd cars by the LH machine.')],
+  res: [__t('กระปุกน้ำมันเบรก (master cylinder reservoir)', 'BRAKE FLUID RESERVOIR (master cylinder reservoir)'), __t('จุดที่หัวเติมสวม: รถพวงมาลัยขวา (RHD) อยู่ฝั่งขวา รถพวงมาลัยซ้าย (LHD) อยู่ฝั่งซ้าย เลือกได้ที่ "ประเภทรถ" ทั้งสองเครื่องเติมรถได้ทั้งสองแบบ (ตามใบ Operation ที่มีรูป RHD และ LHD) ถ้ากระปุกอยู่ฝั่งตรงข้าม operator ต้องลากหัวเติมข้ามห้องเครื่อง', 'Where the gun fits: right-hand-drive cars (RHD) have it on the right, left-hand-drive (LHD) on the left; choose under "Car type". Both machines can fill either type (per the Operation sheet showing RHD and LHD). If the reservoir is on the opposite side, the operator must drag the gun across the engine bay.')],
+  conv: ['SLAT CONVEYOR', __t('สายพานพื้นพารถเคลื่อนที่ต่อเนื่อง ทางเดินสีน้ำเงินมีแถบเหลืองดำและเลขตำแหน่งอยู่ใต้แนวที่ console วิ่ง', 'A floor conveyor carrying cars continuously. The blue walkway with yellow-black stripes and position numbers lies under the line the console runs along.')],
+  pipe: [__t('ท่อ FILL / TOP OFF', 'FILL / TOP OFF PIPE'), __t('ท่อจาก Main unit ขึ้นเพดานไปยังกล่องต้นทางของ cable carrier แต่ละฝั่ง จุดสีแดงวิ่งตอน Filling สีฟ้าตอน Top-off', 'Pipes from the Main unit rise to the ceiling and run to each side\'s cable carrier start box. Red dots run during Filling, blue during Top-off.')],
+};
+const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let downXY = null;
+function pickAt(nx, ny, far = Infinity) {
+  ptr.set(nx, ny); ray.setFromCamera(ptr, camera); ray.far = far;
+  const hits = ray.intersectObjects(pickables, true); ray.far = Infinity;
+  for (const h of hits) {
+    let o = h.object; while (o && !o.userData.info) o = o.parent;
+    if (o && INFO[o.userData.info]) return o.userData.info;
+  }
+  return null;
+}
+function showInfo(key) {
+  if (!key) { $('info').classList.add('hidden'); return; }
+  const [t, d] = INFO[key]; $('infoT').textContent = t; $('infoD').textContent = d; $('info').classList.remove('hidden');
+}
+renderer.domElement.addEventListener('pointerdown', e => { downXY = [e.clientX, e.clientY]; });
+renderer.domElement.addEventListener('pointerup', e => {
+  if (!downXY || Math.hypot(e.clientX - downXY[0], e.clientY - downXY[1]) > 5) return;
+  if (walk.on) {
+    if (walk.locked) showInfo(pickAt(0, 0, 6));
+    else if (e.pointerType === 'mouse') lockPointer();
+    else showInfo(pickAt(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1, 6));
+    return;
+  }
+  showInfo(pickAt(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1));
+});
+$('infoX').onclick = () => $('info').classList.add('hidden');
+
+/* ================= walk mode (first person, like a game) ================= */
+const EYE = 1.62, CROUCH_EYE = .95, RAD = .28;
+const walk = { on: false, yaw: 0, pitch: 0, pos: V3(0, 0, 0), vy: 0, eye: EYE, crouch: false, keys: new Set(), locked: false,
+  joy: null, look: null, bobT: 0, bobA: 0, acc: 1, labelsWas: false, touch: matchMedia('(pointer: coarse)').matches };
+const _eul = new THREE.Euler(0, 0, 0, 'YXZ');
+const SBOX = [];
+const sbox = (x, z, w, d) => SBOX.push([x - w / 2, z - d / 2, x + w / 2, z + d / 2]);
+const PBOX = [];   // pillars — only solid while the structure is shown
+for (const x of [-12, -6, 0, 6, 12]) for (const s of [1, -1]) PBOX.push([x - .18, s * 3.4 - .18, x + .18, s * 3.4 + .18]);
+PBOX.push([-12.41, 6.19, -11.59, 7.01]);
+sbox(-8.3, 5.6, 2.05, 1.25); sbox(-6.8, 5.6, 1.05, 1.25);                                   // main unit A / B
+sbox(-10.7, 5.5, 1.45, 1.45); sbox(-10.0, 6.55, .62, .62); sbox(-11.45, 6.15, .14, .14);   // drum station
+function dynBoxes() {
+  const out = [];
+  for (const c of cars) { const x = c.group.position.x; out.push([x - 2.72, -.98, x + 2.8, .98]); }
+  for (const sd of ['RH', 'LH']) {
+    const s = SIDES[sd], con = consoles[sd], x = con.group.position.x, z = s * RAIL_Z;
+    out.push([x - .7, z - .46, x + .72, z + .46]);
+    const pz = s * (RAIL_Z + con.arm.position.z - .2);
+    out.push([x + .45, pz - .3, x + PAD_LX + .05, pz + .3]);
+  }
+  return out;
+}
+function pushOut(p, b) {
+  const qx = Math.max(b[0], Math.min(p.x, b[2])), qz = Math.max(b[1], Math.min(p.z, b[3]));
+  const dx = p.x - qx, dz = p.z - qz, d2 = dx * dx + dz * dz;
+  if (d2 >= RAD * RAD) return;
+  if (d2 > 1e-9) { const d = Math.sqrt(d2), k = (RAD - d) / d; p.x += dx * k; p.z += dz * k; return; }
+  const m = [p.x - b[0], b[2] - p.x, p.z - b[1], b[3] - p.z], i = m.indexOf(Math.min(...m));
+  if (i === 0) p.x = b[0] - RAD; else if (i === 1) p.x = b[2] + RAD; else if (i === 2) p.z = b[1] - RAD; else p.z = b[3] + RAD;
+}
+const clampPitch = () => { walk.pitch = Math.max(-1.45, Math.min(1.45, walk.pitch)); };
+function jump() { if (walk.pos.y <= .07 && !walk.crouch) walk.vy = 3.6; }
+function setCrouch(v) { walk.crouch = v; $('tCrouch').classList.toggle('on', v); }
+function lockPointer() {
+  const el = renderer.domElement;
+  try { const r = el.requestPointerLock(); if (r && r.catch) r.catch(() => {}); } catch (e) {}
+}
+document.addEventListener('pointerlockchange', () => { walk.locked = document.pointerLockElement === renderer.domElement; updWalkHelp(); });
+function updWalkHelp() {
+  $('walkHelp').innerHTML = walk.touch
+    ? __t('จอยซ้าย = เดิน (ดันสุด = วิ่ง) · ลากจอ = หันมอง · แตะชิ้นส่วนหรือกด ⓘ = ดูข้อมูล · ยืนบนสายพานจะถูกพาไปกับรถ',
+        'Left stick = walk (push fully = run) · drag screen = look · tap a part or press ⓘ = info · standing on the conveyor carries you with the car')
+    : (walk.locked ? '' : __t('<span class="go">คลิกที่ฉากเพื่อจับเมาส์</span> (หรือลากเมาส์เพื่อหันมอง) · ', '<span class="go">Click the scene to capture the mouse</span> (or drag to look) · ')) +
+      __t('<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> เดิน · <kbd>Shift</kbd> วิ่ง · <kbd>Space</kbd> กระโดด · <kbd>C</kbd> ย่อตัว · <kbd>F</kbd>/คลิก ดูข้อมูลชิ้นที่เล็ง · <kbd>P</kbd> หยุดเวลา · <kbd>H</kbd> ซ่อนแผง · <kbd>Esc</kbd> ', '<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> walk · <kbd>Shift</kbd> run · <kbd>Space</kbd> jump · <kbd>C</kbd> crouch · <kbd>F</kbd>/click = info on the aimed part · <kbd>P</kbd> pause · <kbd>H</kbd> hide panels · <kbd>Esc</kbd> ') + (walk.locked ? __t('ปล่อยเมาส์', 'release mouse') : __t('ออกจากโหมดเดิน', 'exit walk mode'));
+}
+const WALK_UI = ['xhair', 'minimap', 'walkHelp'];
+function enterWalk() {
+  if (walk.on) return;
+  walk.on = true; camMode = 'walk'; tween = null; controls.enabled = false;
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  walk.pos.set(-4.6, 0, 2.95); walk.vy = 0; walk.eye = EYE; setCrouch(false);
+  walk.yaw = Math.atan2(-.93, .37); walk.pitch = -.08;
+  camera.fov = 70; camera.updateProjectionMatrix();
+  walk.labelsWas = state.labels; if (state.labels) $('btnLabels').click();
+  document.body.classList.add('walking');
+  for (const id of WALK_UI) $(id).classList.remove('hidden');
+  if (walk.touch) { $('joy').classList.remove('hidden'); $('tbtns').classList.remove('hidden'); }
+  if (innerWidth <= 820) $('panel').classList.add('collapsed');
+  document.querySelectorAll('#cams button').forEach(b => b.classList.toggle('on', b.dataset.cam === 'walk'));
+  updWalkHelp();
+  if (!walk.touch) lockPointer();
+}
+function exitWalk() {
+  if (!walk.on) return;
+  walk.on = false; walk.keys.clear(); walk.joy = null; walk.look = null;
+  if (document.pointerLockElement) { try { document.exitPointerLock(); } catch (e) {} }
+  camera.fov = 42; camera.updateProjectionMatrix();
+  const fwd = V3(0, 0, -1).applyQuaternion(camera.quaternion);
+  controls.target.copy(camera.position).addScaledVector(fwd, 3);
+  controls.enabled = true;
+  document.body.classList.remove('walking');
+  for (const id of [...WALK_UI, 'prompt', 'joy', 'tbtns']) $(id).classList.add('hidden');
+  if (walk.labelsWas && !state.labels) $('btnLabels').click();
+}
+// mouse look (pointer lock) + drag-to-look fallback / touch look
+document.addEventListener('mousemove', e => {
+  if (!walk.on || !walk.locked) return;
+  walk.yaw -= e.movementX * .0022; walk.pitch -= e.movementY * .0022; clampPitch();
+});
+renderer.domElement.addEventListener('pointerdown', e => { if (walk.on && !walk.locked) walk.look = { id: e.pointerId, x: e.clientX, y: e.clientY }; });
+addEventListener('pointermove', e => {
+  const L = walk.look; if (!walk.on || !L || L.id !== e.pointerId) return;
+  const k = e.pointerType === 'touch' ? .006 : .005;
+  walk.yaw -= (e.clientX - L.x) * k; walk.pitch -= (e.clientY - L.y) * k; clampPitch();
+  L.x = e.clientX; L.y = e.clientY;
+});
+const endLook = e => { if (walk.look && walk.look.id === e.pointerId) walk.look = null; };
+addEventListener('pointerup', endLook); addEventListener('pointercancel', endLook);
+// on-screen joystick + buttons (touch)
+const joy = $('joy'), knob = joy.querySelector('i'); let joyId = null;
+function joyMove(e) {
+  const r = joy.getBoundingClientRect(), R = r.width / 2;
+  let x = (e.clientX - r.left - R) / R, y = (e.clientY - r.top - R) / R; const l = Math.hypot(x, y); if (l > 1) { x /= l; y /= l; }
+  walk.joy = { x, y }; knob.style.transform = `translate(${x * R * .6}px, ${y * R * .6}px)`;
+}
+joy.addEventListener('pointerdown', e => { joyId = e.pointerId; try { joy.setPointerCapture(e.pointerId); } catch (_) {} joyMove(e); e.preventDefault(); });
+joy.addEventListener('pointermove', e => { if (e.pointerId === joyId) joyMove(e); });
+const joyEnd = e => { if (e.pointerId !== joyId) return; joyId = null; walk.joy = null; knob.style.transform = ''; };
+joy.addEventListener('pointerup', joyEnd); joy.addEventListener('pointercancel', joyEnd);
+$('tJump').onclick = jump; $('tCrouch').onclick = () => setCrouch(!walk.crouch); $('tInfo').onclick = () => showInfo(pickAt(0, 0, 6));
+// keyboard
+const WALK_KEYS = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ShiftLeft', 'ShiftRight', 'Space', 'KeyC', 'KeyF', 'KeyH', 'KeyP', 'Escape']);
+addEventListener('keydown', e => {
+  if (!walk.on) return;
+  if (WALK_KEYS.has(e.code)) e.preventDefault();
+  walk.keys.add(e.code);
+  if (e.repeat) return;
+  if (e.code === 'Space') jump();
+  else if (e.code === 'KeyC') setCrouch(!walk.crouch);
+  else if (e.code === 'KeyF') showInfo(pickAt(0, 0, 6));
+  else if (e.code === 'KeyH') toggleHud();
+  else if (e.code === 'KeyP') $('btnPlay').click();
+  else if (e.code === 'Escape' && !walk.locked) goCam('overview');
+});
+addEventListener('keyup', e => { walk.keys.delete(e.code); if (walk.on && WALK_KEYS.has(e.code)) e.preventDefault(); });
+addEventListener('blur', () => walk.keys.clear());
+
+function updWalk(dt, halted) {
+  const k = walk.keys, p = walk.pos;
+  let fx = 0, fz = 0;
+  if (k.has('KeyW') || k.has('ArrowUp')) fz += 1;
+  if (k.has('KeyS') || k.has('ArrowDown')) fz -= 1;
+  if (k.has('KeyA') || k.has('ArrowLeft')) fx -= 1;
+  if (k.has('KeyD') || k.has('ArrowRight')) fx += 1;
+  if (walk.joy) { fx += walk.joy.x; fz -= walk.joy.y; }
+  const len = Math.hypot(fx, fz); if (len > 1) { fx /= len; fz /= len; }
+  const run = k.has('ShiftLeft') || k.has('ShiftRight') || (walk.joy && Math.hypot(walk.joy.x, walk.joy.y) > .95);
+  const sp = walk.crouch ? 1.0 : run ? 4.2 : 2.0;
+  const sy = Math.sin(walk.yaw), cy = Math.cos(walk.yaw);
+  p.x += (-sy * fz + cy * fx) * sp * dt;
+  p.z += (-cy * fz - sy * fx) * sp * dt;
+  const onConv = Math.abs(p.z) < 1.15;
+  if (onConv && !halted && p.y < .2) p.x += V * state.speed * dt;     // the slat conveyor carries you
+  const boxes = SBOX.concat(structure.visible ? PBOX : [], dynBoxes());
+  for (let it = 0; it < 2; it++) for (const b of boxes) pushOut(p, b);
+  p.x = Math.max(-21, Math.min(21, p.x)); p.z = Math.max(-9, Math.min(9, p.z));
+  const ground = onConv ? .06 : 0;
+  walk.vy -= 9.8 * dt; p.y += walk.vy * dt;
+  const grounded = p.y <= ground; if (grounded) { p.y = ground; walk.vy = 0; }
+  walk.eye += ((walk.crouch ? CROUCH_EYE : EYE) - walk.eye) * Math.min(1, dt * 10);
+  const moving = len > .05 && grounded;
+  if (moving) walk.bobT += dt * sp * 3.4;
+  walk.bobA += ((moving ? .012 * Math.min(sp, 3) : 0) - walk.bobA) * Math.min(1, dt * 8);
+  camera.position.set(p.x, p.y + walk.eye + Math.sin(walk.bobT) * walk.bobA, p.z);
+  _eul.set(walk.pitch, walk.yaw, 0); camera.quaternion.setFromEuler(_eul);
+  walk.acc += dt;
+  if (walk.acc > .12) {
+    walk.acc = 0;
+    const key = pickAt(0, 0, 5);
+    $('xhair').classList.toggle('hot', !!key);
+    const pr = $('prompt');
+    if (key) { pr.innerHTML = `<b>${walk.touch ? 'ⓘ' : 'F'}</b>${INFO[key][0]}`; pr.classList.remove('hidden'); } else pr.classList.add('hidden');
+    drawMinimap();
+  }
+}
+function drawMinimap() {
+  const cv = $('mmc'), dpr = Math.min(devicePixelRatio, 2), W = 208, H = 120, S = 7.4;
+  if (cv.width !== W * dpr) { cv.width = W * dpr; cv.height = H * dpr; }
+  const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+  const X = x => W / 2 + (x + 1) * S, Y = z => H / 2 + z * S;
+  const rect = (b, c) => { g.fillStyle = c; g.fillRect(X(b[0]), Y(b[1]), (b[2] - b[0]) * S, (b[3] - b[1]) * S); };
+  rect([-22, -1.15, 22, 1.15], 'rgba(255,255,255,.10)');
+  for (const s of [1, -1]) rect([-4.2, s * RAIL_Z - .62, 9.4, s * RAIL_Z + .62], 'rgba(60,120,190,.45)');
+  for (const z of [-4.15, 4.15]) rect([-22, z - .05, 22, z + .05], 'rgba(240,191,42,.7)');
+  for (const b of SBOX) rect(b, 'rgba(230,226,207,.75)');
+  if (structure.visible) for (const b of PBOX) rect(b, 'rgba(255,255,255,.9)');
+  for (const c of cars) { const x = c.group.position.x; rect([x - 2.7, -.9, x + 2.78, .9], 'rgba(185,196,204,.85)'); }
+  for (const sd of ['RH', 'LH']) {
+    const s = SIDES[sd], x = consoles[sd].group.position.x;
+    rect([x - .65, s * RAIL_Z - .42, x + .68, s * RAIL_Z + .42], sd === 'RH' ? '#f2b632' : '#6fd3c7');
+    g.fillStyle = '#e7ecef'; g.font = `600 8px ${MONO}`; g.textAlign = 'center'; g.fillText(sd, X(x), Y(s * (RAIL_Z + 1.05)) + 3);
+  }
+  g.fillStyle = '#c8d0d6'; g.font = `600 8px ${MONO}`; g.textAlign = 'center'; g.fillText('MAIN', X(-7.6), Y(5.6) + 3);
+  const p = walk.pos, fwx = -Math.sin(walk.yaw), fwz = -Math.cos(walk.yaw);
+  g.save(); g.translate(X(p.x), Y(p.z)); g.rotate(Math.atan2(fwz, fwx));
+  g.fillStyle = '#ff4b3e'; g.strokeStyle = '#fff'; g.lineWidth = 1.2;
+  g.beginPath(); g.moveTo(7, 0); g.lineTo(-4.5, 4.5); g.lineTo(-2, 0); g.lineTo(-4.5, -4.5); g.closePath(); g.fill(); g.stroke();
+  g.restore();
+}
+
+/* ---- live wiring: โหมด + รับข้อความจาก Dashboard ---- */
+const SIG_SIM = $('sigHead').textContent, NOTE_SIM = $('noteTxt').textContent, EMPTY_RESULTS = $('results').innerHTML;
+const SIG_LIVE = __t('สัญญาณจริงจากเครื่อง · vacuumgun เป็นค่าดิบ', 'Live signals from the machine · vacuumgun is a raw value');
+const NOTE_LIVE = __t('v3.2 · โหมดข้อมูลจริง · ขั้นตอน (stepnum) และสัญญาณมาจากเครื่องจริง ส่วนเวลาภายในแต่ละขั้นและท่าทางของชิ้นส่วนเป็นค่าประมาณ', 'v3.2 · live mode · step (stepnum) and signals come from the real machine; timing within each step and part motion are estimated');
+function setLive(on) {
+  if (LIVE.on === on) return;
+  LIVE.on = on;
+  document.body.classList.toggle('live', on);
+  document.querySelectorAll('#segMode button').forEach(b => b.classList.toggle('on', (b.dataset.v === 'live') === on));
+  $('sigHead').textContent = on ? SIG_LIVE : SIG_SIM;
+  $('noteTxt').textContent = on ? NOTE_LIVE : NOTE_SIM;
+  hideAlarm();
+  if (on) { if (LIVE.common && LIVE.common.machine_fault) liveFault(true); renderLiveResults(); renderProd(); }
+  else { if (state.fault === 'ALL') state.fault = null; if (results.length) renderResults(); else $('results').innerHTML = EMPTY_RESULTS; $('liveStat').textContent = ''; }
+}
+document.querySelectorAll('#segMode button').forEach(b => b.onclick = () => { LIVE.userSim = b.dataset.v === 'sim'; setLive(b.dataset.v === 'live'); });
+if (EMBEDDED) {
+  document.body.classList.add('embedded');
+  window.addEventListener('message', e => {
+    if (e.origin !== location.origin || e.source !== window.parent) return;
+    const d = e.data; if (!d || d.source !== 'brake-dashboard') return;
+    if (d.type === 'hello') window.parent.postMessage({ source: 'brake-3d', type: 'ready' }, location.origin);   // Dashboard เพิ่งพร้อม
+    else if (d.type === 'live') liveFeed(d.msg);
+    else if (d.type === 'history') liveHistory(d);
+    else if (d.type === 'kpi') { LIVE.kpi = d.kpi; renderProd(); }
+    else if (d.type === 'results') {
+      LIVE.rows = d.rows; LIVE.verdict = new Map(d.rows.map(r => [`${r.side}-${r.bn}`, r.ok]));
+      if (LIVE.on) renderLiveResults();
+    }
+  });
+  window.parent.postMessage({ source: 'brake-3d', type: 'ready' }, location.origin);
+}
+
+/* ================= frame update ================= */
+const clock = new THREE.Clock(); let hudAcc = 1, wall = 0;
+const carMesh = k => cars[((k % NCARS) + NCARS) % NCARS];
+function update(dt) {
+  wall += dt;
+  const halted = !state.playing || !!state.fault || state.estop;
+  if (LIVE.on) liveStep();                       // live: นาฬิกาสายพาน (T) ล็อกกับเครื่องอ้างอิง, ไม่จำลองรอบ
+  else if (!halted) advance(dt * state.speed);
+  const blink = Math.floor(wall * 3) % 2 === 0;
+
+  // cars & conveyor
+  const kNow = Math.floor(T / TAKT);
+  for (let k = kNow - 2; k < kNow - 2 + NCARS; k++) {          // ออกไปแล้ว 1 · กำลังเติม 2 · รอด้านหลัง 3
+    const car = carMesh(k);
+    if (car.k !== k) { car.k = k; car.paint.color.setHex(PALETTE[Math.floor(hash(k * 1.7 + 3) * PALETTE.length)]); }
+    car.group.position.x = X_ALIGN + V * (T - k * TAKT - 4);
+    const ty = typeOf(k); car.res.RH.visible = ty === 'RHD'; car.res.LH.visible = ty === 'LHD';
+    car.group.updateMatrixWorld(true);
+  }
+  conveyorMat.map.offset.x = -(V * T) / (44 / 146);
+  const fdt = halted ? 0 : dt;
+  setLamp(mainBeacon, (!!state.fault || state.estop) && blink);
+
+  const view = {};
+  for (const sd of ['RH', 'LH']) {
+    const lm = LIVE.on ? liveMachine(sd) : null;
+    const con = consoles[sd], { k, t } = lm || machine(sd), cd = cycle(k), ph = phaseAt(t), s = sig(cd, t);
+    if (lm && lm.bn != null) cd.ng = LIVE.verdict.get(`${sd}-${lm.bn}`) === false;   // ผลจริงจาก backend (มาหลังจบรอบ)
+    const gm = lm ? machine(sd) : null;                // live: ตำแหน่งตามแนวสายพาน (T)
+    const tm = gm ? gm.t : t, kc = gm ? gm.k : k;      // tm: เวลาเชิงกล (console/ปืน/แคลมป์) · kc: รถที่เครื่องนี้จับอยู่
+    const car = carMesh(kc), resSide = typeOf(kc) === 'RHD' ? 1 : -1;
+    view[sd] = { k, t, cd, ph, s, lm };
+    const flowOn = !cd.ng && !state.estop && (ph.key === 'vacuum' || ph.key === 'filling' || ph.key === 'topoff');
+    const fCol = ph.key === 'vacuum' ? COL.vac : ph.key === 'filling' ? COL.fill : COL.top;
+    const fDir = ph.key === 'vacuum' ? -1 : 1;
+
+    let cx = HOME_X;
+    if (tm >= 4 && tm < 60) cx = HOME_X + V * (tm - 4);
+    else if (tm >= 60 && tm < 66.5) cx = THREE.MathUtils.lerp(HOME_X + V * 56, HOME_X, ease((tm - 60) / 6.5));
+    con.group.position.x = cx; con.group.updateMatrixWorld(true);
+    updChain(chains[sd], cx);
+    // insertion pad
+    let e = 0;
+    if (tm >= 2.6 && tm < 3.6) e = ease(tm - 2.6); else if (tm >= 3.6 && tm < 59.6) e = 1; else if (tm >= 59.6 && tm < 60.4) e = 1 - ease((tm - 59.6) / .8);
+    con.arm.position.z = -.28 - e * .22;
+    // gun → reservoir (may be on the far side of the engine bay)
+    let f = 0;
+    if (tm >= 4 && tm < 7) f = ease((tm - 4) / 3); else if (tm >= 7 && tm < 58) f = 1; else if (tm >= 58 && tm < 60) f = 1 - ease((tm - 58) / 2);
+    const gp = con.group.localToWorld(con.holderLocal.clone());
+    if (f > 0) {
+      const rW = car.group.localToWorld(V3(RES_LX, RES_TOP + .035, resSide * RES_LZ));
+      gp.lerp(rW, f); gp.y += (resSide === SIDES[sd] ? .3 : .55) * Math.sin(Math.PI * f);
+    }
+    con.gun.position.copy(gp); con.gun.updateMatrixWorld(true);
+    const b = con.gun.localToWorld(V3(0, .25, 0));
+    for (const h of con.hoses) {
+      const a = con.group.localToWorld(h.a.clone());
+      setTube(h.tb, k3(a) + k3(b), () => hoseCurve(a, b, h));
+    }
+    // lamps
+    const alarm = state.estop || state.fault === sd || state.fault === 'ALL';
+    setLamp(con.patlite.white, true);
+    setLamp(con.patlite.green, !alarm && state.playing);
+    setLamp(con.patlite.red, alarm && blink);
+    const L = {
+      vac: !cd.ng && ph.key === 'vacuum', fill: !cd.ng && ph.key === 'filling',
+      top: !cd.ng && ph.key === 'topoff', comp: !cd.ng && ph.key === 'complete',
+      fault: (state.fault === sd || state.fault === 'ALL') ? blink : (cd.ng && t < 60),
+    };
+    for (const tw of con.towers) { setLamp(tw.mats[0], L.fault); setLamp(tw.mats[1], L.comp); setLamp(tw.mats[2], L.top); setLamp(tw.mats[3], L.fill); setLamp(tw.mats[4], L.vac); }
+    setLamp(con.led.clamp, tm >= 7 && tm < 57);
+    setLamp(con.led.unclamp, tm >= 57 && tm < 58.5);
+    setLamp(con.pair, tm >= 7 && tm < 57);
+    con.bankLeds.forEach((m, i) => setLamp(m, (L.vac && i < 3) || (L.fill && i >= 3 && i < 6) || (L.top && i >= 6) || (tm >= 2.6 && tm < 3.6 && i === 7)));
+    const gv = s.vac < -1 ? s.vac : s.pr;
+    con.needleA += (gaugeAngle(gv) - con.needleA) * Math.min(1, dt * 8);
+    con.needle.rotation.z = con.needleA;
+    // LS
+    for (const ls of lsList[sd]) {
+      const hit = !ls.prox && Math.abs(cx - ls.x) < .075;
+      setLamp(ls.led, hit || (ls.prox && Math.abs(cx - HOME_X) < .02));
+      if (ls.lever) ls.lever.rotation.z += ((hit ? .5 : 0) - ls.lever.rotation.z) * Math.min(1, dt * 10);
+    }
+    // flows
+    con.flowGun.update(fdt, con.hoses[0].tb.curve, flowOn, fCol, fDir, .45);
+    pipes[sd].fill.flow.update(fdt, pipes[sd].fill.curve, !cd.ng && !state.estop && ph.key === 'filling', COL.fill, 1, 1.4);
+    pipes[sd].top.flow.update(fdt, pipes[sd].top.curve, !cd.ng && !state.estop && ph.key === 'topoff', COL.top, 1, 1.4);
+    // FCM sight-glass level
+    let lvl = 1;
+    const full = 1 - .55 * (cd.vt + cd.vtop) / 900;
+    if (t >= 30 && t < 57) lvl = 1 - .55 * s.vol / 900; else if (t >= 57 && t < 68 && !cd.ng) lvl = THREE.MathUtils.lerp(full, 1, clamp01((t - 60) / 8));
+    con.fluid.scale.y = .3 * lvl;
+  }
+
+  // camera: walk mode, or follow + tween
+  if (walk.on) updWalk(dt, halted);
+  else if (FOLLOW.has(camMode)) {
+    const side = state.view;
+    if (followSide !== side) goCam(camMode);
+    else {
+      const cx = consoles[side].group.position.x;
+      if (followX !== null) { const dx = cx - followX; camera.position.x += dx; controls.target.x += dx; if (tween) { tween.tp.x += dx; tween.tt.x += dx; } }
+      followX = cx;
+    }
+  }
+  if (tween && !walk.on) {
+    tween.k = Math.min(1, tween.k + dt / 1.1); const e = ease(tween.k);
+    camera.position.lerpVectors(tween.fp, tween.tp, e); controls.target.lerpVectors(tween.ft, tween.tt, e);
+    if (tween.k >= 1) tween = null;
+  }
+
+  procT += halted ? 0 : dt;
+  drawProc(view[state.view]);
+
+  // HUD
+  hudAcc += dt;
+  if (hudAcc > 1 / 15) {
+    hudAcc = 0;
+    for (const sd of ['RH', 'LH']) {
+      const { k, t, cd, ph, lm } = view[sd], c = cards[sd];
+      const ng = cd.ng && (ph.key === 'filling' || ph.key === 'topoff' || ph.key === 'complete');
+      c.ph.textContent = state.estop ? 'E-STOP' : ng ? (ph.key === 'complete' ? 'Unclamp (NG)' : __t('NG · ข้ามการเติม', 'NG · fill skipped')) : ph.th;
+      c.ph.style.color = state.estop || ng || state.fault === sd || state.fault === 'ALL' ? '#ff8278' : ph.c;
+      c.en.textContent = ng ? 'NG BYPASS' : ph.en;
+      c.st.textContent = lm ? (lm.step ?? '—') : ng ? 0 : ph.step;
+      c.tt.textContent = lm ? lm.el.toFixed(0) : t.toFixed(1);
+      c.ttu.textContent = lm ? ' s' : ' / 70 s';
+      c.cur.style.left = (t / CYCLE * 100) + '%';
+      c.car.textContent = lm ? `bn ${lm.bn ?? '—'} · pg${lm.pgnum ?? '—'}` : `${__t('คัน', 'Car')} #${k + 1} · ${typeOf(k)}${cd.leak ? ' · leak' : ''}`;
+    }
+    const v = view[state.view];
+    if (v.lm) {                                         // live: ค่าจริงล่าสุด (vacuumgun เป็นค่าดิบ ไม่มีหน่วย)
+      const L = v.lm.last;
+      $('vVac').innerHTML = (L ? L.vac.toFixed(0) : '—');
+      $('vPr').innerHTML = (L ? L.pr.toFixed(0) : '—') + '<small>kPa</small>';
+      $('vVol').innerHTML = (L ? L.vol.toFixed(0) : '—') + '<small>mL</small>';
+      drawChartsLive(v.lm);
+      const age = (performance.now() - LIVE.lastMsgAt) / 1000, ls = $('liveStat');
+      ls.className = 'small mono' + (LIVE.lastMsgAt && age < 6 ? ' ok' : '');
+      ls.textContent = !LIVE.lastMsgAt ? __t('○ รอข้อมูลสดจากเครื่อง…', '○ waiting for live data…')
+        : age < 6 ? __t('● ข้อมูลสด', '● LIVE') : __t(`○ ไม่มีข้อมูลใหม่ ${age.toFixed(0)} วินาที`, `○ no new data for ${age.toFixed(0)} s`);
+    } else {
+      $('vVac').innerHTML = v.s.vac.toFixed(1) + '<small>kPa</small>';
+      $('vPr').innerHTML = v.s.pr.toFixed(0) + '<small>kPa</small>';
+      $('vVol').innerHTML = v.s.vol.toFixed(0) + '<small>mL</small>';
+      drawCharts(v.cd, v.t);
+    }
+    updProcText(v);
+  }
+}
+
+function loop() {
+  const dt = Math.min(clock.getDelta(), .1);
+  update(dt);
+  if (!walk.on) controls.update();
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+  requestAnimationFrame(loop);
+}
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight); labelRenderer.setSize(innerWidth, innerHeight); sizeCharts();
+});
+if (innerWidth <= 820) $('panel').classList.add('collapsed');
+loop();
+</script>
+</body>
+</html>

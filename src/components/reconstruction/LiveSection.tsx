@@ -1,7 +1,8 @@
 'use client';
 
 import { useLivePrediction } from '@/hooks/usePrediction';
-import { COLORS, SIDE_LABEL } from '@/lib/constants';
+import { useT } from '@/i18n/useT';
+import { COLORS } from '@/lib/constants';
 import { tailCurve } from '@/lib/machines';
 import { useCompareStore } from '@/stores/compareStore';
 import { useLiveStore } from '@/stores/liveStore';
@@ -16,6 +17,7 @@ import { ReconRow } from './ReconRow';
  *  - bn เปลี่ยน: เริ่มรถคันใหม่ทันที (liveStore ล้าง trace, query เปลี่ยนตาม bn)
  */
 export function LiveSection({ side }: { side: Side }) {
+  const { t } = useT();
   const showPredict = useCompareStore((s) => s.showPredict);
   const trace = useLiveStore((s) => s.trace[side]);
   const bn = trace?.bn ?? null;
@@ -38,16 +40,16 @@ export function LiveSection({ side }: { side: Side }) {
   return (
     <div className="mt-4 border-t border-border pt-3.5 first:mt-0 first:border-t-0 first:pt-0">
       <div className="mb-2.5 flex items-baseline gap-2.5">
-        <span className="text-[14px] font-[650]">{SIDE_LABEL[side]}</span>
+        <span className="text-[14px] font-[650]">{t(`side.${side}`)}</span>
         <span className="text-[12px] tabular-nums text-muted">
           {trace ? `bn ${trace.bn} · pg${trace.pgnum}` : '—'}
         </span>
         {trace && (
           <span className={`text-[12px] ${done ? 'text-good' : 'text-muted'}`}>
             {done
-              ? 'ตรวจเสร็จแล้ว'
+              ? t('live.done')
               : pending
-                ? `กำลังทำงาน · รับข้อมูลแล้ว ${trace.pres.length} จุด · รอผล predict`
+                ? t('live.running', { n: trace.pres.length })
                 : ''}
           </span>
         )}
@@ -68,9 +70,9 @@ export function LiveSection({ side }: { side: Side }) {
           showStandard
         />
       ) : (
-        <div className="pb-1.5 pt-3.5 text-[12px] text-muted">รอข้อมูลสดจากเครื่อง…</div>
+        <div className="pb-1.5 pt-3.5 text-[12px] text-muted">{t('live.waiting')}</div>
       )}
-      {isError && <div className="text-[12px] text-crit-soft">โหลดผล predict ไม่สำเร็จ</div>}
+      {isError && <div className="text-[12px] text-crit-soft">{t('live.predictFailed')}</div>}
     </div>
   );
 }

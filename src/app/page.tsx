@@ -2,10 +2,8 @@ import { TopBar } from '@/components/layout/TopBar';
 import { KpiRow } from '@/components/layout/KpiRow';
 import { MachineCard } from '@/components/machine/MachineCard';
 import { ReconstructionPanel } from '@/components/reconstruction/ReconstructionPanel';
-import { NgByPgnumChart } from '@/components/charts/NgByPgnumChart';
+import { NgByPgnumCard } from '@/components/charts/NgByPgnumChart';
 import { HistoryTable } from '@/components/history/HistoryTable';
-import { Card } from '@/components/ui/Card';
-import { NG_DAYS } from '@/lib/constants';
 
 export default function DashboardPage() {
   return (
@@ -20,9 +18,7 @@ export default function DashboardPage() {
 
       <ReconstructionPanel />
 
-      <Card title="NG แยกตามรุ่น (pgnum)" hint={`${NG_DAYS} วันล่าสุด`} className="mb-4">
-        <NgByPgnumChart />
-      </Card>
+      <NgByPgnumCard />
 
       <HistoryTable />
     </main>

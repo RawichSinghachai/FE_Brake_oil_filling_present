@@ -1,3 +1,7 @@
+'use client';
+
+import { useT } from '@/i18n/useT';
+
 interface PaginationProps {
   page: number;
   pageCount: number;
@@ -27,6 +31,7 @@ const BTN =
   'rounded-lg border border-border bg-surface-2 px-3 py-[7px] text-[12px] text-text-2 enabled:hover:border-muted disabled:cursor-default disabled:opacity-40';
 
 export function Pagination({ page, pageCount, more = false, summary, onPage }: PaginationProps) {
+  const { t } = useT();
   // หน้าสุดท้าย "ที่รู้แน่" — ถ้ายังมีข้อมูลเหลือ pageCount รวมหน้าสมมติ 1 หน้า
   const knownPages = more ? pageCount - 1 : pageCount;
 
@@ -34,11 +39,11 @@ export function Pagination({ page, pageCount, more = false, summary, onPage }: P
     <div className="mt-3.5 flex flex-wrap items-center justify-between gap-3">
       <span className="text-[12px] tabular-nums text-muted">{summary}</span>
       <div className="flex flex-wrap items-center gap-1.5">
-        <button type="button" title="หน้าแรก" className={BTN} disabled={page <= 1} onClick={() => onPage(1)}>
+        <button type="button" title={t('page.first')} className={BTN} disabled={page <= 1} onClick={() => onPage(1)}>
           ⏮
         </button>
         <button type="button" className={BTN} disabled={page <= 1} onClick={() => onPage(page - 1)}>
-          ◀ ก่อนหน้า
+          {t('page.prev')}
         </button>
         <span className="flex items-center gap-1">
           {pageItems(page, pageCount).map((it, i) =>
@@ -52,7 +57,7 @@ export function Pagination({ page, pageCount, more = false, summary, onPage }: P
                 type="button"
                 aria-current={it === page ? 'page' : undefined}
                 onClick={() => onPage(it)}
-                className="inline-flex h-[30px] min-w-[30px] items-center justify-center rounded-[7px] border border-border bg-surface-2 text-[12px] tabular-nums text-text-2 hover:border-muted aria-[current=page]:border-s1/55 aria-[current=page]:bg-s1/18 aria-[current=page]:text-white"
+                className="inline-flex h-[30px] min-w-[30px] items-center justify-center rounded-[7px] border border-border bg-surface-2 text-[12px] tabular-nums text-text-2 hover:border-muted aria-[current=page]:border-s1/55 aria-[current=page]:bg-s1/18 aria-[current=page]:text-text"
               >
                 {it}
               </button>
@@ -60,11 +65,11 @@ export function Pagination({ page, pageCount, more = false, summary, onPage }: P
           )}
         </span>
         <button type="button" className={BTN} disabled={page >= pageCount} onClick={() => onPage(page + 1)}>
-          ถัดไป ▶
+          {t('page.next')}
         </button>
         <button
           type="button"
-          title={more ? 'ยังไม่ทราบหน้าสุดท้าย (กำลังกรองด้วยผล)' : 'หน้าสุดท้าย'}
+          title={more ? t('page.lastUnknown') : t('page.last')}
           className={BTN}
           disabled={more || page >= pageCount}
           onClick={() => onPage(pageCount)}
@@ -72,9 +77,9 @@ export function Pagination({ page, pageCount, more = false, summary, onPage }: P
           ⏭
         </button>
         <span className="ml-1.5 flex items-center gap-1.5 text-[12px] text-muted">
-          ไปหน้า
+          {t('page.goto')}
           <select
-            aria-label="ไปหน้า"
+            aria-label={t('page.goto')}
             className="ctl !h-[30px] !min-w-16 !py-1 !pl-2.5 !pr-7 tabular-nums"
             value={page}
             onChange={(e) => onPage(Number(e.target.value))}

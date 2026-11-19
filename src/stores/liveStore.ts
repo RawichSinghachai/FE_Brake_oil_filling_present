@@ -19,6 +19,8 @@ interface LiveState {
   trace: Record<Side, LiveTrace | null>;
   /** epoch ms ของข้อความล่าสุดที่รับได้ */
   lastUpdate: number | null;
+  /** ข้อความล่าสุดที่รับได้ (ดิบ) — หน้า 3D ส่งต่อให้ iframe */
+  lastMessage: RealtimeMessage | null;
   setWsStatus: (status: WsStatus) => void;
   handleMessage: (msg: RealtimeMessage) => void;
 }
@@ -53,6 +55,7 @@ export const useLiveStore = create<LiveState>((set) => ({
   trace: { LH: null, RH: null },
   common: null,
   lastUpdate: null,
+  lastMessage: null,
   setWsStatus: (wsStatus) => set({ wsStatus }),
   handleMessage: (msg) =>
     set((s) => ({
@@ -64,5 +67,6 @@ export const useLiveStore = create<LiveState>((set) => ({
       },
       common: msg.common ?? s.common,
       lastUpdate: Date.now(),
+      lastMessage: msg,
     })),
 }));

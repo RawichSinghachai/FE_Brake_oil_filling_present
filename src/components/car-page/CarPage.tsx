@@ -5,15 +5,19 @@ import { useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
 import { useMachineDetail } from '@/hooks/useMachineCurves';
 import { usePredictionDetail } from '@/hooks/usePrediction';
+import { useT } from '@/i18n/useT';
 import { isNotFound } from '@/lib/api';
-import { COLORS, FEATURES, MAX_DETAIL_ROWS, SIDE_LABEL, VACUUM_GUN_STANDARD } from '@/lib/constants';
+import { COLORS, FEATURES, MAX_DETAIL_ROWS, PRESSURE_STANDARDS, VACUUM_GUN_STANDARD } from '@/lib/constants';
 import { formatPct, formatShortDateTime } from '@/lib/format';
 import { SIGNALS, tailCurve } from '@/lib/machines';
 import type { Side } from '@/types/car';
 import { FeatureChart } from '@/components/reconstruction/FeatureChart';
+import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
+import { ThemeSwitch } from '@/components/layout/ThemeSwitch';
 import { Badge } from '@/components/ui/Badge';
 
 export function CarPage({ side, bn }: { side: Side; bn: number }) {
+  const { t } = useT();
   const router = useRouter();
   // ทุก signal รายวินาที + meta: GET /api/machines/{bn}
   const { data: machine, error: machineError, isPending: machineLoading } = useMachineDetail(bn, side);
@@ -38,10 +42,10 @@ export function CarPage({ side, bn }: { side: Side; bn: number }) {
           href="/"
           className="rounded-[9px] border border-border bg-surface-2 px-3.5 py-2 text-[13px] text-text hover:border-muted"
         >
-          ← กลับ
+          {t('common.back')}
         </Link>
         <span className="text-[16px] font-[680]">
-          {SIDE_LABEL[side]} · bn {bn}
+          {t(`side.${side}`)} · bn {bn}
         </span>
         <span className="ml-3.5 flex gap-4 text-[12px] text-text-2">
           <span className="flex items-center gap-[7px]">
@@ -52,6 +56,10 @@ export function CarPage({ side, bn }: { side: Side; bn: number }) {
             <span className="w-3.5 border-t-2 border-dashed border-predict" />
             Predict
           </span>
+        </span>
+        <span className="ml-auto flex items-center gap-2">
+          <LocaleSwitch />
+          <ThemeSwitch />
         </span>
       </div>
 
@@ -66,7 +74,7 @@ export function CarPage({ side, bn }: { side: Side; bn: number }) {
               {machine && <span>pg{machine.pgnum}</span>}
               {machine && machine.totalRows > MAX_DETAIL_ROWS && (
                 <span className="text-pending-soft">
-                  แสดง {MAX_DETAIL_ROWS} จาก {machine.totalRows} แถวล่าสุด
+                  {t('car.shownRows', { max: MAX_DETAIL_ROWS, total: machine.totalRows })}
                 </span>
               )}
               <span>{side}</span>
@@ -74,9 +82,9 @@ export function CarPage({ side, bn }: { side: Side; bn: number }) {
           </div>
 
           {missing ? (
-            <div className="py-[26px] text-center text-[13px] text-muted">ไม่พบข้อมูลของ bn {bn} ฝั่ง {side}</div>
+            <div className="py-[26px] text-center text-[13px] text-muted">{t('car.notFound', { bn, side })}</div>
           ) : failed ? (
-            <div className="py-[26px] text-center text-[13px] text-crit-soft">โหลดข้อมูลไม่สำเร็จ</div>
+            <div className="py-[26px] text-center text-[13px] text-crit-soft">{t('common.loadFailed')}</div>
           ) : (
             <div className="grid gap-[18px] max-[980px]:grid-cols-1 min-[981px]:grid-cols-3">
               {SIGNALS.map((sig) => {
@@ -103,7 +111,7 @@ export function CarPage({ side, bn }: { side: Side; bn: number }) {
                           {formatPct(result.percent)} / {formatPct(result.threshold)}
                         </span>
                       ) : pending ? (
-                        <span className="text-[12px] text-pending-soft">รอ predict</span>
+                        <span className="text-[12px] text-pending-soft">{t('common.pendingPredict')}</span>
                       ) : null}
                     </div>
                     {curve ? (
@@ -113,9 +121,10 @@ export function CarPage({ side, bn }: { side: Side; bn: number }) {
                         showPredict={!!feature && !!detail}
                         mode="detail"
                         standard={sig.feature === 'vac' ? VACUUM_GUN_STANDARD : undefined}
+                        guides={sig.feature === 'pres' ? PRESSURE_STANDARDS : undefined}
                       />
                     ) : (
-                      <Empty>{machineLoading ? 'กำลังโหลด…' : ''}</Empty>
+                      <Empty>{machineLoading ? t('common.loading') : ''}</Empty>
                     )}
                   </div>
                 );

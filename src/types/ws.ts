@@ -6,6 +6,8 @@ import type { Side } from './car';
 export interface RealtimeSide {
   bn: number;
   pgnum: number;
+  /** ขั้นตอนของเครื่อง: 0 = รอ/สวมหัว, 1 = ดูดสุญญากาศ, 2 = เติม (backend รุ่นเก่าไม่ส่ง) */
+  stepnum?: number | null;
   filling_pressure: number;
   filling_volume: number;
   vacuumgun: number;

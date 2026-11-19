@@ -10,7 +10,7 @@ export type CsvRow = MachineCar & { result: string };
 
 /** export รายการที่ filter แล้ว — ใส่ BOM ให้ Excel อ่านไทยได้ */
 export function downloadHistoryCsv(rows: CsvRow[]) {
-  const data = rows.map((r) => [formatCsvDateTime(r.dt), r.bn, r.asn ?? '', r.pgnum, r.side, r.result]);
+  const data = rows.map((r) => [r.dt ? formatCsvDateTime(r.dt) : '', r.bn, r.asn ?? '', r.pgnum, r.side, r.result]);
   const csv = '\uFEFF' + Papa.unparse({ fields: HEADER, data }, { newline: '\r\n' });
   const filename = `brake_oil_history_${format(new Date(), 'yyyy-MM-dd-HH-mm-ss')}.csv`;
 

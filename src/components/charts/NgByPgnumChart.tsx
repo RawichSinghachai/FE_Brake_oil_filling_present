@@ -3,12 +3,15 @@
 import { useMemo } from 'react';
 import { Bar, BarChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis, type TooltipProps } from 'recharts';
 import { useNgByPgnum } from '@/hooks/useRecentPredictions';
+import { useT } from '@/i18n/useT';
 import { COLORS, NG_DAYS, SIDE_COLOR, SIDES } from '@/lib/constants';
 import type { NgByPgnumRow } from '@/types/api';
+import { Card } from '@/components/ui/Card';
 
 const TICK = { fill: COLORS.muted, fontSize: 11 };
 
 function Tip({ active, payload, label }: TooltipProps<number, string>) {
+  const { t } = useT();
   if (!active || !payload?.length) return null;
   return (
     <div className="pointer-events-none rounded-lg border border-border bg-surface px-[9px] py-[7px] text-[11px] text-text shadow-[0_4px_16px_rgba(0,0,0,0.45)]">
@@ -16,7 +19,7 @@ function Tip({ active, payload, label }: TooltipProps<number, string>) {
       {payload.map((p) => (
         <div key={p.dataKey} className="flex items-center gap-1.5 leading-[1.55] tabular-nums">
           <span className="h-[3px] w-[11px] flex-none rounded-sm" style={{ background: p.color }} />
-          {p.dataKey} · NG <b>{p.value}</b> คัน
+          {p.dataKey} · {t('ng.tooltip', { n: p.value ?? 0 })}
         </div>
       ))}
     </div>
@@ -24,6 +27,7 @@ function Tip({ active, payload, label }: TooltipProps<number, string>) {
 }
 
 export function NgByPgnumChart() {
+  const { t } = useT();
   const { data, isLoading, isError } = useNgByPgnum();
 
   // แกน Y ปัดขึ้นเป็นช่วงละ 5 → ticks = 0, กลาง, max
@@ -33,9 +37,9 @@ export function NgByPgnumChart() {
     return [0, max / 2, max];
   }, [data]);
 
-  if (isLoading) return <div className="py-16 text-center text-[13px] text-muted">กำลังโหลด…</div>;
-  if (isError || !data) return <div className="py-16 text-center text-[13px] text-crit-soft">โหลดข้อมูลไม่สำเร็จ</div>;
-  if (data.length === 0) return <div className="py-16 text-center text-[13px] text-muted">ยังไม่มีผลตรวจใน {NG_DAYS} วันล่าสุด</div>;
+  if (isLoading) return <div className="py-16 text-center text-[13px] text-muted">{t('common.loading')}</div>;
+  if (isError || !data) return <div className="py-16 text-center text-[13px] text-crit-soft">{t('common.loadFailed')}</div>;
+  if (data.length === 0) return <div className="py-16 text-center text-[13px] text-muted">{t('ng.empty', { days: NG_DAYS })}</div>;
 
   return (
     <>
@@ -47,7 +51,7 @@ export function NgByPgnumChart() {
           </span>
         ))}
       </div>
-      <div className="h-[250px]" role="img" aria-label="จำนวน NG ต่อ pgnum แยก LH RH">
+      <div className="h-[250px]" role="img" aria-label={t('ng.aria')}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 10, right: 12, bottom: 0, left: 0 }} barGap={4}>
             {ticks.map((v) => (
@@ -62,7 +66,7 @@ export function NgByPgnumChart() {
               label={{ value: 'pgnum', position: 'insideBottom', offset: 0, fill: COLORS.muted, fontSize: 11 }}
             />
             <YAxis width={40} ticks={ticks} domain={[0, ticks[2]]} tick={TICK} axisLine={false} tickLine={false} />
-            <Tooltip content={Tip} cursor={{ fill: 'rgba(255,255,255,0.04)' }} isAnimationActive={false} />
+            <Tooltip content={Tip} cursor={{ fill: 'rgb(128 128 128 / 0.1)' }} isAnimationActive={false} />
             {SIDES.map((side) => (
               <Bar
                 key={side}
@@ -77,5 +81,15 @@ export function NgByPgnumChart() {
         </ResponsiveContainer>
       </div>
     </>
+  );
+}
+
+/** การ์ดกราฟ NG แยกรุ่น (ห่อ title/hint ตามภาษาปัจจุบัน) */
+export function NgByPgnumCard() {
+  const { t } = useT();
+  return (
+    <Card title={t('ng.title')} hint={t('ng.hint', { days: NG_DAYS })} className="mb-4">
+      <NgByPgnumChart />
+    </Card>
   );
 }

@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { Pencil, Plus, X } from 'lucide-react';
 import { MAX_COMPARE } from '@/lib/constants';
+import { useT } from '@/i18n/useT';
 import type { MachineCar } from '@/types/car';
 
 export interface ChipEntry {
@@ -24,12 +25,13 @@ interface CompareChipsProps {
 }
 
 export function CompareChips({ entries, editingId, onEdit, onRemove, onAdd, children }: CompareChipsProps) {
+  const { t } = useT();
   return (
     <div className="mb-4 rounded-xl border border-border bg-surface-2 px-3.5 py-[13px]">
       <div className="mb-2.5 flex items-center justify-between gap-2.5">
-        <span className="text-[12px] font-semibold uppercase tracking-[0.3px] text-text-2">ชุดเปรียบเทียบ</span>
+        <span className="text-[12px] font-semibold uppercase tracking-[0.3px] text-text-2">{t('compare.sets')}</span>
         <span className="text-[12px] tabular-nums text-muted">
-          {entries.length} / {MAX_COMPARE} ชุด
+          {t('compare.count', { n: entries.length, max: MAX_COMPARE })}
         </span>
       </div>
       <div className="flex min-h-8 flex-wrap items-center gap-2">
@@ -47,13 +49,13 @@ export function CompareChips({ entries, editingId, onEdit, onRemove, onAdd, chil
               {e.car ? (
                 <> · pg{e.car.pgnum} · {e.car.side}</>
               ) : (
-                <span className="text-muted"> · {e.status === 'error' ? 'ไม่พบ' : 'กำลังโหลด…'}</span>
+                <span className="text-muted"> · {e.status === 'error' ? t('compare.notFound') : t('common.loading')}</span>
               )}
             </span>
             <button
               type="button"
-              title="แก้ไขชุดนี้"
-              aria-label={`แก้ไขชุด #${i + 1}`}
+              title={t('compare.edit')}
+              aria-label={t('compare.editAria', { n: i + 1 })}
               onClick={() => onEdit(e.id)}
               className="px-0.5 text-muted hover:text-s1"
             >
@@ -61,8 +63,8 @@ export function CompareChips({ entries, editingId, onEdit, onRemove, onAdd, chil
             </button>
             <button
               type="button"
-              title="เอาออก"
-              aria-label={`เอาชุด #${i + 1} ออก`}
+              title={t('compare.remove')}
+              aria-label={t('compare.removeAria', { n: i + 1 })}
               onClick={() => onRemove(e.id)}
               className="px-0.5 text-muted hover:text-crit"
             >
@@ -74,9 +76,9 @@ export function CompareChips({ entries, editingId, onEdit, onRemove, onAdd, chil
           type="button"
           onClick={onAdd}
           disabled={entries.length >= MAX_COMPARE}
-          className="inline-flex items-center gap-1 rounded-full border border-dashed border-muted px-[13px] py-[7px] text-[12px] font-semibold text-text-2 hover:border-s1 hover:text-white disabled:cursor-default disabled:opacity-40"
+          className="inline-flex items-center gap-1 rounded-full border border-dashed border-muted px-[13px] py-[7px] text-[12px] font-semibold text-text-2 hover:border-s1 hover:text-text disabled:cursor-default disabled:opacity-40"
         >
-          <Plus size={13} /> เพิ่มชุด
+          <Plus size={13} /> {t('compare.add')}
         </button>
       </div>
       {children}

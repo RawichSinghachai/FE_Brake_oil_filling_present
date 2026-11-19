@@ -32,6 +32,8 @@ interface FeatureChartProps {
   mode?: 'compare' | 'detail';
   /** เส้น standard แนวนอน (ค่าคงที่บนแกน Y) — ไม่ส่ง = ไม่ตีเส้น */
   standard?: number;
+  /** เส้นประอ้างอิงเฉยๆ (เช่น 250 / 300 ของ pressure) — ไม่ซูม/ไม่เพิ่ม tick ของแกน ; เส้นที่อยู่นอกช่วงกราฟไม่แสดง */
+  guides?: readonly number[];
 }
 
 const TICK = { fill: COLORS.muted, fontSize: 10 };
@@ -57,6 +59,7 @@ export function FeatureChart({
   legend = false,
   mode = 'compare',
   standard,
+  guides,
 }: FeatureChartProps) {
   // 1 จุดของ curve ≈ 1 วินาที — แกน X เป็นวินาทีนับจากจุดแรก
   const rows = useMemo(() => {
@@ -92,9 +95,12 @@ export function FeatureChart({
     return {
       domain: [dMin - pad, dMax + pad] as [number, number],
       // ข้อมูลคงที่ (min = max) จะได้ tick ซ้ำ → ต้อง dedupe ไม่งั้น recharts/React ฟ้อง duplicate key
-      yTicks: withStandard([round(min), round((min + max) / 2), round(max)], standard, (dMax - dMin) + 2 * pad),
+      // เลขกำกับเส้น guide (เช่น 250 / 300) อยู่ตำแหน่งเดียวกับเลขแกน Y → ซ่อนเลขแกนที่ชิด guide ที่มองเห็นอยู่ (กันตัวเลขทับกัน)
+      yTicks: withStandard([round(min), round((min + max) / 2), round(max)], standard, (dMax - dMin) + 2 * pad).filter(
+        (t) => !(guides ?? []).some((g) => g >= dMin - pad && g <= dMax + pad && Math.abs(t - g) < ((dMax - dMin) + 2 * pad) * 0.08),
+      ),
     };
-  }, [series, showPredict, standard]);
+  }, [series, showPredict, standard, guides]);
 
   // แต่ละชุดยาวไม่เท่ากัน / ยังไม่มี recon → ค่าที่จุดนั้นอาจเป็น undefined (หรือ NaN)
   const fmt = (v: number | undefined) => (typeof v === 'number' && Number.isFinite(v) ? v.toFixed(1) : null);
@@ -152,6 +158,18 @@ export function FeatureChart({
               ifOverflow="extendDomain"
             />
           )}
+          {guides?.map((v) => (
+            <ReferenceLine
+              key={`guide${v}`}
+              y={v}
+              stroke={COLORS.standard}
+              strokeWidth={1.5}
+              strokeDasharray="6 4"
+              ifOverflow="hidden"
+              // เลขกำกับหน้าเส้น (ฝั่งซ้าย ตรงตำแหน่งตัวเลขแกน Y) สีเดียวกับเส้น standard ของ vacuumgun
+              label={{ value: String(v), position: 'left', fill: COLORS.standard, fontSize: TICK.fontSize, fontWeight: 600 }}
+            />
+          ))}
           <XAxis
             type="number"
             dataKey="t"

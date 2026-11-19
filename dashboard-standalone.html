@@ -1,0 +1,2075 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="dark" class="font-sans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Brake Oil Filling — Anomaly Monitor</title><meta name="description" content="Brake Oil Filling anomaly detection (LSTM Autoencoder) · ระบบตรวจจับความผิดปกติ"><!--
+  Brake Oil Filling — Dashboard (ไฟล์เดียว)
+  ที่มา: HTML ที่แอปจริง (Next.js + Tailwind + Recharts) เรนเดอร์ออกมา + CSS ที่ compile แล้วของแอปนี้ inline ไว้ใน <style>
+  → หน้าตาเหมือนที่รันใน webapp (ภาษาไทย) ; ข้อมูลเป็นข้อมูลตัวอย่าง ไม่ได้ต่อ backend
+  - สี/ธีม: CSS variable ใน <style> (ค้นหา "--color-" ; ชุด light อยู่ที่ :root[data-theme=light])
+  - ปุ่มสลับธีมใช้ได้ ; ปุ่ม TH/EN, ตัวกรอง, กราฟ tooltip ในไฟล์นี้เป็น static (ไม่มี logic)
+  - class ที่ขึ้นต้นด้วย utility ของ Tailwind (flex, px-5, ...) มีใน CSS ด้านล่างเฉพาะตัวที่แอปใช้
+-->
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzFhMWExOSIvPjxwYXRoIGQ9Ik0xNiA2YzQgNSA3IDguNSA3IDEyYTcgNyAwIDAgMS0xNCAwYzAtMy41MDAgMy03IDctMTJ6IiBmaWxsPSIjMzk4N2U1Ii8+PC9zdmc+Cg==" type="image/svg+xml">
+<style>
+/*!*****************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[3]!./src/app/globals.css ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************/
+/*! tailwindcss v4.3.4 | MIT License | https://tailwindcss.com */
+@layer properties;
+@layer theme, base, components, utilities;
+@layer theme {
+  :root, :host {
+    --font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+    --color-white: #fff;
+    --spacing: 0.25rem;
+    --font-weight-normal: 400;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --tracking-normal: 0em;
+    --radius-sm: 0.25rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.75rem;
+    --default-transition-duration: 150ms;
+    --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    --default-font-family: var(--font-sans);
+    --default-mono-font-family: var(--font-mono);
+    --color-page: #0d0d0d;
+    --color-surface: #1a1a19;
+    --color-surface-2: #222221;
+    --color-text: #f0efec;
+    --color-text-2: #c3c2b7;
+    --color-muted: #898781;
+    --color-grid: #2c2c2a;
+    --color-baseline: #383835;
+    --color-border: rgb(255 255 255 / 0.1);
+    --color-s1: #3987e5;
+    --color-good: #0ca30c;
+    --color-warn: #fab219;
+    --color-crit: #d03b3b;
+    --color-crit-soft: #ff9b9b;
+    --color-pass-soft: #7ee787;
+    --color-pending-soft: #ffce73;
+    --color-predict: #e34948;
+    --radius-card: 14px;
+  }
+}
+@layer base {
+  *, ::after, ::before, ::backdrop, ::file-selector-button {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0 solid;
+  }
+  html, :host {
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    tab-size: 4;
+    font-family: var(--default-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");
+    font-feature-settings: var(--default-font-feature-settings, normal);
+    font-variation-settings: var(--default-font-variation-settings, normal);
+    -webkit-tap-highlight-color: transparent;
+  }
+  hr {
+    height: 0;
+    color: inherit;
+    border-top-width: 1px;
+  }
+  abbr:where([title]) {
+    -webkit-text-decoration: underline dotted;
+    text-decoration: underline dotted;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  a {
+    color: inherit;
+    -webkit-text-decoration: inherit;
+    text-decoration: inherit;
+  }
+  b, strong {
+    font-weight: bolder;
+  }
+  code, kbd, samp, pre {
+    font-family: var(--default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);
+    font-feature-settings: var(--default-mono-font-feature-settings, normal);
+    font-variation-settings: var(--default-mono-font-variation-settings, normal);
+    font-size: 1em;
+  }
+  small {
+    font-size: 80%;
+  }
+  sub, sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+  }
+  sub {
+    bottom: -0.25em;
+  }
+  sup {
+    top: -0.5em;
+  }
+  table {
+    text-indent: 0;
+    border-color: inherit;
+    border-collapse: collapse;
+  }
+  :-moz-focusring:where(:not(iframe)) {
+    outline: auto;
+  }
+  progress {
+    vertical-align: baseline;
+  }
+  summary {
+    display: list-item;
+  }
+  ol, ul, menu {
+    list-style: none;
+  }
+  img, svg, video, canvas, audio, iframe, embed, object {
+    display: block;
+    vertical-align: middle;
+  }
+  img, video {
+    max-width: 100%;
+    height: auto;
+  }
+  button, input, select, optgroup, textarea, ::file-selector-button {
+    font: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    border-radius: 0;
+    background-color: transparent;
+    opacity: 1;
+  }
+  :where(select:is([multiple], [size])) optgroup {
+    font-weight: bolder;
+  }
+  :where(select:is([multiple], [size])) optgroup option {
+    padding-inline-start: 20px;
+  }
+  ::file-selector-button {
+    margin-inline-end: 4px;
+  }
+  ::placeholder {
+    opacity: 1;
+  }
+  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {
+    ::placeholder {
+      color: currentcolor;
+      @supports (color: color-mix(in lab, red, red)) {
+        color: color-mix(in oklab, currentcolor 50%, transparent);
+      }
+    }
+  }
+  textarea {
+    resize: vertical;
+  }
+  ::-webkit-search-decoration {
+    -webkit-appearance: none;
+  }
+  ::-webkit-date-and-time-value {
+    min-height: 1lh;
+    text-align: inherit;
+  }
+  ::-webkit-datetime-edit {
+    display: inline-flex;
+  }
+  ::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+  }
+  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {
+    padding-block: 0;
+  }
+  ::-webkit-calendar-picker-indicator {
+    line-height: 1;
+  }
+  :-moz-ui-invalid {
+    box-shadow: none;
+  }
+  button, input:where([type="button"], [type="reset"], [type="submit"]), ::file-selector-button {
+    appearance: button;
+  }
+  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {
+    height: auto;
+  }
+  [hidden]:where(:not([hidden="until-found"])) {
+    display: none !important;
+  }
+}
+@layer utilities {
+  .pointer-events-none {
+    pointer-events: none;
+  }
+  .visible {
+    visibility: visible;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border-width: 0;
+  }
+  .absolute {
+    position: absolute;
+  }
+  .fixed {
+    position: fixed;
+  }
+  .relative {
+    position: relative;
+  }
+  .sticky {
+    position: sticky;
+  }
+  .-inset-y-\[3px\] {
+    inset-block: calc(3px * -1);
+  }
+  .inset-y-0 {
+    inset-block: 0px;
+  }
+  .top-0 {
+    top: 0px;
+  }
+  .top-0\.5 {
+    top: calc(var(--spacing) * 0.5);
+  }
+  .top-\[15px\] {
+    top: 15px;
+  }
+  .left-0 {
+    left: 0px;
+  }
+  .left-0\.5 {
+    left: calc(var(--spacing) * 0.5);
+  }
+  .left-\[46px\] {
+    left: 46px;
+  }
+  .z-2 {
+    z-index: 2;
+  }
+  .m-0 {
+    margin: 0px;
+  }
+  .mx-auto {
+    margin-inline: auto;
+  }
+  .my-\[11px\] {
+    margin-block: 11px;
+  }
+  .mt-0\.5 {
+    margin-top: calc(var(--spacing) * 0.5);
+  }
+  .mt-1 {
+    margin-top: var(--spacing);
+  }
+  .mt-1\.5 {
+    margin-top: calc(var(--spacing) * 1.5);
+  }
+  .mt-2\.5 {
+    margin-top: calc(var(--spacing) * 2.5);
+  }
+  .mt-3 {
+    margin-top: calc(var(--spacing) * 3);
+  }
+  .mt-3\.5 {
+    margin-top: calc(var(--spacing) * 3.5);
+  }
+  .mt-4 {
+    margin-top: calc(var(--spacing) * 4);
+  }
+  .mr-\[3px\] {
+    margin-right: 3px;
+  }
+  .-mb-0\.5 {
+    margin-bottom: calc(var(--spacing) * -0.5);
+  }
+  .mb-1 {
+    margin-bottom: var(--spacing);
+  }
+  .mb-1\.5 {
+    margin-bottom: calc(var(--spacing) * 1.5);
+  }
+  .mb-2 {
+    margin-bottom: calc(var(--spacing) * 2);
+  }
+  .mb-2\.5 {
+    margin-bottom: calc(var(--spacing) * 2.5);
+  }
+  .mb-3 {
+    margin-bottom: calc(var(--spacing) * 3);
+  }
+  .mb-3\.5 {
+    margin-bottom: calc(var(--spacing) * 3.5);
+  }
+  .mb-4 {
+    margin-bottom: calc(var(--spacing) * 4);
+  }
+  .mb-\[3px\] {
+    margin-bottom: 3px;
+  }
+  .mb-\[5px\] {
+    margin-bottom: 5px;
+  }
+  .ml-1\.5 {
+    margin-left: calc(var(--spacing) * 1.5);
+  }
+  .ml-3\.5 {
+    margin-left: calc(var(--spacing) * 3.5);
+  }
+  .ml-auto {
+    margin-left: auto;
+  }
+  .block {
+    display: block;
+  }
+  .contents {
+    display: contents;
+  }
+  .flex {
+    display: flex;
+  }
+  .grid {
+    display: grid;
+  }
+  .hidden {
+    display: none;
+  }
+  .inline-flex {
+    display: inline-flex;
+  }
+  .table {
+    display: table;
+  }
+  .size-2 {
+    width: calc(var(--spacing) * 2);
+    height: calc(var(--spacing) * 2);
+  }
+  .size-3\.5 {
+    width: calc(var(--spacing) * 3.5);
+    height: calc(var(--spacing) * 3.5);
+  }
+  .size-\[9px\] {
+    width: 9px;
+    height: 9px;
+  }
+  .size-\[34px\] {
+    width: 34px;
+    height: 34px;
+  }
+  .\!h-\[30px\] {
+    height: 30px !important;
+  }
+  .h-2\.5 {
+    height: calc(var(--spacing) * 2.5);
+  }
+  .h-\[3px\] {
+    height: 3px;
+  }
+  .h-\[9px\] {
+    height: 9px;
+  }
+  .h-\[13px\] {
+    height: 13px;
+  }
+  .h-\[18px\] {
+    height: 18px;
+  }
+  .h-\[30px\] {
+    height: 30px;
+  }
+  .h-\[38px\] {
+    height: 38px;
+  }
+  .h-\[210px\] {
+    height: 210px;
+  }
+  .h-\[250px\] {
+    height: 250px;
+  }
+  .h-dvh {
+    height: 100dvh;
+  }
+  .min-h-0 {
+    min-height: 0px;
+  }
+  .min-h-8 {
+    min-height: calc(var(--spacing) * 8);
+  }
+  .min-h-\[18px\] {
+    min-height: 18px;
+  }
+  .min-h-screen {
+    min-height: 100vh;
+  }
+  .w-0\.5 {
+    width: calc(var(--spacing) * 0.5);
+  }
+  .w-3\.5 {
+    width: calc(var(--spacing) * 3.5);
+  }
+  .w-4 {
+    width: calc(var(--spacing) * 4);
+  }
+  .w-\[11px\] {
+    width: 11px;
+  }
+  .w-\[34px\] {
+    width: 34px;
+  }
+  .w-fit {
+    width: fit-content;
+  }
+  .w-full {
+    width: 100%;
+  }
+  .max-w-\[230px\] {
+    max-width: 230px;
+  }
+  .max-w-\[1320px\] {
+    max-width: 1320px;
+  }
+  .max-w-full {
+    max-width: 100%;
+  }
+  .\!min-w-16 {
+    min-width: calc(var(--spacing) * 16) !important;
+  }
+  .\!min-w-\[90px\] {
+    min-width: 90px !important;
+  }
+  .\!min-w-\[120px\] {
+    min-width: 120px !important;
+  }
+  .\!min-w-\[185px\] {
+    min-width: 185px !important;
+  }
+  .min-w-\[18px\] {
+    min-width: 18px;
+  }
+  .min-w-\[30px\] {
+    min-width: 30px;
+  }
+  .flex-1 {
+    flex: 1;
+  }
+  .flex-none {
+    flex: none;
+  }
+  .basis-full {
+    flex-basis: 100%;
+  }
+  .border-collapse {
+    border-collapse: collapse;
+  }
+  .transform {
+    transform: var(--tw-rotate-x, ) var(--tw-rotate-y, ) var(--tw-rotate-z, ) var(--tw-skew-x, ) var(--tw-skew-y, );
+  }
+  .cursor-pointer {
+    cursor: pointer;
+  }
+  .resize {
+    resize: both;
+  }
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .flex-col {
+    flex-direction: column;
+  }
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
+  .items-baseline {
+    align-items: baseline;
+  }
+  .items-center {
+    align-items: center;
+  }
+  .items-end {
+    align-items: flex-end;
+  }
+  .justify-between {
+    justify-content: space-between;
+  }
+  .justify-center {
+    justify-content: center;
+  }
+  .gap-1 {
+    gap: var(--spacing);
+  }
+  .gap-1\.5 {
+    gap: calc(var(--spacing) * 1.5);
+  }
+  .gap-2 {
+    gap: calc(var(--spacing) * 2);
+  }
+  .gap-2\.5 {
+    gap: calc(var(--spacing) * 2.5);
+  }
+  .gap-3 {
+    gap: calc(var(--spacing) * 3);
+  }
+  .gap-3\.5 {
+    gap: calc(var(--spacing) * 3.5);
+  }
+  .gap-4 {
+    gap: calc(var(--spacing) * 4);
+  }
+  .gap-\[5px\] {
+    gap: 5px;
+  }
+  .gap-\[7px\] {
+    gap: 7px;
+  }
+  .gap-\[9px\] {
+    gap: 9px;
+  }
+  .gap-\[18px\] {
+    gap: 18px;
+  }
+  .gap-\[22px\] {
+    gap: 22px;
+  }
+  .overflow-x-auto {
+    overflow-x: auto;
+  }
+  .rounded-\[5px\] {
+    border-radius: 5px;
+  }
+  .rounded-\[7px\] {
+    border-radius: 7px;
+  }
+  .rounded-\[9px\] {
+    border-radius: 9px;
+  }
+  .rounded-\[11px\] {
+    border-radius: 11px;
+  }
+  .rounded-card {
+    border-radius: var(--radius-card);
+  }
+  .rounded-full {
+    border-radius: calc(infinity * 1px);
+  }
+  .rounded-lg {
+    border-radius: var(--radius-lg);
+  }
+  .rounded-md {
+    border-radius: var(--radius-md);
+  }
+  .rounded-sm {
+    border-radius: var(--radius-sm);
+  }
+  .rounded-xl {
+    border-radius: var(--radius-xl);
+  }
+  .border {
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+  }
+  .border-0 {
+    border-style: var(--tw-border-style);
+    border-width: 0px;
+  }
+  .border-t {
+    border-top-style: var(--tw-border-style);
+    border-top-width: 1px;
+  }
+  .border-t-2 {
+    border-top-style: var(--tw-border-style);
+    border-top-width: 2px;
+  }
+  .border-b {
+    border-bottom-style: var(--tw-border-style);
+    border-bottom-width: 1px;
+  }
+  .border-dashed {
+    --tw-border-style: dashed;
+    border-style: dashed;
+  }
+  .border-border {
+    border-color: var(--color-border);
+  }
+  .border-crit\/60 {
+    border-color: color-mix(in srgb, #d03b3b 60%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-crit) 60%, transparent);
+    }
+  }
+  .border-good\/55 {
+    border-color: color-mix(in srgb, #0ca30c 55%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-good) 55%, transparent);
+    }
+  }
+  .border-grid {
+    border-color: var(--color-grid);
+  }
+  .border-muted {
+    border-color: var(--color-muted);
+  }
+  .border-predict {
+    border-color: var(--color-predict);
+  }
+  .border-s1 {
+    border-color: var(--color-s1);
+  }
+  .border-warn\/50 {
+    border-color: color-mix(in srgb, #fab219 50%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-warn) 50%, transparent);
+    }
+  }
+  .bg-baseline {
+    background-color: var(--color-baseline);
+  }
+  .bg-crit {
+    background-color: var(--color-crit);
+  }
+  .bg-crit\/20 {
+    background-color: color-mix(in srgb, #d03b3b 20%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-crit) 20%, transparent);
+    }
+  }
+  .bg-good {
+    background-color: var(--color-good);
+  }
+  .bg-good\/15 {
+    background-color: color-mix(in srgb, #0ca30c 15%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-good) 15%, transparent);
+    }
+  }
+  .bg-good\/20 {
+    background-color: color-mix(in srgb, #0ca30c 20%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-good) 20%, transparent);
+    }
+  }
+  .bg-muted {
+    background-color: var(--color-muted);
+  }
+  .bg-page {
+    background-color: var(--color-page);
+  }
+  .bg-s1 {
+    background-color: var(--color-s1);
+  }
+  .bg-surface {
+    background-color: var(--color-surface);
+  }
+  .bg-surface-2 {
+    background-color: var(--color-surface-2);
+  }
+  .bg-surface\/75 {
+    background-color: color-mix(in srgb, #1a1a19 75%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-surface) 75%, transparent);
+    }
+  }
+  .bg-text-2\/85 {
+    background-color: color-mix(in srgb, #c3c2b7 85%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-text-2) 85%, transparent);
+    }
+  }
+  .bg-transparent {
+    background-color: transparent;
+  }
+  .bg-warn {
+    background-color: var(--color-warn);
+  }
+  .bg-warn\/16 {
+    background-color: color-mix(in srgb, #fab219 16%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-warn) 16%, transparent);
+    }
+  }
+  .bg-white {
+    background-color: var(--color-white);
+  }
+  .p-3 {
+    padding: calc(var(--spacing) * 3);
+  }
+  .p-\[3px\] {
+    padding: 3px;
+  }
+  .px-0\.5 {
+    padding-inline: calc(var(--spacing) * 0.5);
+  }
+  .px-1 {
+    padding-inline: var(--spacing);
+  }
+  .px-2\.5 {
+    padding-inline: calc(var(--spacing) * 2.5);
+  }
+  .px-3 {
+    padding-inline: calc(var(--spacing) * 3);
+  }
+  .px-3\.5 {
+    padding-inline: calc(var(--spacing) * 3.5);
+  }
+  .px-5 {
+    padding-inline: calc(var(--spacing) * 5);
+  }
+  .px-\[9px\] {
+    padding-inline: 9px;
+  }
+  .px-\[11px\] {
+    padding-inline: 11px;
+  }
+  .px-\[13px\] {
+    padding-inline: 13px;
+  }
+  .px-\[18px\] {
+    padding-inline: 18px;
+  }
+  .\!py-1 {
+    padding-block: var(--spacing) !important;
+  }
+  .py-0\.5 {
+    padding-block: calc(var(--spacing) * 0.5);
+  }
+  .py-1 {
+    padding-block: var(--spacing);
+  }
+  .py-1\.5 {
+    padding-block: calc(var(--spacing) * 1.5);
+  }
+  .py-2 {
+    padding-block: calc(var(--spacing) * 2);
+  }
+  .py-2\.5 {
+    padding-block: calc(var(--spacing) * 2.5);
+  }
+  .py-3\.5 {
+    padding-block: calc(var(--spacing) * 3.5);
+  }
+  .py-4 {
+    padding-block: calc(var(--spacing) * 4);
+  }
+  .py-6 {
+    padding-block: calc(var(--spacing) * 6);
+  }
+  .py-16 {
+    padding-block: calc(var(--spacing) * 16);
+  }
+  .py-\[3px\] {
+    padding-block: 3px;
+  }
+  .py-\[5px\] {
+    padding-block: 5px;
+  }
+  .py-\[7px\] {
+    padding-block: 7px;
+  }
+  .py-\[9px\] {
+    padding-block: 9px;
+  }
+  .py-\[13px\] {
+    padding-block: 13px;
+  }
+  .py-\[26px\] {
+    padding-block: 26px;
+  }
+  .pt-3 {
+    padding-top: calc(var(--spacing) * 3);
+  }
+  .pt-3\.5 {
+    padding-top: calc(var(--spacing) * 3.5);
+  }
+  .pt-\[18px\] {
+    padding-top: 18px;
+  }
+  .\!pr-7 {
+    padding-right: calc(var(--spacing) * 7) !important;
+  }
+  .pr-2 {
+    padding-right: calc(var(--spacing) * 2);
+  }
+  .pr-\[3px\] {
+    padding-right: 3px;
+  }
+  .pr-\[13px\] {
+    padding-right: 13px;
+  }
+  .pb-1\.5 {
+    padding-bottom: calc(var(--spacing) * 1.5);
+  }
+  .pb-\[60px\] {
+    padding-bottom: 60px;
+  }
+  .\!pl-2\.5 {
+    padding-left: calc(var(--spacing) * 2.5) !important;
+  }
+  .pl-2 {
+    padding-left: calc(var(--spacing) * 2);
+  }
+  .pl-2\.5 {
+    padding-left: calc(var(--spacing) * 2.5);
+  }
+  .pl-3 {
+    padding-left: calc(var(--spacing) * 3);
+  }
+  .text-center {
+    text-align: center;
+  }
+  .text-left {
+    text-align: left;
+  }
+  .font-sans {
+    font-family: var(--font-sans);
+  }
+  .text-\[9\.5px\] {
+    font-size: 9.5px;
+  }
+  .text-\[10px\] {
+    font-size: 10px;
+  }
+  .text-\[11px\] {
+    font-size: 11px;
+  }
+  .text-\[12px\] {
+    font-size: 12px;
+  }
+  .text-\[13px\] {
+    font-size: 13px;
+  }
+  .text-\[14px\] {
+    font-size: 14px;
+  }
+  .text-\[15px\] {
+    font-size: 15px;
+  }
+  .text-\[16px\] {
+    font-size: 16px;
+  }
+  .text-\[30px\] {
+    font-size: 30px;
+  }
+  .leading-\[1\.55\] {
+    --tw-leading: 1.55;
+    line-height: 1.55;
+  }
+  .font-\[650\] {
+    --tw-font-weight: 650;
+    font-weight: 650;
+  }
+  .font-\[680\] {
+    --tw-font-weight: 680;
+    font-weight: 680;
+  }
+  .font-bold {
+    --tw-font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-bold);
+  }
+  .font-normal {
+    --tw-font-weight: var(--font-weight-normal);
+    font-weight: var(--font-weight-normal);
+  }
+  .font-semibold {
+    --tw-font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-semibold);
+  }
+  .tracking-\[-0\.5px\] {
+    --tw-tracking: -0.5px;
+    letter-spacing: -0.5px;
+  }
+  .tracking-\[0\.2px\] {
+    --tw-tracking: 0.2px;
+    letter-spacing: 0.2px;
+  }
+  .tracking-\[0\.3px\] {
+    --tw-tracking: 0.3px;
+    letter-spacing: 0.3px;
+  }
+  .tracking-normal {
+    --tw-tracking: var(--tracking-normal);
+    letter-spacing: var(--tracking-normal);
+  }
+  .whitespace-nowrap {
+    white-space: nowrap;
+  }
+  .text-crit {
+    color: var(--color-crit);
+  }
+  .text-crit-soft {
+    color: var(--color-crit-soft);
+  }
+  .text-good {
+    color: var(--color-good);
+  }
+  .text-muted {
+    color: var(--color-muted);
+  }
+  .text-pass-soft {
+    color: var(--color-pass-soft);
+  }
+  .text-pending-soft {
+    color: var(--color-pending-soft);
+  }
+  .text-text {
+    color: var(--color-text);
+  }
+  .text-text-2 {
+    color: var(--color-text-2);
+  }
+  .text-white {
+    color: var(--color-white);
+  }
+  .normal-case {
+    text-transform: none;
+  }
+  .uppercase {
+    text-transform: uppercase;
+  }
+  .tabular-nums {
+    --tw-numeric-spacing: tabular-nums;
+    font-variant-numeric: var(--tw-ordinal, ) var(--tw-slashed-zero, ) var(--tw-numeric-figure, ) var(--tw-numeric-spacing, ) var(--tw-numeric-fraction, );
+  }
+  .opacity-50 {
+    opacity: 50%;
+  }
+  .shadow-\[0_0_0_3px_rgba\(12\,163\,12\,0\.18\)\] {
+    --tw-shadow: 0 0 0 3px var(--tw-shadow-color, rgba(12,163,12,0.18));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .shadow-\[0_0_0_3px_rgba\(208\,59\,59\,0\.16\)\] {
+    --tw-shadow: 0 0 0 3px var(--tw-shadow-color, rgba(208,59,59,0.16));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .shadow-\[0_4px_16px_rgba\(0\,0\,0\,0\.45\)\] {
+    --tw-shadow: 0 4px 16px var(--tw-shadow-color, rgba(0,0,0,0.45));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .shadow-\[inset_0_0_0_1px_var\(--color-s1\)\] {
+    --tw-shadow: inset 0 0 0 1px var(--tw-shadow-color, var(--color-s1));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .ring {
+    --tw-ring-shadow: var(--tw-ring-inset, ) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .blur {
+    --tw-blur: blur(8px);
+    filter: var(--tw-blur, ) var(--tw-brightness, ) var(--tw-contrast, ) var(--tw-grayscale, ) var(--tw-hue-rotate, ) var(--tw-invert, ) var(--tw-saturate, ) var(--tw-sepia, ) var(--tw-drop-shadow, );
+  }
+  .filter {
+    filter: var(--tw-blur, ) var(--tw-brightness, ) var(--tw-contrast, ) var(--tw-grayscale, ) var(--tw-hue-rotate, ) var(--tw-invert, ) var(--tw-saturate, ) var(--tw-sepia, ) var(--tw-drop-shadow, );
+  }
+  .transition-colors {
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .transition-opacity {
+    transition-property: opacity;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .transition-transform {
+    transition-property: transform, translate, scale, rotate;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  :is(:where(.group)[aria-pressed="true"] .group-aria-pressed\:translate-x-4) {
+    --tw-translate-x: calc(var(--spacing) * 4);
+    translate: var(--tw-translate-x) var(--tw-translate-y);
+  }
+  :is(:where(.group)[aria-pressed="true"] .group-aria-pressed\:bg-s1) {
+    background-color: var(--color-s1);
+  }
+  .first\:mt-0:first-child {
+    margin-top: 0px;
+  }
+  .first\:border-t-0:first-child {
+    border-top-style: var(--tw-border-style);
+    border-top-width: 0px;
+  }
+  .first\:pt-0:first-child {
+    padding-top: 0px;
+  }
+  @media (hover: hover) {
+    .hover\:border-muted:hover {
+      border-color: var(--color-muted);
+    }
+    .hover\:border-s1:hover {
+      border-color: var(--color-s1);
+    }
+    .hover\:bg-surface-2:hover {
+      background-color: var(--color-surface-2);
+    }
+    .hover\:text-crit:hover {
+      color: var(--color-crit);
+    }
+    .hover\:text-s1:hover {
+      color: var(--color-s1);
+    }
+    .hover\:text-text:hover {
+      color: var(--color-text);
+    }
+    .enabled\:hover\:border-muted:enabled:hover {
+      border-color: var(--color-muted);
+    }
+  }
+  .disabled\:cursor-default:disabled {
+    cursor: default;
+  }
+  .disabled\:opacity-40:disabled {
+    opacity: 40%;
+  }
+  .disabled\:opacity-50:disabled {
+    opacity: 50%;
+  }
+  .aria-pressed\:border-s1\/55[aria-pressed="true"] {
+    border-color: color-mix(in srgb, #3987e5 55%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-s1) 55%, transparent);
+    }
+  }
+  .aria-pressed\:bg-s1[aria-pressed="true"] {
+    background-color: var(--color-s1);
+  }
+  .aria-pressed\:bg-s1\/18[aria-pressed="true"] {
+    background-color: color-mix(in srgb, #3987e5 18%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-s1) 18%, transparent);
+    }
+  }
+  .aria-pressed\:text-text[aria-pressed="true"] {
+    color: var(--color-text);
+  }
+  .aria-pressed\:text-white[aria-pressed="true"] {
+    color: var(--color-white);
+  }
+  .aria-\[current\=page\]\:border-s1\/55[aria-current="page"] {
+    border-color: color-mix(in srgb, #3987e5 55%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-s1) 55%, transparent);
+    }
+  }
+  .aria-\[current\=page\]\:bg-s1\/18[aria-current="page"] {
+    background-color: color-mix(in srgb, #3987e5 18%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-s1) 18%, transparent);
+    }
+  }
+  .aria-\[current\=page\]\:text-text[aria-current="page"] {
+    color: var(--color-text);
+  }
+  @media (width < 980px) {
+    .max-\[980px\]\:grid-cols-1 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+    .max-\[980px\]\:grid-cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (width >= 981px) {
+    .min-\[981px\]\:grid-cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .min-\[981px\]\:grid-cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .min-\[981px\]\:grid-cols-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+}
+:root {
+  color-scheme: dark;
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+  --color-page: #f4f4f1;
+  --color-surface: #ffffff;
+  --color-surface-2: #f0efeb;
+  --color-text: #1a1a19;
+  --color-text-2: #4a4944;
+  --color-muted: #6b6a65;
+  --color-grid: #e6e5df;
+  --color-baseline: #cfcec7;
+  --color-border: rgb(0 0 0 / 0.12);
+  --color-good: #0a8a0a;
+  --color-warn: #c98500;
+  --color-serious: #c4542a;
+  --color-crit: #c23030;
+  --color-crit-soft: #b42318;
+  --color-pass-soft: #0a6e0a;
+  --color-pending-soft: #8a5a00;
+}
+html {
+  background: var(--color-page);
+}
+body {
+  margin: 0;
+  background: var(--color-page);
+  color: var(--color-text);
+  font-size: 14px;
+  line-height: 1.45;
+}
+button:not(:disabled),
+[role='button']:not(:disabled) {
+  cursor: pointer;
+}
+@layer components {
+  .ctl {
+    background: var(--color-surface-2);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 9px;
+    padding: 8px 11px;
+    font-size: 13px;
+    font-family: inherit;
+    min-width: 130px;
+    height: 38px;
+  }
+  .ctl:focus {
+    outline: none;
+    border-color: var(--color-s1);
+  }
+  select.ctl {
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%23898781' stroke-width='1.6'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 11px center;
+    padding-right: 30px;
+  }
+}
+@property --tw-rotate-x {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-rotate-y {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-rotate-z {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-skew-x {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-skew-y {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-border-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
+@property --tw-leading {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-font-weight {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-tracking {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ordinal {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-slashed-zero {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-numeric-figure {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-numeric-spacing {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-numeric-fraction {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-inset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-ring-inset {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-offset-width {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --tw-ring-offset-color {
+  syntax: "*";
+  inherits: false;
+  initial-value: #fff;
+}
+@property --tw-ring-offset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-blur {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-brightness {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-contrast {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-grayscale {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-hue-rotate {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-invert {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-opacity {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-saturate {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-sepia {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-drop-shadow {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-drop-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-drop-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-drop-shadow-size {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-translate-x {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@property --tw-translate-y {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@property --tw-translate-z {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@layer properties {
+  @supports ((-webkit-hyphens: none) and (not (margin-trim: block))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
+    *, ::before, ::after, ::backdrop {
+      --tw-rotate-x: initial;
+      --tw-rotate-y: initial;
+      --tw-rotate-z: initial;
+      --tw-skew-x: initial;
+      --tw-skew-y: initial;
+      --tw-border-style: solid;
+      --tw-leading: initial;
+      --tw-font-weight: initial;
+      --tw-tracking: initial;
+      --tw-ordinal: initial;
+      --tw-slashed-zero: initial;
+      --tw-numeric-figure: initial;
+      --tw-numeric-spacing: initial;
+      --tw-numeric-fraction: initial;
+      --tw-shadow: 0 0 #0000;
+      --tw-shadow-color: initial;
+      --tw-shadow-alpha: 100%;
+      --tw-inset-shadow: 0 0 #0000;
+      --tw-inset-shadow-color: initial;
+      --tw-inset-shadow-alpha: 100%;
+      --tw-ring-color: initial;
+      --tw-ring-shadow: 0 0 #0000;
+      --tw-inset-ring-color: initial;
+      --tw-inset-ring-shadow: 0 0 #0000;
+      --tw-ring-inset: initial;
+      --tw-ring-offset-width: 0px;
+      --tw-ring-offset-color: #fff;
+      --tw-ring-offset-shadow: 0 0 #0000;
+      --tw-blur: initial;
+      --tw-brightness: initial;
+      --tw-contrast: initial;
+      --tw-grayscale: initial;
+      --tw-hue-rotate: initial;
+      --tw-invert: initial;
+      --tw-opacity: initial;
+      --tw-saturate: initial;
+      --tw-sepia: initial;
+      --tw-drop-shadow: initial;
+      --tw-drop-shadow-color: initial;
+      --tw-drop-shadow-alpha: 100%;
+      --tw-drop-shadow-size: initial;
+      --tw-translate-x: 0;
+      --tw-translate-y: 0;
+      --tw-translate-z: 0;
+    }
+  }
+}
+
+
+</style>
+<script>
+(function () {
+  var root = document.documentElement, KEY = 'theme';
+  function get() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
+  function set(v) { try { localStorage.setItem(KEY, v); } catch (e) {} }
+  var t = get();
+  if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  root.dataset.theme = t;
+  var SUN = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>';
+  var MOON = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>';
+  document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.querySelector('button[aria-label^="เปลี่ยนเป็นธีม"]');
+    if (!btn) return;
+    function paint() {
+      var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      btn.innerHTML = next === 'light' ? SUN : MOON;
+      btn.title = btn.ariaLabel = next === 'light' ? 'เปลี่ยนเป็นธีมสว่าง' : 'เปลี่ยนเป็นธีมมืด';
+    }
+    btn.addEventListener('click', function () {
+      var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next; set(next); paint();
+    });
+    paint();
+  });
+})();
+</script>
+</head><body>
+<main class="mx-auto max-w-[1320px] px-5 pb-[60px] pt-[18px]">
+<header class="mb-4 flex flex-wrap items-center gap-4 rounded-card border border-border bg-surface px-[18px] py-3.5">
+<div>
+<h1 class="m-0 text-[16px] font-[650] tracking-[0.2px]">Brake Oil Filling — ระบบตรวจจับความผิดปกติ</h1>
+<div class="text-[12px] text-muted">LSTM Autoencoder · ตรวจท้ายทุก cycle · อัปเดตล่าสุด 13:53:01</div>
+</div>
+<div class="ml-auto flex flex-wrap items-center gap-2">
+<nav class="flex gap-1 rounded-full border border-border bg-surface-2 p-[3px]" aria-label="หน้า"><a aria-current="page" class="rounded-full px-3 py-1 text-[12px] transition-colors bg-s1 text-white" href="/">Dashboard</a><a class="rounded-full px-3 py-1 text-[12px] transition-colors text-text-2 hover:text-text" href="/3d">3D เครื่องจักร</a></nav>
+<span class="flex items-center gap-[7px] rounded-full border border-border bg-surface-2 px-[11px] py-1.5 text-[12px] text-text-2"><span class="size-2 flex-none rounded-full bg-good"></span>Real-time เชื่อมต่อแล้ว</span><span class="flex items-center gap-[7px] rounded-full border border-border bg-surface-2 px-[11px] py-1.5 text-[12px] text-text-2"><span class="size-2 flex-none rounded-full bg-good"></span>API</span>
+<div role="group" aria-label="ภาษา" class="flex gap-1 rounded-full border border-border bg-surface-2 p-[3px]"><button type="button" aria-pressed="true" class="rounded-full px-2.5 py-1 text-[12px] font-semibold text-text-2 hover:text-text aria-pressed:bg-s1 aria-pressed:text-white">TH</button><button type="button" aria-pressed="false" class="rounded-full px-2.5 py-1 text-[12px] font-semibold text-text-2 hover:text-text aria-pressed:bg-s1 aria-pressed:text-white">EN</button></div>
+<button type="button" title="เปลี่ยนเป็นธีมสว่าง" aria-label="เปลี่ยนเป็นธีมสว่าง" class="flex size-[34px] items-center justify-center rounded-full border border-border bg-surface-2 text-text-2 hover:text-text"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun">
+<circle cx="12" cy="12" r="4"></circle>
+<path d="M12 2v2"></path>
+<path d="M12 20v2"></path>
+<path d="m4.93 4.93 1.41 1.41"></path>
+<path d="m17.66 17.66 1.41 1.41"></path>
+<path d="M2 12h2"></path>
+<path d="M20 12h2"></path>
+<path d="m6.34 17.66-1.41 1.41"></path>
+<path d="m19.07 4.93-1.41 1.41"></path></svg></button></div>
+</header>
+<div class="mb-4 grid gap-4 max-[980px]:grid-cols-2 min-[981px]:grid-cols-4">
+<section class="rounded-card border border-border bg-surface px-[18px] py-4 ">
+<div class="text-[30px] font-[680] tabular-nums tracking-[-0.5px]">16</div>
+<div class="mt-0.5 text-[12px] text-muted">ผลตรวจวันนี้ (รายการ)</div>
+<div class="mt-1.5 min-h-[18px] text-[12px] tabular-nums text-crit">▼ 45% จากเมื่อวาน</div>
+</section>
+<section class="rounded-card border border-border bg-surface px-[18px] py-4 ">
+<div class="text-[30px] font-[680] tabular-nums tracking-[-0.5px]">81.3%</div>
+<div class="mt-0.5 text-[12px] text-muted">Pass rate วันนี้</div>
+<div class="mt-1.5 min-h-[18px] text-[12px] tabular-nums text-crit">▼ 8.4 จุด</div>
+</section>
+<section class="rounded-card border border-border bg-surface px-[18px] py-4 ">
+<div class="text-[30px] font-[680] tabular-nums tracking-[-0.5px]">3</div>
+<div class="mt-0.5 text-[12px] text-muted">NG วันนี้ (รายการ)</div>
+<div class="mt-1.5 min-h-[18px] text-[12px] tabular-nums text-good">▲ 0 รายการ</div>
+</section>
+<section class="rounded-card border border-border bg-surface px-[18px] py-4 ">
+<div class="text-[30px] font-[680] tabular-nums tracking-[-0.5px]">13:01:02</div>
+<div class="mt-0.5 text-[12px] text-muted">ผลตรวจล่าสุด</div>
+<div class="mt-1.5 min-h-[18px] text-[12px] tabular-nums text-crit">RH · bn 6310 · NG</div>
+</section>
+</div>
+<div class="mb-4 grid gap-4 max-[980px]:grid-cols-1 min-[981px]:grid-cols-2">
+<section class="rounded-card border border-border bg-surface px-[18px] py-4 ">
+<div class="mb-3.5 flex items-center gap-2.5"><span class="text-[15px] font-[650]">เครื่องซ้าย (LH)</span><span class="rounded-[7px] px-2.5 py-[3px] text-[13px] font-bold border border-good/55 bg-good/20 text-text">PASS</span><span class="ml-auto rounded-full border border-border bg-surface-2 px-2.5 py-1 text-[12px] text-text-2">ตรวจเมื่อ 12:11:02</span></div>
+<div class="mb-2.5 flex gap-[22px] text-[13px] text-text-2"><span>รถ (bn) <b class="font-semibold tabular-nums text-text">6309</b></span><span>รุ่น (pgnum) <b class="font-semibold tabular-nums text-text">20</b></span><span class="text-muted">ค่าสดตอนนี้</span></div>
+<div class="mb-4 grid grid-cols-3 gap-2.5">
+<div class="rounded-[9px] border border-border bg-surface-2 px-3 py-2">
+<div class="text-[11px] text-muted">filling pressure</div>
+<div class="text-[16px] font-semibold tabular-nums">287</div>
+</div>
+<div class="rounded-[9px] border border-border bg-surface-2 px-3 py-2">
+<div class="text-[11px] text-muted">filling volume</div>
+<div class="text-[16px] font-semibold tabular-nums">910</div>
+</div>
+<div class="rounded-[9px] border border-border bg-surface-2 px-3 py-2">
+<div class="text-[11px] text-muted">vacuumgun</div>
+<div class="text-[16px] font-semibold tabular-nums">79</div>
+</div>
+</div>
+<div class="mb-1 text-[12px] text-muted">ผลตรวจ · bn <b class="tabular-nums text-text-2">6309</b></div>
+<div class="my-[11px]">
+<div class="mb-[5px] flex justify-between text-[12px]"><span class="text-text-2">fillingpressure</span><span class="tabular-nums text-text">2.1% <span class="text-muted">/ 8.0%</span></span></div>
+<div class="relative h-[9px] rounded-[5px] bg-surface-2">
+<div class="absolute inset-y-0 left-0 rounded-[5px] bg-good" style="width: 25.75%;"></div>
+<div class="absolute -inset-y-[3px] w-0.5 bg-text-2/85" style="left: calc(100% - 2px);"></div>
+</div>
+</div>
+<div class="my-[11px]">
+<div class="mb-[5px] flex justify-between text-[12px]"><span class="text-text-2">fillingvolume</span><span class="tabular-nums text-text">5.1% <span class="text-muted">/ 8.0%</span></span></div>
+<div class="relative h-[9px] rounded-[5px] bg-surface-2">
+<div class="absolute inset-y-0 left-0 rounded-[5px] bg-warn" style="width: 63.75%;"></div>
+<div class="absolute -inset-y-[3px] w-0.5 bg-text-2/85" style="left: calc(100% - 2px);"></div>
+</div>
+</div>
+<div class="my-[11px]">
+<div class="mb-[5px] flex justify-between text-[12px]"><span class="text-text-2">vacuumgun</span><span class="tabular-nums text-text">0.7% <span class="text-muted">/ 8.0%</span></span></div>
+<div class="relative h-[9px] rounded-[5px] bg-surface-2">
+<div class="absolute inset-y-0 left-0 rounded-[5px] bg-good" style="width: 8.875%;"></div>
+<div class="absolute -inset-y-[3px] w-0.5 bg-text-2/85" style="left: calc(100% - 2px);"></div>
+</div>
+</div>
+<div class="mt-1 text-[11px] text-muted">แถบ = % diff เทียบ reconstruction · เส้น = threshold ต่อฟีเจอร์</div>
+</section>
+<section class="rounded-card border border-border bg-surface px-[18px] py-4 ">
+<div class="mb-3.5 flex items-center gap-2.5"><span class="text-[15px] font-[650]">เครื่องขวา (RH)</span><span class="rounded-[7px] px-2.5 py-[3px] text-[13px] font-bold border border-crit/60 bg-crit/20 text-text">NG</span><span class="ml-auto rounded-full border border-border bg-surface-2 px-2.5 py-1 text-[12px] text-text-2">ตรวจเมื่อ 13:01:02</span></div>
+<div class="mb-2.5 flex gap-[22px] text-[13px] text-text-2"><span>รถ (bn) <b class="font-semibold tabular-nums text-text">6310</b></span><span>รุ่น (pgnum) <b class="font-semibold tabular-nums text-text">19</b></span><span class="text-muted">ค่าสดตอนนี้</span></div>
+<div class="mb-4 grid grid-cols-3 gap-2.5">
+<div class="rounded-[9px] border border-border bg-surface-2 px-3 py-2">
+<div class="text-[11px] text-muted">filling pressure</div>
+<div class="text-[16px] font-semibold tabular-nums">292</div>
+</div>
+<div class="rounded-[9px] border border-border bg-surface-2 px-3 py-2">
+<div class="text-[11px] text-muted">filling volume</div>
+<div class="text-[16px] font-semibold tabular-nums">905</div>
+</div>
+<div class="rounded-[9px] border border-border bg-surface-2 px-3 py-2">
+<div class="text-[11px] text-muted">vacuumgun</div>
+<div class="text-[16px] font-semibold tabular-nums">120</div>
+</div>
+</div>
+<div class="mb-1 text-[12px] text-muted">ผลตรวจ · bn <b class="tabular-nums text-text-2">6310</b></div>
+<div class="my-[11px]">
+<div class="mb-[5px] flex justify-between text-[12px]"><span class="text-text-2">fillingpressure</span><span class="tabular-nums text-text">3.4% <span class="text-muted">/ 8.0%</span></span></div>
+<div class="relative h-[9px] rounded-[5px] bg-surface-2">
+<div class="absolute inset-y-0 left-0 rounded-[5px] bg-good" style="width: 42.5%;"></div>
+<div class="absolute -inset-y-[3px] w-0.5 bg-text-2/85" style="left: calc(100% - 2px);"></div>
+</div>
+</div>
+<div class="my-[11px]">
+<div class="mb-[5px] flex justify-between text-[12px]"><span class="text-text-2">fillingvolume</span><span class="tabular-nums text-text">1.2% <span class="text-muted">/ 8.0%</span></span></div>
+<div class="relative h-[9px] rounded-[5px] bg-surface-2">
+<div class="absolute inset-y-0 left-0 rounded-[5px] bg-good" style="width: 15%;"></div>
+<div class="absolute -inset-y-[3px] w-0.5 bg-text-2/85" style="left: calc(100% - 2px);"></div>
+</div>
+</div>
+<div class="my-[11px]">
+<div class="mb-[5px] flex justify-between text-[12px]"><span class="text-text-2">vacuumgun</span><span class="tabular-nums text-crit-soft">9.4% <span class="text-muted">/ 8.0%</span></span></div>
+<div class="relative h-[9px] rounded-[5px] bg-surface-2">
+<div class="absolute inset-y-0 left-0 rounded-[5px] bg-crit" style="width: 100%;"></div>
+<div class="absolute -inset-y-[3px] w-0.5 bg-text-2/85" style="left: calc(85.1064% - 2px);"></div>
+</div>
+</div>
+<div class="mt-1 text-[11px] text-muted">vacuumgun เกิน threshold → ตัดสินเป็น NG</div>
+</section>
+</div>
+<section class="rounded-card border border-border bg-surface px-[18px] py-4 mb-4">
+<div class="mb-3.5 flex flex-wrap items-center justify-between gap-3.5">
+<h2 class="m-0 text-[13px] font-semibold uppercase tracking-[0.3px] text-text-2">Reconstruction overlay — 3 ฟีเจอร์ <span class="text-[12px] font-normal normal-case tracking-normal text-muted">เส้นทึบ = input (สีตาม bn) · เส้นประแดง = predict</span></h2>
+<div class="flex flex-wrap items-center gap-3"><span class="inline-flex items-center gap-1 rounded-[9px] border border-border bg-surface-2 py-[3px] pl-2.5 pr-[3px]"><span class="mr-[3px] text-[11px] text-muted">มุมมอง</span><button type="button" aria-pressed="true" class="rounded-[7px] px-[13px] py-[5px] text-[12px] font-bold text-muted aria-pressed:bg-s1 aria-pressed:text-white">Real-time</button><button type="button" aria-pressed="false" class="rounded-[7px] px-[13px] py-[5px] text-[12px] font-bold text-muted aria-pressed:bg-s1 aria-pressed:text-white">เปรียบเทียบ</button></span><span class="inline-flex items-center gap-1 rounded-[9px] border border-border bg-surface-2 py-[3px] pl-2.5 pr-[3px]"><span class="mr-[3px] text-[11px] text-muted">ฝั่ง</span><button type="button" aria-pressed="true" class="rounded-[7px] px-[13px] py-[5px] text-[12px] font-bold text-muted aria-pressed:bg-s1 aria-pressed:text-white">LH</button><button type="button" aria-pressed="true" class="rounded-[7px] px-[13px] py-[5px] text-[12px] font-bold text-muted aria-pressed:bg-s1 aria-pressed:text-white">RH</button></span><button type="button" aria-pressed="true" class="group inline-flex items-center gap-[9px] rounded-full border border-border bg-surface-2 py-1.5 pl-2 pr-[13px] text-[12px] text-text-2 aria-pressed:text-text"><span class="relative h-[18px] w-[34px] flex-none rounded-full bg-baseline transition-colors group-aria-pressed:bg-s1"><span class="absolute left-0.5 top-0.5 size-3.5 rounded-full bg-white transition-transform group-aria-pressed:translate-x-4"></span></span>แสดงผล predict</button></div>
+</div>
+<div class="mb-3.5 flex w-fit max-w-full flex-wrap items-center gap-4 rounded-[9px] border border-border bg-surface-2 px-3 py-2"><span class="text-[13px] font-bold text-text">สถานะเครื่อง</span><span class="flex items-center gap-[7px] text-[12px] text-text-2"><span aria-hidden="true" class="size-[9px] flex-none rounded-full bg-good shadow-[0_0_0_3px_rgba(12,163,12,0.18)]"></span>continue<span class="sr-only">ทำงาน</span></span><span class="flex items-center gap-[7px] text-[12px] text-text-2"><span aria-hidden="true" class="size-[9px] flex-none rounded-full bg-good shadow-[0_0_0_3px_rgba(12,163,12,0.18)]"></span>Master on<span class="sr-only">ทำงาน</span></span><span class="flex items-center gap-[7px] text-[12px] text-text-2"><span aria-hidden="true" class="size-[9px] flex-none rounded-full bg-crit shadow-[0_0_0_3px_rgba(208,59,59,0.16)]"></span>machine fault<span class="sr-only">ไม่ทำงาน</span></span><span class="ml-1.5 text-[11px] text-muted">● เขียว = ทำงาน · ● แดง = ไม่ทำงาน</span></div>
+<div>
+<div class="mt-4 border-t border-border pt-3.5 first:mt-0 first:border-t-0 first:pt-0">
+<div class="mb-2.5 flex items-baseline gap-2.5"><span class="text-[14px] font-[650]">เครื่องซ้าย (LH)</span><span class="text-[12px] tabular-nums text-muted">bn 6309 · pg20</span><span class="text-[12px] text-good">ตรวจเสร็จแล้ว</span></div>
+<div class="grid gap-[18px] max-[980px]:grid-cols-1 min-[981px]:grid-cols-3">
+<div>
+<div class="mb-2 flex items-center justify-between text-[13px] font-semibold"><span>filling pressure</span><span class="text-[12px] tabular-nums text-good">2.1% <span class="text-muted">/ 8.0%</span></span></div>
+<div class="relative h-[210px]">
+<div class="recharts-responsive-container" style="width: 100%; height: 100%; min-width: 0px;">
+<div class="recharts-wrapper" style="position: relative; cursor: default; width: 100%; height: 100%; max-height: 210px; max-width: 402px;"><svg class="recharts-surface" width="402" height="210" viewBox="0 0 402 210" style="width: 100%; height: 100%;"><title></title><desc></desc>
+<defs>
+<clipPath id="recharts12-clip">
+<rect x="40" y="12" height="168" width="352"></rect></clipPath></defs>
+<g class="recharts-layer recharts-reference-line">
+<line y="17" stroke="var(--color-grid)" fill="none" fill-opacity="1" stroke-width="1" x1="40" y1="163.78960750039724" x2="392" y2="163.78960750039724" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-reference-line">
+<line y="159" stroke="var(--color-grid)" fill="none" fill-opacity="1" stroke-width="1" x1="40" y1="96.0953440330526" x2="392" y2="96.0953440330526" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-reference-line">
+<line y="301" stroke="var(--color-grid)" fill="none" fill-opacity="1" stroke-width="1" x1="40" y1="28.401080565707936" x2="392" y2="28.401080565707936" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis">
+<g class="recharts-cartesian-axis-ticks">
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="40" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="40" dy="0.71em">0s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="119.10112359550561" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="119.10112359550561" dy="0.71em">20s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="198.20224719101122" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="198.20224719101122" dy="0.71em">40s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="277.30337078651684" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="277.30337078651684" dy="0.71em">60s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="356.40449438202245" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="356.40449438202245" dy="0.71em">80s</tspan></text></g></g></g>
+<g class="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis">
+<g class="recharts-cartesian-axis-ticks">
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text x="32" y="163.78960750039724" dy="3.5" text-anchor="end" font-size="10" fill="var(--color-muted)" font-weight="400">17</text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text x="32" y="96.0953440330526" dy="3.5" text-anchor="end" font-size="10" fill="var(--color-muted)" font-weight="400">159</text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text x="32" y="28.401080565707936" dy="3.5" text-anchor="end" font-size="10" fill="var(--color-muted)" font-weight="400">301</text></g></g></g>
+<g class="recharts-layer recharts-line">
+<path stroke="#e34948" stroke-width="2" stroke-dasharray="5 4" width="352" height="168" fill="none" class="recharts-curve recharts-line-curve" d="M40,162.216L43.955,163.361L47.91,161.263L51.865,162.836L55.82,161.501L59.775,162.598L63.73,160.5L67.685,161.644L71.64,162.645L75.596,161.692L79.551,161.12L83.506,161.025L87.461,161.072L91.416,161.978L95.371,161.835L99.326,161.501L103.281,161.501L107.236,161.549L111.191,159.69L115.146,159.118L119.101,161.072L123.056,160.786L127.011,161.215L130.966,158.784L134.921,159.642L138.876,158.641L142.831,160.882L146.787,32.692L150.742,34.169L154.697,34.074L158.652,34.598L162.607,37.411L166.562,36.744L170.517,37.268L174.472,36.601L178.427,37.602L182.382,36.553L186.337,33.502L190.292,33.597L194.247,31.786L198.202,31.643L202.157,30.403L206.112,31.309L210.067,30.308L214.022,30.642L217.978,31.786L221.933,31.786L225.888,34.694L229.843,33.502L233.798,34.837L237.753,36.648L241.708,37.03L245.663,38.126L249.618,36.362L253.573,37.268L257.528,34.122L261.483,33.788L265.438,33.788L269.393,31.643L273.348,31.166L277.303,29.879L281.258,29.688L285.213,30.499L289.169,30.689L293.124,31.261L297.079,32.263L301.034,34.265L304.989,35.409L308.944,41.13L312.899,46.898L316.854,51.713L320.809,57.815L324.764,62.677L328.719,68.589L332.674,71.735L336.629,77.313L340.584,84.225L344.539,88.706L348.494,93.759L352.449,100.577L356.404,104.962L360.36,110.397L364.315,115.975L368.27,121.409L372.225,128.56L376.18,131.802L380.135,137.427L384.09,144.435L388.045,148.296L392,154.589"></path>
+<g class="recharts-layer"></g></g>
+<g class="recharts-layer recharts-line">
+<path stroke="#3987e5" stroke-width="2" width="352" height="168" fill="none" class="recharts-curve recharts-line-curve" d="M40,163.265L43.955,163.742L47.91,161.93L51.865,163.075L55.82,163.265L59.775,162.836L63.73,159.833L67.685,162.455L71.64,163.17L75.596,159.833L79.551,161.406L83.506,159.69L87.461,162.121L91.416,161.168L95.371,161.549L99.326,161.168L103.281,159.499L107.236,161.93L111.191,159.881L115.146,161.978L119.101,160.214L123.056,161.311L127.011,161.787L130.966,158.593L134.921,160.548L138.876,159.451L142.831,161.12L146.787,32.167L150.742,33.025L154.697,34.217L158.652,34.598L162.607,34.741L166.562,38.031L170.517,38.031L174.472,37.697L178.427,35.647L182.382,34.598L186.337,34.026L190.292,34.312L194.247,32.787L198.202,31.595L202.157,32.167L206.112,28.258L210.067,30.594L214.022,28.973L217.978,32.787L221.933,32.835L225.888,34.694L229.843,33.359L233.798,37.745L237.753,35.171L241.708,37.84L245.663,37.983L249.618,35.838L253.573,36.219L257.528,36.315L261.483,34.646L265.438,33.121L269.393,32.263L273.348,31.118L277.303,31.786L281.258,29.641L285.213,31.643L289.169,30.403L293.124,32.93L297.079,33.502L301.034,32.549L304.989,33.359L308.944,42.131L312.899,46.612L316.854,50.664L320.809,58.625L324.764,63.297L328.719,68.589L332.674,74.691L336.629,78.218L340.584,84.606L344.539,87.991L348.494,95.905L352.449,100.386L356.404,105.868L360.36,111.589L364.315,115.355L368.27,123.221L372.225,128.036L376.18,131.277L380.135,136.903L384.09,141.908L388.045,149.774L392,153.922"></path>
+<g class="recharts-layer"></g></g></svg>
+<div tabindex="-1" class="recharts-tooltip-wrapper" style="visibility: hidden; pointer-events: none; position: absolute; top: 0px; left: 0px;"></div>
+</div>
+</div>
+<div class="pointer-events-none absolute left-[46px] top-[15px] rounded-[5px] border border-grid bg-surface/75 px-1 py-[3px]">
+<div class="flex h-[13px] items-center gap-1.5 text-[9.5px] text-text-2"><span class="w-4 flex-none" style="border-top: 2.5px solid rgb(57, 135, 229);"></span>6309 LH</div>
+<div class="flex h-[13px] items-center gap-1.5 text-[9.5px] text-text-2"><span class="w-4 flex-none" style="border-top: 2.5px dashed rgb(227, 73, 72);"></span>predict</div>
+</div>
+</div>
+</div>
+<div>
+<div class="mb-2 flex items-center justify-between text-[13px] font-semibold"><span>filling volume</span><span class="text-[12px] tabular-nums text-good">5.1% <span class="text-muted">/ 8.0%</span></span></div>
+<div class="relative h-[210px]">
+<div class="recharts-responsive-container" style="width: 100%; height: 100%; min-width: 0px;">
+<div class="recharts-wrapper" style="position: relative; cursor: default; width: 100%; height: 100%; max-height: 210px; max-width: 402px;"><svg class="recharts-surface" width="402" height="210" viewBox="0 0 402 210" style="width: 100%; height: 100%;"><title></title><desc></desc>
+<defs>
+<clipPath id="recharts18-clip">
+<rect x="40" y="12" height="168" width="352"></rect></clipPath></defs>
+<g class="recharts-layer recharts-reference-line">
+<line y="-7" stroke="var(--color-grid)" fill="none" fill-opacity="1" stroke-width="1" x1="40" y1="163.80063733437694" x2="392" y2="163.80063733437694" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-reference-line">
+<line y="455" stroke="var(--color-grid)" fill="none" fill-opacity="1" stroke-width="1" x1="40" y1="96" x2="392" y2="96" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-reference-line">
+<line y="917" stroke="var(--color-grid)" fill="none" fill-opacity="1" stroke-width="1" x1="40" y1="28.199362665623084" x2="392" y2="28.199362665623084" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis">
+<g class="recharts-cartesian-axis-ticks">
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="40" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="40" dy="0.71em">0s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="119.10112359550561" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="119.10112359550561" dy="0.71em">20s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="198.20224719101122" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="198.20224719101122" dy="0.71em">40s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="277.30337078651684" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="277.30337078651684" dy="0.71em">60s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="356.40449438202245" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="356.40449438202245" dy="0.71em">80s</tspan></text></g></g></g>
+<g class="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis">
+<g class="recharts-cartesian-axis-ticks">
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text x="32" y="163.80063733437694" dy="3.5" text-anchor="end" font-size="10" fill="var(--color-muted)" font-weight="400">-7</text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text x="32" y="96" dy="3.5" text-anchor="end" font-size="10" fill="var(--color-muted)" font-weight="400">455</text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text x="32" y="28.199362665623084" dy="3.5" text-anchor="end" font-size="10" fill="var(--color-muted)" font-weight="400">917</text></g></g></g>
+<g class="recharts-layer recharts-line">
+<path stroke="#e34948" stroke-width="2" stroke-dasharray="5 4" width="352" height="168" fill="none" class="recharts-curve recharts-line-curve" d="M40,162.539L43.955,163.023L47.91,162.392L51.865,162.583L55.82,162.905L59.775,163.052L63.73,163.023L67.685,162.524L71.64,162.406L75.596,163.052L79.551,162.597L83.506,163.038L87.461,162.979L91.416,163.038L95.371,163.038L99.326,162.641L103.281,163.17L107.236,162.92L111.191,163.082L115.146,162.832L119.101,162.891L123.056,162.45L127.011,162.964L130.966,162.964L134.921,162.348L138.876,162.274L142.831,159.237L146.787,156.874L150.742,153.807L154.697,150.49L158.652,147.32L162.607,144.561L166.562,141.626L170.517,138.559L174.472,135.624L178.427,132.733L182.382,129.915L186.337,126.452L190.292,123.502L194.247,120.611L198.202,117.676L202.157,114.623L206.112,111.365L210.067,108.474L214.022,105.51L217.978,102.428L221.933,99.434L225.888,96.132L229.843,93.637L233.798,90.321L237.753,87.606L241.708,84.406L245.663,81.515L249.618,78.492L253.573,75.131L257.528,72.71L261.483,69.364L265.438,66.546L269.393,63.318L273.348,60.177L277.303,57.858L281.258,54.689L285.213,51.68L289.169,48.789L293.124,45.648L297.079,42.479L301.034,39.074L304.989,36.271L308.944,33.057L312.899,30.665L316.854,29.623L320.809,29.08L324.764,28.977L328.719,28.845L332.674,29.109L336.629,29.535L340.584,29.3L344.539,29.55L348.494,29.051L352.449,28.874L356.404,29.227L360.36,29.153L364.315,29.227L368.27,29.359L372.225,29.564L376.18,29.652L380.135,29.227L384.09,28.83L388.045,28.816L392,29.667"></path>
+<g class="recharts-layer"></g></g>
+<g class="recharts-layer recharts-line">
+<path stroke="#3987e5" stroke-width="2" width="352" height="168" fill="none" class="recharts-curve recharts-line-curve" d="M40,163.082L43.955,163.052L47.91,163.463L51.865,163.184L55.82,162.084L59.775,163.581L63.73,163.199L67.685,162.964L71.64,163.111L75.596,161.775L79.551,163.272L83.506,162.406L87.461,163.331L91.416,162.069L95.371,162.142L99.326,163.052L103.281,163.404L107.236,162.48L111.191,163.742L115.146,162.45L119.101,162.201L123.056,161.775L127.011,161.981L130.966,162.685L134.921,162.92L138.876,163.419L142.831,158.767L146.787,157.358L150.742,152.735L154.697,150.05L158.652,146.968L162.607,144.737L166.562,141.127L170.517,139.322L174.472,134.743L178.427,133.07L182.382,128.946L186.337,126.32L190.292,124.192L194.247,119.701L198.202,117.147L202.157,113.699L206.112,111.512L210.067,109.281L214.022,104.864L217.978,102.736L221.933,100.109L225.888,95.795L229.843,93.402L233.798,91.142L237.753,87.43L241.708,85.17L245.663,80.708L249.618,78.61L253.573,76.496L257.528,72.49L261.483,70.024L265.438,67.236L269.393,63.024L273.348,60.192L277.303,58.123L281.258,53.779L285.213,50.756L289.169,49.391L293.124,46.221L297.079,41.583L301.034,39.602L304.989,36.858L308.944,32.675L312.899,31.296L316.854,29.726L320.809,30.034L324.764,28.317L328.719,29.77L332.674,30.122L336.629,28.258L340.584,29.99L344.539,29.77L348.494,29.916L352.449,29.212L356.404,28.522L360.36,30.166L364.315,30.107L368.27,29.975L372.225,29.55L376.18,28.317L380.135,28.419L384.09,28.948L388.045,29.535L392,28.64"></path>
+<g class="recharts-layer"></g></g></svg>
+<div tabindex="-1" class="recharts-tooltip-wrapper" style="visibility: hidden; pointer-events: none; position: absolute; top: 0px; left: 0px;"></div>
+</div>
+</div>
+<div class="pointer-events-none absolute left-[46px] top-[15px] rounded-[5px] border border-grid bg-surface/75 px-1 py-[3px]">
+<div class="flex h-[13px] items-center gap-1.5 text-[9.5px] text-text-2"><span class="w-4 flex-none" style="border-top: 2.5px solid rgb(57, 135, 229);"></span>6309 LH</div>
+<div class="flex h-[13px] items-center gap-1.5 text-[9.5px] text-text-2"><span class="w-4 flex-none" style="border-top: 2.5px dashed rgb(227, 73, 72);"></span>predict</div>
+</div>
+</div>
+</div>
+<div>
+<div class="mb-2 flex items-center justify-between text-[13px] font-semibold"><span>vacuumgun</span><span class="text-[12px] tabular-nums text-good">0.7% <span class="text-muted">/ 8.0%</span></span></div>
+<div class="relative h-[210px]">
+<div class="recharts-responsive-container" style="width: 100%; height: 100%; min-width: 0px;">
+<div class="recharts-wrapper" style="position: relative; cursor: default; width: 100%; height: 100%; max-height: 210px; max-width: 402px;"><svg class="recharts-surface" width="402" height="210" viewBox="0 0 402 210" style="width: 100%; height: 100%;"><title></title><desc></desc>
+<defs>
+<clipPath id="recharts24-clip">
+<rect x="40" y="12" height="168" width="352"></rect></clipPath></defs>
+<g class="recharts-layer recharts-reference-line">
+<line y="-3" stroke="var(--color-grid)" fill="none" fill-opacity="1" stroke-width="1" x1="40" y1="163.34286664449618" x2="392" y2="163.34286664449618" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-reference-line">
+<line y="65" stroke="var(--color-grid)" fill="none" fill-opacity="1" stroke-width="1" x1="40" y1="95.50116395078152" x2="392" y2="95.50116395078152" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-reference-line">
+<line y="130" stroke="#c98500" stroke-width="1.5" stroke-dasharray="6 4" fill="none" fill-opacity="1" x1="40" y1="30.65247755237779" x2="392" y2="30.65247755237779" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis">
+<g class="recharts-cartesian-axis-ticks">
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="40" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="40" dy="0.71em">0s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="119.10112359550561" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="119.10112359550561" dy="0.71em">20s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="198.20224719101122" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="198.20224719101122" dy="0.71em">40s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="277.30337078651684" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="277.30337078651684" dy="0.71em">60s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="356.40449438202245" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="356.40449438202245" dy="0.71em">80s</tspan></text></g></g></g>
+<g class="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis">
+<g class="recharts-cartesian-axis-ticks">
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text x="32" y="163.34286664449618" dy="3.5" text-anchor="end" font-size="10" fill="var(--color-muted)" font-weight="400">-3</text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text x="32" y="95.50116395078152" dy="3.5" text-anchor="end" font-size="10" fill="var(--color-muted)" font-weight="400">65</text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text x="32" y="30.65247755237779" dy="3.5" text-anchor="end" font-size="10" fill="#c98500" font-weight="600">130</text></g></g></g>
+<g class="recharts-layer recharts-line">
+<path stroke="#e34948" stroke-width="2" stroke-dasharray="5 4" width="352" height="168" fill="none" class="recharts-curve recharts-line-curve" d="M40,138.501L43.955,140.895L47.91,140.396L51.865,140.297L55.82,141.893L59.775,139.698L63.73,140.895L67.685,139.898L71.64,132.714L75.596,128.225L79.551,126.828L83.506,116.851L87.461,115.953L91.416,108.072L95.371,102.485L99.326,96.499L103.281,92.209L107.236,85.924L111.191,83.429L115.146,77.044L119.101,72.754L123.056,65.272L127.011,62.678L130.966,55.894L134.921,52.402L138.876,43.223L142.831,37.836L146.787,34.244L150.742,31.351L154.697,30.054L158.652,30.952L162.607,34.444L166.562,34.543L170.517,29.256L174.472,31.85L178.427,32.648L182.382,35.741L186.337,32.847L190.292,34.942L194.247,38.634L198.202,40.529L202.157,39.133L206.112,38.235L210.067,41.926L214.022,39.931L217.978,42.225L221.933,40.23L225.888,39.731L229.843,36.539L233.798,35.342L237.753,38.235L241.708,34.444L245.663,32.847L249.618,33.446L253.573,34.843L257.528,30.553L261.483,33.546L265.438,32.548L269.393,32.548L273.348,32.249L277.303,30.952L281.258,36.04L285.213,37.536L289.169,33.047L293.124,37.636L297.079,36.539L301.034,40.629L304.989,39.831L308.944,40.23L312.899,50.207L316.854,52.601L320.809,60.982L324.764,66.968L328.719,72.455L332.674,78.241L336.629,80.636L340.584,88.517L344.539,91.61L348.494,101.587L352.449,105.179L356.404,111.065L360.36,118.248L364.315,122.438L368.27,124.334L372.225,134.211L376.18,137.104L380.135,144.686L384.09,147.38L388.045,153.266L392,161.946"></path>
+<g class="recharts-layer"></g></g>
+<g class="recharts-layer recharts-line">
+<path stroke="#3987e5" stroke-width="2" width="352" height="168" fill="none" class="recharts-curve recharts-line-curve" d="M40,137.204L43.955,142.891L47.91,137.802L51.865,140.895L55.82,141.294L59.775,141.893L63.73,144.188L67.685,142.691L71.64,131.717L75.596,133.113L79.551,122.937L83.506,118.747L87.461,112.162L91.416,110.267L95.371,105.777L99.326,95.202L103.281,96.1L107.236,90.114L111.191,80.536L115.146,75.448L119.101,69.362L123.056,65.072L127.011,59.984L130.966,57.191L134.921,50.606L138.876,45.218L142.831,42.026L146.787,31.251L150.742,30.353L154.697,34.244L158.652,30.154L162.607,33.645L166.562,34.743L170.517,34.843L174.472,33.147L178.427,35.441L182.382,33.745L186.337,34.244L190.292,34.144L194.247,39.033L198.202,34.543L202.157,37.137L206.112,41.328L210.067,36.339L214.022,36.938L217.978,35.741L221.933,40.23L225.888,41.826L229.843,40.031L233.798,40.629L237.753,35.641L241.708,33.246L245.663,34.942L249.618,35.641L253.573,35.342L257.528,35.441L261.483,31.451L265.438,33.845L269.393,28.258L273.348,28.857L277.303,33.446L281.258,33.346L285.213,32.249L289.169,32.349L293.124,39.332L297.079,38.335L301.034,38.035L304.989,36.838L308.944,42.026L312.899,47.214L316.854,54.996L320.809,61.281L324.764,62.079L328.719,68.165L332.674,72.455L336.629,81.035L340.584,89.415L344.539,91.111L348.494,102.285L352.449,101.088L356.404,106.276L360.36,116.153L364.315,123.636L368.27,125.431L372.225,131.218L376.18,140.995L380.135,147.081L384.09,153.167L388.045,156.559L392,163.742"></path>
+<g class="recharts-layer"></g></g></svg>
+<div tabindex="-1" class="recharts-tooltip-wrapper" style="visibility: hidden; pointer-events: none; position: absolute; top: 0px; left: 0px;"></div>
+</div>
+</div>
+<div class="pointer-events-none absolute left-[46px] top-[15px] rounded-[5px] border border-grid bg-surface/75 px-1 py-[3px]">
+<div class="flex h-[13px] items-center gap-1.5 text-[9.5px] text-text-2"><span class="w-4 flex-none" style="border-top: 2.5px solid rgb(57, 135, 229);"></span>6309 LH</div>
+<div class="flex h-[13px] items-center gap-1.5 text-[9.5px] text-text-2"><span class="w-4 flex-none" style="border-top: 2.5px dashed rgb(227, 73, 72);"></span>predict</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-4 border-t border-border pt-3.5 first:mt-0 first:border-t-0 first:pt-0">
+<div class="mb-2.5 flex items-baseline gap-2.5"><span class="text-[14px] font-[650]">เครื่องขวา (RH)</span><span class="text-[12px] tabular-nums text-muted">bn 6310 · pg19</span><span class="text-[12px] text-good">ตรวจเสร็จแล้ว</span></div>
+<div class="grid gap-[18px] max-[980px]:grid-cols-1 min-[981px]:grid-cols-3">
+<div>
+<div class="mb-2 flex items-center justify-between text-[13px] font-semibold"><span>filling pressure</span><span class="text-[12px] tabular-nums text-good">3.4% <span class="text-muted">/ 8.0%</span></span></div>
+<div class="relative h-[210px]">
+<div class="recharts-responsive-container" style="width: 100%; height: 100%; min-width: 0px;">
+<div class="recharts-wrapper" style="position: relative; cursor: default; width: 100%; height: 100%; max-height: 210px; max-width: 402px;"><svg class="recharts-surface" width="402" height="210" viewBox="0 0 402 210" style="width: 100%; height: 100%;"><title></title><desc></desc>
+<defs>
+<clipPath id="recharts30-clip">
+<rect x="40" y="12" height="168" width="352"></rect></clipPath></defs>
+<g class="recharts-layer recharts-reference-line">
+<line y="19" stroke="var(--color-grid)" fill="none" fill-opacity="1" stroke-width="1" x1="40" y1="163.54975978037064" x2="392" y2="163.54975978037064" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-reference-line">
+<line y="160" stroke="var(--color-grid)" fill="none" fill-opacity="1" stroke-width="1" x1="40" y1="95.80782429649966" x2="392" y2="95.80782429649966" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-reference-line">
+<line y="301" stroke="var(--color-grid)" fill="none" fill-opacity="1" stroke-width="1" x1="40" y1="28.06588881262868" x2="392" y2="28.06588881262868" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis">
+<g class="recharts-cartesian-axis-ticks">
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="40" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="40" dy="0.71em">0s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="119.10112359550561" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="119.10112359550561" dy="0.71em">20s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="198.20224719101122" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="198.20224719101122" dy="0.71em">40s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="277.30337078651684" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="277.30337078651684" dy="0.71em">60s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="356.40449438202245" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="356.40449438202245" dy="0.71em">80s</tspan></text></g></g></g>
+<g class="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis">
+<g class="recharts-cartesian-axis-ticks">
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text x="32" y="163.54975978037064" dy="3.5" text-anchor="end" font-size="10" fill="var(--color-muted)" font-weight="400">19</text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text x="32" y="95.80782429649966" dy="3.5" text-anchor="end" font-size="10" fill="var(--color-muted)" font-weight="400">160</text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text x="32" y="28.06588881262868" dy="3.5" text-anchor="end" font-size="10" fill="var(--color-muted)" font-weight="400">301</text></g></g></g>
+<g class="recharts-layer recharts-line">
+<path stroke="#e34948" stroke-width="2" stroke-dasharray="5 4" width="352" height="168" fill="none" class="recharts-curve recharts-line-curve" d="M40,162.493L43.955,161.58L47.91,163.213L51.865,161.628L55.82,161.772L59.775,163.742L63.73,163.598L67.685,162.589L71.64,163.261L75.596,162.012L79.551,161.676L83.506,161.148L87.461,162.445L91.416,162.349L95.371,160.907L99.326,161.003L103.281,162.301L107.236,161.628L111.191,160.715L115.146,159.995L119.101,162.301L123.056,161.292L127.011,161.003L130.966,161.676L134.921,159.322L138.876,160.811L142.831,161.484L146.787,31.045L150.742,33.351L154.697,34.312L158.652,36.233L162.607,35.369L166.562,36.522L170.517,36.089L174.472,37.338L178.427,34.984L182.382,35.945L186.337,34.792L190.292,34.36L194.247,30.468L198.202,29.94L202.157,29.747L206.112,30.42L210.067,28.979L214.022,28.931L217.978,30.949L221.933,31.237L225.888,33.303L229.843,35.224L233.798,35.609L237.753,36.762L241.708,37.242L245.663,38.107L249.618,38.107L253.573,36.041L257.528,34.312L261.483,33.303L265.438,33.399L269.393,31.717L273.348,29.603L277.303,30.708L281.258,28.258L285.213,29.363L289.169,29.507L293.124,30.372L297.079,31.429L301.034,33.062L304.989,35.657L308.944,39.068L312.899,46.13L316.854,50.262L320.809,57.036L324.764,61.36L328.719,68.567L332.674,74.38L336.629,78.272L340.584,84.469L344.539,89.995L348.494,94.415L352.449,101.093L356.404,104.552L360.36,112.863L364.315,116.467L368.27,121.992L372.225,128.766L376.18,133.714L380.135,137.942L384.09,144.284L388.045,148.848L392,156.103"></path>
+<g class="recharts-layer"></g></g>
+<g class="recharts-layer recharts-line">
+<path stroke="#3987e5" stroke-width="2" width="352" height="168" fill="none" class="recharts-curve recharts-line-curve" d="M40,163.31L43.955,162.06L47.91,163.694L51.865,163.742L55.82,163.598L59.775,160.907L63.73,160.571L67.685,162.156L71.64,163.742L75.596,161.196L79.551,162.253L83.506,160.811L87.461,159.995L91.416,161.436L95.371,163.358L99.326,159.85L103.281,162.685L107.236,160.667L111.191,161.148L115.146,160.523L119.101,159.13L123.056,161.1L127.011,162.012L130.966,161.196L134.921,160.571L138.876,160.811L142.831,159.466L146.787,30.372L150.742,32.294L154.697,35.897L158.652,33.783L162.607,35.561L166.562,35.945L170.517,35.513L174.472,36.233L178.427,35.801L182.382,33.879L186.337,35.08L190.292,33.927L194.247,33.399L198.202,30.324L202.157,28.354L206.112,30.949L210.067,30.132L214.022,30.708L217.978,31.093L221.933,32.822L225.888,31.429L229.843,34.456L233.798,36.041L237.753,37.194L241.708,36.906L245.663,38.395L249.618,35.801L253.573,36.329L257.528,36.474L261.483,35.272L265.438,32.678L269.393,32.054L273.348,31.237L277.303,31.573L281.258,29.411L285.213,29.747L289.169,28.739L293.124,31.045L297.079,30.708L301.034,34.744L304.989,33.159L308.944,41.134L312.899,47.235L316.854,50.743L320.809,55.595L324.764,61.024L328.719,66.837L332.674,73.996L336.629,77.935L340.584,82.692L344.539,89.178L348.494,96.144L352.449,101.333L356.404,105.321L360.36,109.741L364.315,117.235L368.27,120.791L372.225,129.054L376.18,134.675L380.135,137.606L384.09,144.861L388.045,149.089L392,153.701"></path>
+<g class="recharts-layer"></g></g></svg>
+<div tabindex="-1" class="recharts-tooltip-wrapper" style="visibility: hidden; pointer-events: none; position: absolute; top: 0px; left: 0px;"></div>
+</div>
+</div>
+<div class="pointer-events-none absolute left-[46px] top-[15px] rounded-[5px] border border-grid bg-surface/75 px-1 py-[3px]">
+<div class="flex h-[13px] items-center gap-1.5 text-[9.5px] text-text-2"><span class="w-4 flex-none" style="border-top: 2.5px solid rgb(57, 135, 229);"></span>6310 RH</div>
+<div class="flex h-[13px] items-center gap-1.5 text-[9.5px] text-text-2"><span class="w-4 flex-none" style="border-top: 2.5px dashed rgb(227, 73, 72);"></span>predict</div>
+</div>
+</div>
+</div>
+<div>
+<div class="mb-2 flex items-center justify-between text-[13px] font-semibold"><span>filling volume</span><span class="text-[12px] tabular-nums text-good">1.2% <span class="text-muted">/ 8.0%</span></span></div>
+<div class="relative h-[210px]">
+<div class="recharts-responsive-container" style="width: 100%; height: 100%; min-width: 0px;">
+<div class="recharts-wrapper" style="position: relative; cursor: default; width: 100%; height: 100%; max-height: 210px; max-width: 402px;"><svg class="recharts-surface" width="402" height="210" viewBox="0 0 402 210" style="width: 100%; height: 100%;"><title></title><desc></desc>
+<defs>
+<clipPath id="recharts36-clip">
+<rect x="40" y="12" height="168" width="352"></rect></clipPath></defs>
+<g class="recharts-layer recharts-reference-line">
+<line y="-6" stroke="var(--color-grid)" fill="none" fill-opacity="1" stroke-width="1" x1="40" y1="163.77135332579212" x2="392" y2="163.77135332579212" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-reference-line">
+<line y="455" stroke="var(--color-grid)" fill="none" fill-opacity="1" stroke-width="1" x1="40" y1="95.96322769759858" x2="392" y2="95.96322769759858" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-reference-line">
+<line y="915" stroke="var(--color-grid)" fill="none" fill-opacity="1" stroke-width="1" x1="40" y1="28.3021912790107" x2="392" y2="28.3021912790107" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis">
+<g class="recharts-cartesian-axis-ticks">
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="40" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="40" dy="0.71em">0s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="119.10112359550561" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="119.10112359550561" dy="0.71em">20s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="198.20224719101122" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="198.20224719101122" dy="0.71em">40s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="277.30337078651684" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="277.30337078651684" dy="0.71em">60s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="356.40449438202245" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="356.40449438202245" dy="0.71em">80s</tspan></text></g></g></g>
+<g class="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis">
+<g class="recharts-cartesian-axis-ticks">
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text x="32" y="163.77135332579212" dy="3.5" text-anchor="end" font-size="10" fill="var(--color-muted)" font-weight="400">-6</text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text x="32" y="95.96322769759858" dy="3.5" text-anchor="end" font-size="10" fill="var(--color-muted)" font-weight="400">455</text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text x="32" y="28.3021912790107" dy="3.5" text-anchor="end" font-size="10" fill="var(--color-muted)" font-weight="400">915</text></g></g></g>
+<g class="recharts-layer recharts-line">
+<path stroke="#e34948" stroke-width="2" stroke-dasharray="5 4" width="352" height="168" fill="none" class="recharts-curve recharts-line-curve" d="M40,163.286L43.955,162.668L47.91,163.301L51.865,163.051L55.82,163.286L59.775,162.918L63.73,162.977L67.685,162.742L71.64,162.609L75.596,162.801L79.551,163.168L83.506,162.786L87.461,162.492L91.416,162.933L95.371,162.948L99.326,162.698L103.281,162.948L107.236,162.462L111.191,162.653L115.146,162.551L119.101,163.183L123.056,162.83L127.011,163.183L130.966,162.668L134.921,162.992L138.876,162.786L142.831,159.638L146.787,156.52L150.742,153.269L154.697,150.666L158.652,147.489L162.607,144.562L166.562,141.473L170.517,139.002L174.472,135.795L178.427,132.162L182.382,129.735L186.337,126.646L190.292,123.366L194.247,120.292L198.202,117.924L202.157,114.747L206.112,111.584L210.067,108.583L214.022,105.333L217.978,102.832L221.933,99.214L225.888,96.434L229.843,93.522L233.798,90.506L237.753,87.638L241.708,84.549L245.663,81.122L249.618,78.71L253.573,75.209L257.528,72.723L261.483,69.296L265.438,66.207L269.393,63.148L273.348,60.544L277.303,57.073L281.258,54.513L285.213,51.763L289.169,48.483L293.124,45.526L297.079,42.026L301.034,39.304L304.989,36.451L308.944,33.097L312.899,30.406L316.854,29.317L320.809,29.42L324.764,28.846L328.719,29.038L332.674,29.17L336.629,28.891L340.584,29.17L344.539,28.758L348.494,29.435L352.449,29.405L356.404,28.743L360.36,28.964L364.315,28.979L368.27,29.376L372.225,29.449L376.18,29.008L380.135,28.685L384.09,29.332L388.045,29.214L392,29.082"></path>
+<g class="recharts-layer"></g></g>
+<g class="recharts-layer recharts-line">
+<path stroke="#3987e5" stroke-width="2" width="352" height="168" fill="none" class="recharts-curve recharts-line-curve" d="M40,162.08L43.955,162.756L47.91,163.08L51.865,162.006L55.82,162.521L59.775,162.683L63.73,162.359L67.685,162.095L71.64,162.477L75.596,163.477L79.551,163.742L83.506,161.874L87.461,162.227L91.416,162.889L95.371,162.506L99.326,162.521L103.281,163.462L107.236,163.404L111.191,162.477L115.146,163.006L119.101,162.212L123.056,163.492L127.011,162.271L130.966,162.948L134.921,162.08L138.876,162.109L142.831,160.079L146.787,157.549L150.742,153.519L154.697,150.136L158.652,146.871L162.607,144.9L166.562,141.737L170.517,137.604L174.472,136.295L178.427,132.368L182.382,128.617L186.337,126.043L190.292,124.499L194.247,120.63L198.202,118.13L202.157,114.099L206.112,112.187L210.067,108.128L214.022,106.304L217.978,103.009L221.933,99.729L225.888,96.007L229.843,94.228L233.798,91.109L237.753,86.755L241.708,84.226L245.663,80.71L249.618,78.445L253.573,75.989L257.528,72.282L261.483,70.208L265.438,65.442L269.393,63.589L273.348,59.897L277.303,58.397L281.258,53.984L285.213,52.234L289.169,47.894L293.124,45.453L297.079,42.379L301.034,38.981L304.989,37.26L308.944,33.171L312.899,30.244L316.854,28.626L320.809,29.626L324.764,28.891L328.719,29.479L332.674,28.743L336.629,29.758L340.584,29.067L344.539,29.494L348.494,28.258L352.449,28.699L356.404,28.552L360.36,29.405L364.315,28.935L368.27,28.802L372.225,29.052L376.18,28.42L380.135,28.876L384.09,28.493L388.045,29.964L392,30.008"></path>
+<g class="recharts-layer"></g></g></svg>
+<div tabindex="-1" class="recharts-tooltip-wrapper" style="visibility: hidden; pointer-events: none; position: absolute; top: 0px; left: 0px;"></div>
+</div>
+</div>
+<div class="pointer-events-none absolute left-[46px] top-[15px] rounded-[5px] border border-grid bg-surface/75 px-1 py-[3px]">
+<div class="flex h-[13px] items-center gap-1.5 text-[9.5px] text-text-2"><span class="w-4 flex-none" style="border-top: 2.5px solid rgb(57, 135, 229);"></span>6310 RH</div>
+<div class="flex h-[13px] items-center gap-1.5 text-[9.5px] text-text-2"><span class="w-4 flex-none" style="border-top: 2.5px dashed rgb(227, 73, 72);"></span>predict</div>
+</div>
+</div>
+</div>
+<div>
+<div class="mb-2 flex items-center justify-between text-[13px] font-semibold"><span>vacuumgun</span><span class="text-[12px] tabular-nums text-crit">9.4% <span class="text-muted">/ 8.0%</span></span></div>
+<div class="relative h-[210px]">
+<div class="recharts-responsive-container" style="width: 100%; height: 100%; min-width: 0px;">
+<div class="recharts-wrapper" style="position: relative; cursor: default; width: 100%; height: 100%; max-height: 210px; max-width: 402px;"><svg class="recharts-surface" width="402" height="210" viewBox="0 0 402 210" style="width: 100%; height: 100%;"><title></title><desc></desc>
+<defs>
+<clipPath id="recharts42-clip">
+<rect x="40" y="12" height="168" width="352"></rect></clipPath></defs>
+<g class="recharts-layer recharts-reference-line">
+<line y="1" stroke="var(--color-grid)" fill="none" fill-opacity="1" stroke-width="1" x1="40" y1="164.05435025166744" x2="392" y2="164.05435025166744" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-reference-line">
+<line y="66" stroke="var(--color-grid)" fill="none" fill-opacity="1" stroke-width="1" x1="40" y1="96.36448389576256" x2="392" y2="96.36448389576256" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-reference-line">
+<line y="130" stroke="#c98500" stroke-width="1.5" stroke-dasharray="6 4" fill="none" fill-opacity="1" x1="40" y1="29.716000099179283" x2="392" y2="29.716000099179283" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis">
+<g class="recharts-cartesian-axis-ticks">
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="40" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="40" dy="0.71em">0s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="119.10112359550561" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="119.10112359550561" dy="0.71em">20s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="198.20224719101122" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="198.20224719101122" dy="0.71em">40s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="277.30337078651684" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="277.30337078651684" dy="0.71em">60s</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="352" height="30" stroke="none" font-size="10" x="356.40449438202245" y="188" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="356.40449438202245" dy="0.71em">80s</tspan></text></g></g></g>
+<g class="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis">
+<g class="recharts-cartesian-axis-ticks">
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text x="32" y="164.05435025166744" dy="3.5" text-anchor="end" font-size="10" fill="var(--color-muted)" font-weight="400">1</text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text x="32" y="96.36448389576256" dy="3.5" text-anchor="end" font-size="10" fill="var(--color-muted)" font-weight="400">66</text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text x="32" y="29.716000099179283" dy="3.5" text-anchor="end" font-size="10" fill="#c98500" font-weight="600">130</text></g></g></g>
+<g class="recharts-layer recharts-line">
+<path stroke="#e34948" stroke-width="2" stroke-dasharray="5 4" width="352" height="168" fill="none" class="recharts-curve recharts-line-curve" d="M40,144.372L43.955,145.205L47.91,142.81L51.865,146.247L55.82,146.767L59.775,142.498L63.73,145.309L67.685,143.435L71.64,140.623L75.596,135.52L79.551,126.773L83.506,123.128L87.461,114.797L91.416,109.798L95.371,105.008L99.326,102.196L103.281,93.657L107.236,91.158L111.191,82.514L115.146,75.537L119.101,69.705L123.056,64.394L127.011,62.103L130.966,54.084L134.921,52.835L138.876,44.712L142.831,36.173L146.787,34.09L150.742,32.944L154.697,30.341L158.652,33.569L162.607,28.258L166.562,28.883L170.517,30.028L174.472,28.57L178.427,31.799L182.382,33.673L186.337,31.382L190.292,35.444L194.247,33.986L198.202,38.151L202.157,40.13L206.112,38.151L210.067,36.797L214.022,40.651L217.978,38.255L221.933,37.11L225.888,38.047L229.843,34.09L233.798,34.715L237.753,33.257L241.708,35.235L245.663,33.153L249.618,33.777L253.573,30.862L257.528,28.675L261.483,30.862L265.438,30.237L269.393,33.048L273.348,33.673L277.303,33.257L281.258,33.465L285.213,36.902L289.169,34.506L293.124,35.235L297.079,34.298L301.034,38.359L304.989,39.401L308.944,44.608L312.899,49.502L316.854,56.375L320.809,57.937L324.764,62.936L328.719,70.33L332.674,76.786L336.629,84.18L340.584,89.283L344.539,94.073L348.494,103.029L352.449,105.425L356.404,109.902L360.36,120.316L364.315,121.149L368.27,132.917L372.225,134.479L376.18,142.81L380.135,146.038L384.09,155.411L388.045,159.056L392,162.492"></path>
+<g class="recharts-layer"></g></g>
+<g class="recharts-layer recharts-line">
+<path stroke="#3987e5" stroke-width="2" width="352" height="168" fill="none" class="recharts-curve recharts-line-curve" d="M40,147.913L43.955,143.643L47.91,143.643L51.865,141.769L55.82,144.893L59.775,141.352L63.73,146.247L67.685,142.394L71.64,138.436L75.596,135.104L79.551,130.209L83.506,122.503L87.461,120.837L91.416,109.069L95.371,104.696L99.326,103.133L103.281,92.824L107.236,88.762L111.191,84.389L115.146,74.079L119.101,75.537L123.056,66.997L127.011,62.832L130.966,52.835L134.921,50.231L138.876,43.879L142.831,40.651L146.787,70.226L150.742,70.746L154.697,73.246L158.652,68.768L162.607,73.038L166.562,68.976L170.517,68.039L174.472,67.414L178.427,69.601L182.382,76.474L186.337,76.37L190.292,73.454L194.247,71.788L198.202,75.433L202.157,79.702L206.112,80.535L210.067,79.911L214.022,78.036L217.978,76.058L221.933,79.807L225.888,74.079L229.843,72.621L233.798,76.162L237.753,72.933L241.708,73.871L245.663,68.976L249.618,74.808L253.573,72.829L257.528,73.038L261.483,68.768L265.438,69.289L269.393,73.35L273.348,71.684L277.303,69.913L281.258,69.809L285.213,71.475L289.169,77.099L293.124,73.871L297.079,77.724L301.034,75.953L304.989,37.735L308.944,40.338L312.899,51.377L316.854,57.833L320.809,63.144L324.764,68.56L328.719,73.246L332.674,76.266L336.629,85.638L340.584,89.908L344.539,94.178L348.494,104.383L352.449,109.069L356.404,110.007L360.36,120.733L364.315,125.211L368.27,129.689L372.225,138.853L376.18,143.227L380.135,150.621L384.09,156.14L388.045,158.639L392,163.742"></path>
+<g class="recharts-layer"></g></g></svg>
+<div tabindex="-1" class="recharts-tooltip-wrapper" style="visibility: hidden; pointer-events: none; position: absolute; top: 0px; left: 0px;"></div>
+</div>
+</div>
+<div class="pointer-events-none absolute left-[46px] top-[15px] rounded-[5px] border border-grid bg-surface/75 px-1 py-[3px]">
+<div class="flex h-[13px] items-center gap-1.5 text-[9.5px] text-text-2"><span class="w-4 flex-none" style="border-top: 2.5px solid rgb(57, 135, 229);"></span>6310 RH</div>
+<div class="flex h-[13px] items-center gap-1.5 text-[9.5px] text-text-2"><span class="w-4 flex-none" style="border-top: 2.5px dashed rgb(227, 73, 72);"></span>predict</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-2.5 text-[12px] text-muted">โหมด Real-time: cycle ปัจจุบันของแต่ละเครื่อง ไม่เกิน 150 จุดล่าสุด และคงไว้จนกว่ารถคันใหม่เข้า (เส้นทึบ = input, เส้นประแดง = predict) · สลับไป "เปรียบเทียบ" เพื่อเลือก bn มาซ้อนทับย้อนหลัง</div>
+</section>
+<section class="rounded-card border border-border bg-surface px-[18px] py-4 mb-4">
+<h2 class="mb-3.5 text-[13px] font-semibold uppercase tracking-[0.3px] text-text-2">NG แยกตามรุ่น (pgnum) <span class="text-[12px] font-normal normal-case tracking-normal text-muted">7 วันล่าสุด</span></h2>
+<div class="mb-1.5 flex gap-[18px] text-[12px] text-text-2"><span class="flex items-center gap-[7px]"><span class="h-2.5 w-3.5 flex-none rounded-sm" style="background: rgb(57, 135, 229);"></span>LH</span><span class="flex items-center gap-[7px]"><span class="h-2.5 w-3.5 flex-none rounded-sm" style="background: rgb(25, 158, 112);"></span>RH</span></div>
+<div class="h-[250px]" role="img" aria-label="จำนวน NG ต่อ pgnum แยก LH RH">
+<div class="recharts-responsive-container" style="width: 100%; height: 100%; min-width: 0px;">
+<div class="recharts-wrapper" style="position: relative; cursor: default; width: 100%; height: 100%; max-height: 250px; max-width: 1242px;"><svg class="recharts-surface" width="1242" height="250" viewBox="0 0 1242 250" style="width: 100%; height: 100%;"><title></title><desc></desc>
+<defs>
+<clipPath id="recharts2-clip">
+<rect x="40" y="10" height="190" width="1190"></rect></clipPath></defs>
+<g class="recharts-layer recharts-reference-line">
+<line y="0" stroke="var(--color-grid)" fill="none" fill-opacity="1" stroke-width="1" x1="40" y1="200" x2="1230" y2="200" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-reference-line">
+<line y="5" stroke="var(--color-grid)" fill="none" fill-opacity="1" stroke-width="1" x1="40" y1="105" x2="1230" y2="105" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-reference-line">
+<line y="10" stroke="var(--color-grid)" fill="none" fill-opacity="1" stroke-width="1" x1="40" y1="10" x2="1230" y2="10" class="recharts-reference-line-line"></line></g>
+<g class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis">
+<g class="recharts-cartesian-axis-ticks">
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="1190" height="50" stroke="none" font-size="11" x="238.33333333333334" y="208" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="238.33333333333334" dy="0.71em">14</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="1190" height="50" stroke="none" font-size="11" x="635" y="208" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="635" dy="0.71em">19</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="bottom" width="1190" height="50" stroke="none" font-size="11" x="1031.6666666666667" y="208" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="var(--color-muted)"><tspan x="1031.6666666666667" dy="0.71em">20</tspan></text></g></g>
+<text offset="0" font-size="11" x="635" y="250" class="recharts-text recharts-label" text-anchor="middle" fill="var(--color-muted)"><tspan x="635" dy="0em">pgnum</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis">
+<g class="recharts-cartesian-axis-ticks">
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="left" width="40" height="190" stroke="none" font-size="11" x="32" y="200" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end" fill="var(--color-muted)"><tspan x="32" dy="0.355em">0</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="left" width="40" height="190" stroke="none" font-size="11" x="32" y="105" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end" fill="var(--color-muted)"><tspan x="32" dy="0.355em">5</tspan></text></g>
+<g class="recharts-layer recharts-cartesian-axis-tick">
+<text orientation="left" width="40" height="190" stroke="none" font-size="11" x="32" y="10" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end" fill="var(--color-muted)"><tspan x="32" dy="0.355em">10</tspan></text></g></g></g>
+<g class="recharts-layer recharts-bar">
+<g class="recharts-layer recharts-bar-rectangles">
+<g class="recharts-layer recharts-bar-rectangle">
+<path x="220" y="124" width="16" height="76" radius="4,4,0,0" fill="#3987e5" class="recharts-rectangle" d="M220,128A 4,4,0,0,1,224,124L 232,124A 4,4,0,0,1,
+        236,128L 236,200L 220,200Z"></path></g>
+<g class="recharts-layer recharts-bar-rectangle">
+<path x="616.6666666666667" y="143" width="16" height="57" radius="4,4,0,0" fill="#3987e5" class="recharts-rectangle" d="M616.6666666666667,147A 4,4,0,0,1,620.6666666666667,143L 628.6666666666667,143A 4,4,0,0,1,
+        632.6666666666667,147L 632.6666666666667,200L 616.6666666666667,200Z"></path></g>
+<g class="recharts-layer recharts-bar-rectangle">
+<path x="1013.3333333333334" y="124" width="16" height="76" radius="4,4,0,0" fill="#3987e5" class="recharts-rectangle" d="M1013.3333333333334,128A 4,4,0,0,1,1017.3333333333334,124L 1025.3333333333335,124A 4,4,0,0,1,
+        1029.3333333333335,128L 1029.3333333333335,200L 1013.3333333333334,200Z"></path></g></g>
+<g class="recharts-layer"></g></g>
+<g class="recharts-layer recharts-bar">
+<g class="recharts-layer recharts-bar-rectangles">
+<g class="recharts-layer recharts-bar-rectangle">
+<path x="240" y="143" width="16" height="57" radius="4,4,0,0" fill="#199e70" class="recharts-rectangle" d="M240,147A 4,4,0,0,1,244,143L 252,143A 4,4,0,0,1,
+        256,147L 256,200L 240,200Z"></path></g>
+<g class="recharts-layer recharts-bar-rectangle">
+<path x="636.6666666666667" y="105" width="16" height="95" radius="4,4,0,0" fill="#199e70" class="recharts-rectangle" d="M636.6666666666667,109A 4,4,0,0,1,640.6666666666667,105L 648.6666666666667,105A 4,4,0,0,1,
+        652.6666666666667,109L 652.6666666666667,200L 636.6666666666667,200Z"></path></g>
+<g class="recharts-layer recharts-bar-rectangle">
+<path x="1033.3333333333335" y="162" width="16" height="38" radius="4,4,0,0" fill="#199e70" class="recharts-rectangle" d="M1033.3333333333335,166A 4,4,0,0,1,1037.3333333333335,162L 1045.3333333333335,162A 4,4,0,0,1,
+        1049.3333333333335,166L 1049.3333333333335,200L 1033.3333333333335,200Z"></path></g></g>
+<g class="recharts-layer"></g></g></svg>
+<div tabindex="-1" class="recharts-tooltip-wrapper" style="visibility: hidden; pointer-events: none; position: absolute; top: 0px; left: 0px;"></div>
+</div>
+</div>
+</div>
+</section>
+<section class="rounded-card border border-border bg-surface px-[18px] py-4 ">
+<h2 class="mb-3.5 text-[13px] font-semibold uppercase tracking-[0.3px] text-text-2">ประวัติรถ <span class="text-[12px] font-normal normal-case tracking-normal text-muted">200 คัน</span></h2>
+<div class="mb-3.5 flex flex-wrap items-end gap-3 rounded-[11px] border border-border bg-surface-2 p-3">
+<div class="flex flex-col gap-[5px]">
+<label for="t-bn" class="text-[11px] uppercase tracking-[0.3px] text-muted">bn</label><input id="t-bn" class="ctl" type="search" inputmode="numeric" placeholder="ตัวเลข bn…" autocomplete="off" value=""></div>
+<div class="flex flex-col gap-[5px]">
+<label for="t-asn" class="text-[11px] uppercase tracking-[0.3px] text-muted">asn</label><input id="t-asn" class="ctl" type="search" inputmode="numeric" placeholder="ตัวเลข asn…" autocomplete="off" value=""></div>
+<div class="flex flex-col gap-[5px]">
+<label for="t-pg" class="text-[11px] uppercase tracking-[0.3px] text-muted">pgnum</label><input id="t-pg" class="ctl" type="search" inputmode="numeric" placeholder="ตัวเลข pgnum…" autocomplete="off" list="t-pg-options" value=""><datalist id="t-pg-options">
+<option value="14"></option>
+<option value="19"></option>
+<option value="20"></option></datalist></div>
+<div class="flex flex-col gap-[5px]">
+<label for="t-side" class="text-[11px] uppercase tracking-[0.3px] text-muted">ฝั่ง</label>
+<select id="t-side" class="ctl !min-w-[90px]">
+<option value="" selected="">LH + RH</option>
+<option>LH</option>
+<option>RH</option></select></div>
+<div class="flex flex-col gap-[5px]">
+<label for="t-res" class="text-[11px] uppercase tracking-[0.3px] text-muted">ผล</label>
+<select id="t-res" class="ctl !min-w-[120px]">
+<option value="" selected="">ทั้งหมด</option>
+<option value="pass">ผ่าน (PASS)</option>
+<option value="ng">ไม่ผ่าน (NG)</option>
+<option value="pending">รอ predict</option></select></div>
+<div class="flex flex-col gap-[5px]">
+<label class="text-[11px] uppercase tracking-[0.3px] text-muted">ช่วงเวลา</label>
+<div class="flex gap-1.5"><button type="button" aria-pressed="true" class="h-[38px] rounded-lg border border-border bg-surface-2 px-3 text-[12px] text-text-2 hover:border-muted aria-pressed:border-s1/55 aria-pressed:bg-s1/18 aria-pressed:text-text">ทั้งหมด</button><button type="button" aria-pressed="false" class="h-[38px] rounded-lg border border-border bg-surface-2 px-3 text-[12px] text-text-2 hover:border-muted aria-pressed:border-s1/55 aria-pressed:bg-s1/18 aria-pressed:text-text">วันนี้</button><button type="button" aria-pressed="false" class="h-[38px] rounded-lg border border-border bg-surface-2 px-3 text-[12px] text-text-2 hover:border-muted aria-pressed:border-s1/55 aria-pressed:bg-s1/18 aria-pressed:text-text">7 วัน</button></div>
+</div>
+<div class="flex flex-col gap-[5px]">
+<label for="t-from" class="text-[11px] uppercase tracking-[0.3px] text-muted">ตั้งแต่</label><input id="t-from" class="ctl !min-w-[185px]" type="datetime-local" value=""></div>
+<div class="flex flex-col gap-[5px]">
+<label for="t-to" class="text-[11px] uppercase tracking-[0.3px] text-muted">ถึง</label><input id="t-to" class="ctl !min-w-[185px]" type="datetime-local" value=""></div>
+<button type="button" class="h-[38px] rounded-[9px] px-[18px] text-[13px] font-semibold disabled:cursor-default disabled:opacity-50 border border-border bg-transparent text-text-2 ">ล้าง</button>
+<div class="ml-auto flex items-center gap-2.5"><button type="button" class="h-[38px] rounded-[9px] px-[18px] text-[13px] font-semibold disabled:cursor-default disabled:opacity-50 bg-s1 text-white inline-flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download">
+<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline>
+<line x1="12" x2="12" y1="15" y2="3"></line></svg> Export CSV</button></div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full border-collapse text-[13px]">
+<thead>
+<tr>
+<th class="whitespace-nowrap border-b border-border px-2.5 py-[9px] text-left text-[12px] font-semibold uppercase tracking-[0.3px] text-muted">วันเวลา</th>
+<th class="whitespace-nowrap border-b border-border px-2.5 py-[9px] text-left text-[12px] font-semibold uppercase tracking-[0.3px] text-muted">bn</th>
+<th class="whitespace-nowrap border-b border-border px-2.5 py-[9px] text-left text-[12px] font-semibold uppercase tracking-[0.3px] text-muted">asn</th>
+<th class="whitespace-nowrap border-b border-border px-2.5 py-[9px] text-left text-[12px] font-semibold uppercase tracking-[0.3px] text-muted">pgnum</th>
+<th class="whitespace-nowrap border-b border-border px-2.5 py-[9px] text-left text-[12px] font-semibold uppercase tracking-[0.3px] text-muted">ฝั่ง</th>
+<th class="whitespace-nowrap border-b border-border px-2.5 py-[9px] text-left text-[12px] font-semibold uppercase tracking-[0.3px] text-muted">ผล</th></tr>
+</thead>
+<tbody class="transition-opacity">
+<tr title="คลิกเพื่อดูสัญญาณทั้งหมดของเครื่องฝั่ง LH" class="cursor-pointer hover:bg-surface-2">
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">13:49 16/11/2026</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">6311</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">11688</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">20</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="text-[11px] text-muted">LH</span></td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="rounded-md px-[9px] py-0.5 text-[12px] font-bold bg-warn/16 text-pending-soft">รอ predict</span></td></tr>
+<tr title="คลิกเพื่อดูสัญญาณทั้งหมดของเครื่องฝั่ง RH" class="cursor-pointer hover:bg-surface-2">
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">12:59 16/11/2026</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">6310</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">11687</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">19</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="text-[11px] text-muted">RH</span></td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="rounded-md px-[9px] py-0.5 text-[12px] font-bold bg-crit/20 text-crit-soft">NG</span></td></tr>
+<tr title="คลิกเพื่อดูสัญญาณทั้งหมดของเครื่องฝั่ง LH" class="cursor-pointer hover:bg-surface-2">
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">12:09 16/11/2026</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">6309</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">11686</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">20</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="text-[11px] text-muted">LH</span></td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="rounded-md px-[9px] py-0.5 text-[12px] font-bold bg-good/15 text-pass-soft">PASS</span></td></tr>
+<tr title="คลิกเพื่อดูสัญญาณทั้งหมดของเครื่องฝั่ง RH" class="cursor-pointer hover:bg-surface-2">
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">11:19 16/11/2026</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">6308</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">11685</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">14</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="text-[11px] text-muted">RH</span></td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="rounded-md px-[9px] py-0.5 text-[12px] font-bold bg-good/15 text-pass-soft">PASS</span></td></tr>
+<tr title="คลิกเพื่อดูสัญญาณทั้งหมดของเครื่องฝั่ง LH" class="cursor-pointer hover:bg-surface-2">
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">10:29 16/11/2026</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">6307</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">11684</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">14</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="text-[11px] text-muted">LH</span></td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="rounded-md px-[9px] py-0.5 text-[12px] font-bold bg-crit/20 text-crit-soft">NG</span></td></tr>
+<tr title="คลิกเพื่อดูสัญญาณทั้งหมดของเครื่องฝั่ง RH" class="cursor-pointer hover:bg-surface-2">
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">09:39 16/11/2026</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">6306</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">11683</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">20</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="text-[11px] text-muted">RH</span></td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="rounded-md px-[9px] py-0.5 text-[12px] font-bold bg-good/15 text-pass-soft">PASS</span></td></tr>
+<tr title="คลิกเพื่อดูสัญญาณทั้งหมดของเครื่องฝั่ง LH" class="cursor-pointer hover:bg-surface-2">
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">08:49 16/11/2026</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">6305</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">11682</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">19</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="text-[11px] text-muted">LH</span></td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="rounded-md px-[9px] py-0.5 text-[12px] font-bold bg-good/15 text-pass-soft">PASS</span></td></tr>
+<tr title="คลิกเพื่อดูสัญญาณทั้งหมดของเครื่องฝั่ง RH" class="cursor-pointer hover:bg-surface-2">
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">07:59 16/11/2026</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">6304</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">11681</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">19</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="text-[11px] text-muted">RH</span></td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="rounded-md px-[9px] py-0.5 text-[12px] font-bold bg-good/15 text-pass-soft">PASS</span></td></tr>
+<tr title="คลิกเพื่อดูสัญญาณทั้งหมดของเครื่องฝั่ง LH" class="cursor-pointer hover:bg-surface-2">
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">07:09 16/11/2026</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">6303</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">11680</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">14</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="text-[11px] text-muted">LH</span></td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="rounded-md px-[9px] py-0.5 text-[12px] font-bold bg-good/15 text-pass-soft">PASS</span></td></tr>
+<tr title="คลิกเพื่อดูสัญญาณทั้งหมดของเครื่องฝั่ง RH" class="cursor-pointer hover:bg-surface-2">
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">06:19 16/11/2026</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">6302</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">11679</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]">14</td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="text-[11px] text-muted">RH</span></td>
+<td class="whitespace-nowrap border-b border-border px-2.5 py-[9px]"><span class="rounded-md px-[9px] py-0.5 text-[12px] font-bold bg-good/15 text-pass-soft">PASS</span></td></tr>
+</tbody>
+</table>
+</div>
+<div class="mt-3.5 flex flex-wrap items-center justify-between gap-3"><span class="text-[12px] tabular-nums text-muted">แสดง 1–10 จาก 200</span>
+<div class="flex flex-wrap items-center gap-1.5"><button type="button" title="หน้าแรก" class="rounded-lg border border-border bg-surface-2 px-3 py-[7px] text-[12px] text-text-2 enabled:hover:border-muted disabled:cursor-default disabled:opacity-40" disabled="">⏮</button><button type="button" class="rounded-lg border border-border bg-surface-2 px-3 py-[7px] text-[12px] text-text-2 enabled:hover:border-muted disabled:cursor-default disabled:opacity-40" disabled="">◀ ก่อนหน้า</button><span class="flex items-center gap-1"><button type="button" aria-current="page" class="inline-flex h-[30px] min-w-[30px] items-center justify-center rounded-[7px] border border-border bg-surface-2 text-[12px] tabular-nums text-text-2 hover:border-muted aria-[current=page]:border-s1/55 aria-[current=page]:bg-s1/18 aria-[current=page]:text-text">1</button><button type="button" class="inline-flex h-[30px] min-w-[30px] items-center justify-center rounded-[7px] border border-border bg-surface-2 text-[12px] tabular-nums text-text-2 hover:border-muted aria-[current=page]:border-s1/55 aria-[current=page]:bg-s1/18 aria-[current=page]:text-text">2</button><button type="button" class="inline-flex h-[30px] min-w-[30px] items-center justify-center rounded-[7px] border border-border bg-surface-2 text-[12px] tabular-nums text-text-2 hover:border-muted aria-[current=page]:border-s1/55 aria-[current=page]:bg-s1/18 aria-[current=page]:text-text">3</button><button type="button" class="inline-flex h-[30px] min-w-[30px] items-center justify-center rounded-[7px] border border-border bg-surface-2 text-[12px] tabular-nums text-text-2 hover:border-muted aria-[current=page]:border-s1/55 aria-[current=page]:bg-s1/18 aria-[current=page]:text-text">4</button><span class="min-w-[18px] text-center text-[12px] text-muted">…</span><button type="button" class="inline-flex h-[30px] min-w-[30px] items-center justify-center rounded-[7px] border border-border bg-surface-2 text-[12px] tabular-nums text-text-2 hover:border-muted aria-[current=page]:border-s1/55 aria-[current=page]:bg-s1/18 aria-[current=page]:text-text">20</button></span><button type="button" class="rounded-lg border border-border bg-surface-2 px-3 py-[7px] text-[12px] text-text-2 enabled:hover:border-muted disabled:cursor-default disabled:opacity-40">ถัดไป ▶</button><button type="button" title="หน้าสุดท้าย" class="rounded-lg border border-border bg-surface-2 px-3 py-[7px] text-[12px] text-text-2 enabled:hover:border-muted disabled:cursor-default disabled:opacity-40">⏭</button><span class="ml-1.5 flex items-center gap-1.5 text-[12px] text-muted">ไปหน้า
+<select aria-label="ไปหน้า" class="ctl !h-[30px] !min-w-16 !py-1 !pl-2.5 !pr-7 tabular-nums">
+<option value="1" selected="">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5">5</option>
+<option value="6">6</option>
+<option value="7">7</option>
+<option value="8">8</option>
+<option value="9">9</option>
+<option value="10">10</option>
+<option value="11">11</option>
+<option value="12">12</option>
+<option value="13">13</option>
+<option value="14">14</option>
+<option value="15">15</option>
+<option value="16">16</option>
+<option value="17">17</option>
+<option value="18">18</option>
+<option value="19">19</option>
+<option value="20">20</option></select>/ 20</span></div>
+</div>
+</section>
+</main>
+</body></html>

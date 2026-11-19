@@ -1,15 +1,14 @@
 'use client';
 
 import { useLivePrediction } from '@/hooks/usePrediction';
-import { FEATURES, SIDE_LABEL } from '@/lib/constants';
+import { useT } from '@/i18n/useT';
+import { FEATURES } from '@/lib/constants';
 import { formatClock } from '@/lib/format';
 import { useLiveStore } from '@/stores/liveStore';
 import type { Side } from '@/types/car';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { FeatureBar } from './FeatureBar';
-
-const DEFAULT_NOTE = 'แถบ = % diff เทียบ reconstruction · เส้น = threshold ต่อฟีเจอร์';
 
 function Reading({ label, value }: { label: string; value: number | undefined }) {
   return (
@@ -25,6 +24,7 @@ function Reading({ label, value }: { label: string; value: number | undefined })
  * ผลมาจาก GET /api/predictions/{bn} หลังจบ process — ยังไม่มีผล (404) = ไม่แสดงส่วนผลเลย (poll จนกว่าจะได้)
  */
 export function MachineCard({ side }: { side: Side }) {
+  const { t } = useT();
   const live = useLiveStore((s) => s.live[side]);
   const { detail } = useLivePrediction(live?.bn ?? null);
   // ผลต้องเป็นของ bn ที่เครื่องกำลังทำอยู่เท่านั้น (กันค้างผลคันเก่าตอน bn เปลี่ยน)
@@ -34,11 +34,11 @@ export function MachineCard({ side }: { side: Side }) {
   return (
     <Card>
       <div className="mb-3.5 flex items-center gap-2.5">
-        <span className="text-[15px] font-[650]">{SIDE_LABEL[side]}</span>
+        <span className="text-[15px] font-[650]">{t(`side.${side}`)}</span>
         {result && <Badge verdict={result.verdict} size="lg" />}
         {result && (
           <span className="ml-auto rounded-full border border-border bg-surface-2 px-2.5 py-1 text-[12px] text-text-2">
-            ตรวจเมื่อ {formatClock(new Date(result.dt).getTime())}
+            {t('machine.checkedAt', { time: formatClock(new Date(result.dt).getTime()) })}
           </span>
         )}
       </div>
@@ -47,12 +47,12 @@ export function MachineCard({ side }: { side: Side }) {
         <>
           <div className="mb-2.5 flex gap-[22px] text-[13px] text-text-2">
             <span>
-              รถ (bn) <b className="font-semibold tabular-nums text-text">{live.bn}</b>
+              {t('machine.car')} <b className="font-semibold tabular-nums text-text">{live.bn}</b>
             </span>
             <span>
-              รุ่น (pgnum) <b className="font-semibold tabular-nums text-text">{live.pgnum}</b>
+              {t('machine.model')} <b className="font-semibold tabular-nums text-text">{live.pgnum}</b>
             </span>
-            <span className="text-muted">ค่าสดตอนนี้</span>
+            <span className="text-muted">{t('machine.liveNow')}</span>
           </div>
           <div className="mb-4 grid grid-cols-3 gap-2.5">
             <Reading label="filling pressure" value={live.filling_pressure} />
@@ -61,19 +61,19 @@ export function MachineCard({ side }: { side: Side }) {
           </div>
         </>
       ) : (
-        <div className="py-6 text-center text-[13px] text-muted">รอข้อมูลสดจากเครื่อง…</div>
+        <div className="py-6 text-center text-[13px] text-muted">{t('machine.waitLive')}</div>
       )}
 
       {result && (
         <>
           <div className="mb-1 text-[12px] text-muted">
-            ผลตรวจ · bn <b className="tabular-nums text-text-2">{result.bn}</b>
+            {t('machine.result')} <b className="tabular-nums text-text-2">{result.bn}</b>
           </div>
           {FEATURES.map((f) => (
             <FeatureBar key={f.key} feature={f} result={result.features[f.key]} />
           ))}
           <div className="mt-1 text-[11px] text-muted">
-            {failed ? `${failed.rawName} เกิน threshold → ตัดสินเป็น NG` : DEFAULT_NOTE}
+            {failed ? t('machine.noteFailed', { name: failed.rawName }) : t('machine.noteDefault')}
           </div>
         </>
       )}

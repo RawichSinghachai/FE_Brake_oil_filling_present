@@ -27,6 +27,7 @@ function parseSide(v: unknown): RealtimeSide | null {
   return {
     bn: v.bn,
     pgnum: v.pgnum,
+    stepnum: isNum(v.stepnum) ? v.stepnum : null,
     filling_pressure: v.filling_pressure,
     filling_volume: v.filling_volume,
     // ค่าพุ่งเกินเพดานแสดงผลเป็นเพดาน — ใช้ทั้งค่าสดในการ์ดและกราฟ real-time

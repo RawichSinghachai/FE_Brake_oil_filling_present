@@ -1,13 +1,14 @@
+'use client';
+
 import type { Verdict } from '@/types/car';
+import { useT } from '@/i18n/useT';
 
 /** PENDING = ยังไม่มีผล predict (backend ตอบ 404) */
 export type BadgeVerdict = Verdict | 'PENDING';
 
-const LABEL: Record<BadgeVerdict, string> = { PASS: 'PASS', NG: 'NG', PENDING: 'รอ predict' };
-
 const BIG: Record<BadgeVerdict, string> = {
-  PASS: 'border border-good/55 bg-good/20 text-white',
-  NG: 'border border-crit/60 bg-crit/20 text-white',
+  PASS: 'border border-good/55 bg-good/20 text-text',
+  NG: 'border border-crit/60 bg-crit/20 text-text',
   PENDING: 'border border-warn/50 bg-warn/16 text-pending-soft',
 };
 
@@ -24,6 +25,8 @@ interface BadgeProps {
 }
 
 export function Badge({ verdict, size = 'sm' }: BadgeProps) {
+  const { t } = useT();
+  const LABEL: Record<BadgeVerdict, string> = { PASS: 'PASS', NG: 'NG', PENDING: t('common.pendingPredict') };
   return size === 'lg' ? (
     <span className={`rounded-[7px] px-2.5 py-[3px] text-[13px] font-bold ${BIG[verdict]}`}>{LABEL[verdict]}</span>
   ) : (

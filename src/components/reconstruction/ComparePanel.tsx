@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useQueries } from '@tanstack/react-query';
 import { machineCarQueryOptions } from '@/hooks/useMachineCurves';
+import { useT } from '@/i18n/useT';
 import { COLORS, MAX_COMPARE } from '@/lib/constants';
 import { useCompareStore } from '@/stores/compareStore';
 import { CompareChips, type ChipEntry } from './CompareChips';
@@ -16,6 +17,7 @@ type FormState = { mode: 'add' } | { mode: 'edit'; id: number } | null;
  * ข้อมูลมาจาก GET /api/machines/{bn} (ค่า input รายวินาที; ไม่พบ bn = ตอบ 404 หรือไม่มีแถว) — ไม่มีเส้น predict
  */
 export function ComparePanel() {
+  const { t } = useT();
   const sets = useCompareStore((s) => s.sets);
   const addSet = useCompareStore((s) => s.addSet);
   const updateSet = useCompareStore((s) => s.updateSet);
@@ -48,9 +50,9 @@ export function ComparePanel() {
   return (
     <div>
       <div className="mb-2.5 flex items-baseline gap-2.5">
-        <span className="text-[14px] font-[650]">เปรียบเทียบย้อนหลัง</span>
+        <span className="text-[14px] font-[650]">{t('compare.title')}</span>
         <span className="text-[12px] tabular-nums text-muted">
-          {sets.length} / {MAX_COMPARE} ชุด
+          {t('compare.count', { n: sets.length, max: MAX_COMPARE })}
         </span>
       </div>
 
@@ -67,8 +69,8 @@ export function ComparePanel() {
         {form && (
           <CompareForm
             key={form.mode === 'edit' ? form.id : 'add'}
-            title={form.mode === 'add' ? 'เพิ่มชุดใหม่' : `แก้ไขชุด #${editingIndex}`}
-            confirmLabel={form.mode === 'add' ? 'เพิ่มชุดนี้' : 'บันทึก'}
+            title={form.mode === 'add' ? t('compare.addTitle') : t('compare.editTitle', { n: editingIndex })}
+            confirmLabel={form.mode === 'add' ? t('compare.addConfirm') : t('compare.save')}
             initial={editing ?? { bn: 0 }}
             onConfirm={(input) => {
               if (form.mode === 'edit') updateSet(form.id, input);
@@ -81,15 +83,15 @@ export function ComparePanel() {
       </CompareChips>
 
       {failed.length > 0 && (
-        <div className="mb-2.5 text-[12px] text-crit-soft">ไม่พบข้อมูลของ bn: {failed.map((e) => e.bn).join(', ')}</div>
+        <div className="mb-2.5 text-[12px] text-crit-soft">{t('compare.failedBn', { list: failed.map((e) => e.bn).join(', ') })}</div>
       )}
 
       {sets.length === 0 ? (
         <div className="pb-1.5 pt-3.5 text-[12px] text-muted">
-          ยังไม่มีชุดข้อมูล — กด &quot;+ เพิ่มชุด&quot; แล้วใส่ bn เพื่อเปรียบเทียบ (ซ้อนได้สูงสุด {MAX_COMPARE} ชุด)
+          {t('compare.empty', { max: MAX_COMPARE })}
         </div>
       ) : loaded.length === 0 ? (
-        <div className="pb-1.5 pt-3.5 text-[12px] text-muted">{loading ? 'กำลังโหลด curve…' : 'ไม่มีข้อมูลให้แสดง'}</div>
+        <div className="pb-1.5 pt-3.5 text-[12px] text-muted">{loading ? t('compare.loadingCurve') : t('compare.noData')}</div>
       ) : (
         <ReconRow series={loaded} showPredict={false} />
       )}

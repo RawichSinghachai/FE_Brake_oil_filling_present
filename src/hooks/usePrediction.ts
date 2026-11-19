@@ -1,8 +1,9 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { ApiError, fetchPredictionByBn, isNotFound } from '@/lib/api';
-import { POLL_PREDICTION_MS } from '@/lib/constants';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { ApiError, fetchPredictionByBn, fetchPredictions } from '@/lib/api';
+import { POLL_PREDICTION_MS, POLL_VERDICT_PAGE_MS } from '@/lib/constants';
+import type { MachineCar, Verdict } from '@/types/car';
 
 /** ผลตรวจที่จบแล้วไม่เปลี่ยน → cache นาน; 404 (ยังไม่มีผล/ไม่มี bn) ไม่ retry */
 export const predictionQueryOptions = (bn: number) => ({
@@ -40,16 +41,41 @@ export function useLivePrediction(bn: number | null) {
 
 export type PredictionStatus = 'loading' | 'pass' | 'ng' | 'pending' | 'error';
 
+/** รถที่เก่ากว่านี้ยังไม่มีผล = ไม่น่าจะมีผลมาแล้ว → ไม่ต้อง poll ถามซ้ำ */
+const PENDING_FRESH_MS = 15 * 60_000;
+
 /**
- * สถานะผลของ bn จาก GET /api/predictions/{bn}: 404 = ยังไม่มีผล (pending)
- * ที่ยัง pending จะถามซ้ำทุก 10 วินาที เผื่อ predict เสร็จทีหลัง
+ * ผลตรวจของรถในตารางประวัติ (หน้าปัจจุบัน) ด้วย 1 request: GET /api/predictions?dt_from=<รถเก่าสุดของหน้า>
+ * (ผล predict เกิดหลังรถบันทึก จึงไม่พลาด) แทนการถาม /api/predictions/{bn} ทีละแถว
+ * bn ที่ไม่อยู่ใน map = ยังไม่มีผล (pending) ; poll เฉพาะเมื่อมีรถใหม่ ๆ ที่ยังรอผล
  */
-export function usePredictionStatus(bn: number): PredictionStatus {
-  const q = useQuery({
-    ...predictionQueryOptions(bn),
-    refetchInterval: (query) => (isNotFound(query.state.error) ? 10_000 : false),
+export function usePageVerdicts(cars: MachineCar[]) {
+  let oldest = Infinity;
+  let pendingFresh = false;
+  const now = Date.now();
+  for (const c of cars) {
+    const t = new Date(c.dt).getTime();
+    if (t < oldest) oldest = t;
+    if (now - t < PENDING_FRESH_MS) pendingFresh = true;
+  }
+  const dtFrom = Number.isFinite(oldest) ? new Date(oldest).toISOString() : null;
+
+  return useQuery({
+    queryKey: ['page-verdicts', dtFrom],
+    queryFn: async () => new Map((await fetchPredictions({ dt_from: dtFrom ?? undefined })).map((r) => [r.bn, r.verdict])),
+    enabled: dtFrom !== null,
+    staleTime: 10_000,
+    placeholderData: keepPreviousData,
+    // มีรถใหม่ในหน้า → ถามซ้ำเผื่อเพิ่ง predict เสร็จ
+    refetchInterval: pendingFresh ? POLL_VERDICT_PAGE_MS : false,
   });
-  if (q.data) return q.data.record.verdict === 'PASS' ? 'pass' : 'ng';
-  if (isNotFound(q.error)) return 'pending';
+}
+
+/** สถานะผลของ bn จาก map ของหน้า */
+export function verdictStatus(q: { data?: Map<number, Verdict>; isError: boolean }, bn: number): PredictionStatus {
+  if (q.data) {
+    const v = q.data.get(bn);
+    return v === 'PASS' ? 'pass' : v === 'NG' ? 'ng' : 'pending';
+  }
   return q.isError ? 'error' : 'loading';
 }

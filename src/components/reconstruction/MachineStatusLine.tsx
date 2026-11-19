@@ -1,6 +1,7 @@
 'use client';
 
 import { useLiveStore } from '@/stores/liveStore';
+import { useT } from '@/i18n/useT';
 import type { RealtimeCommon } from '@/types/ws';
 
 const ITEMS: { key: keyof RealtimeCommon; label: string }[] = [
@@ -11,11 +12,12 @@ const ITEMS: { key: keyof RealtimeCommon; label: string }[] = [
 
 /** สถานะเครื่องที่ใช้ร่วมทั้ง LH/RH จาก WS `common` — เขียว = ทำงาน (true), แดง = ไม่ทำงาน (false), เทา = ยังไม่มีข้อมูล */
 export function MachineStatusLine() {
+  const { t } = useT();
   const common = useLiveStore((s) => s.common);
 
   return (
     <div className="mb-3.5 flex w-fit max-w-full flex-wrap items-center gap-4 rounded-[9px] border border-border bg-surface-2 px-3 py-2">
-      <span className="text-[13px] font-bold text-text">สถานะเครื่อง</span>
+      <span className="text-[13px] font-bold text-text">{t('status.title')}</span>
       {ITEMS.map(({ key, label }) => {
         const value = common ? common[key] : null;
         const dot =
@@ -28,12 +30,12 @@ export function MachineStatusLine() {
           <span key={key} className="flex items-center gap-[7px] text-[12px] text-text-2">
             <span aria-hidden className={`size-[9px] flex-none rounded-full ${dot}`} />
             {label}
-            <span className="sr-only">{value === null ? 'ไม่มีข้อมูล' : value ? 'ทำงาน' : 'ไม่ทำงาน'}</span>
+            <span className="sr-only">{value === null ? t('status.unknown') : value ? t('status.on') : t('status.off')}</span>
           </span>
         );
       })}
       <span className="ml-1.5 text-[11px] text-muted">
-        {common ? '● เขียว = ทำงาน · ● แดง = ไม่ทำงาน' : '○ ยังไม่ได้รับสถานะจาก WebSocket (common)'}
+        {common ? t('status.legend') : t('status.legendNone')}
       </span>
     </div>
   );

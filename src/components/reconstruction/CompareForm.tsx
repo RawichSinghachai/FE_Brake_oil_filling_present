@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useT } from '@/i18n/useT';
 import type { CompareInput } from '@/stores/compareStore';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
@@ -15,6 +16,7 @@ interface CompareFormProps {
 
 /** backend ระบุรถด้วย bn (ตัวเลข) — ฝั่งและ pgnum ได้จากผลตรวจเอง */
 export function CompareForm({ title, confirmLabel, initial, onConfirm, onCancel }: CompareFormProps) {
+  const { t } = useT();
   const [bn, setBn] = useState(initial.bn ? String(initial.bn) : '');
   const valid = /^\d+$/.test(bn);
 
@@ -31,14 +33,14 @@ export function CompareForm({ title, confirmLabel, initial, onConfirm, onCancel 
       }}
     >
       <div className="-mb-0.5 basis-full text-[12px] font-semibold text-text-2">{title}</div>
-      <Field label="bn (รหัสคัน)" htmlFor="cmp-bn">
+      <Field label={t('compare.bnLabel')} htmlFor="cmp-bn">
         <input
           id="cmp-bn"
           className="ctl"
           inputMode="numeric"
           value={bn}
           onChange={(e) => setBn(e.target.value.trim())}
-          placeholder="เช่น 1145"
+          placeholder={t('compare.bnPlaceholder')}
           autoComplete="off"
           autoFocus
         />
@@ -47,7 +49,7 @@ export function CompareForm({ title, confirmLabel, initial, onConfirm, onCancel 
         {confirmLabel}
       </Button>
       <Button variant="ghost" onClick={onCancel}>
-        ยกเลิก
+        {t('common.cancel')}
       </Button>
     </form>
   );

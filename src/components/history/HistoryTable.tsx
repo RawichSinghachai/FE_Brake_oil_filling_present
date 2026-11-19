@@ -1,20 +1,24 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { useHistory } from '@/hooks/useHistory';
+import { usePageVerdicts } from '@/hooks/usePrediction';
+import { useT } from '@/i18n/useT';
 import { useHistoryFilterStore } from '@/stores/historyFilterStore';
 import type { MachineCar } from '@/types/car';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { columns } from './columns';
+import { useColumns } from './columns';
 import { HistoryFilters } from './HistoryFilters';
 import { Pagination } from './Pagination';
 
 const EMPTY: MachineCar[] = [];
 
 export function HistoryTable() {
+  const { t } = useT();
+  const columns = useColumns();
   const page = useHistoryFilterStore((s) => s.page);
   const setPage = useHistoryFilterStore((s) => s.setPage);
   const h = useHistory();
@@ -37,8 +41,20 @@ export function HistoryTable() {
   const holding = pageRows.length === 0 && busy && lastRows.current.length > 0;
   const shownRows = holding ? lastRows.current : pageRows;
 
+  // กรอง PASS/NG: รายการรถทั้งหมดมาจากผล predict ที่ตรงกับตัวกรองอยู่แล้ว → ใช้ผลนั้นเลย (ไม่ต้องถามช่วงเวลาซ้ำ)
+  // ไม่กรอง / รอ predict: ถามผลของรถในหน้านี้ด้วย 1 request (ช่วงเวลา = รถเก่าสุดของหน้า)
+  const resultFilter = useHistoryFilterStore((s) => s.filters.result);
+  const known = resultFilter === 'pass' || resultFilter === 'ng';
+  const pageVerdicts = usePageVerdicts(known ? EMPTY : shownRows);
+  const knownVerdicts = useMemo(
+    () => ({ data: new Map(shownRows.map((r) => [r.bn, resultFilter === 'pass' ? ('PASS' as const) : ('NG' as const)])), isError: false }),
+    [shownRows, resultFilter],
+  );
+  const verdicts = known ? knownVerdicts : pageVerdicts;
+
   const table = useReactTable({
     data: shownRows,
+    meta: { verdicts },
     columns,
     getCoreRowModel: getCoreRowModel(),
     // แบ่งหน้าเองนอกตาราง — ไม่ให้ตาราง auto-reset state เมื่อ data เปลี่ยน
@@ -48,7 +64,7 @@ export function HistoryTable() {
   const noRows = shownRows.length === 0;
 
   return (
-    <Card title="ประวัติรถ" hint={h.hint}>
+    <Card title={t('history.title')} hint={h.hint}>
       <HistoryFilters cars={h.exportCars} note={h.exportNote} />
 
       <div className="overflow-x-auto">
@@ -71,7 +87,7 @@ export function HistoryTable() {
             {table.getRowModel().rows.map((row) => (
               <tr
                 key={row.original.key}
-                title={`คลิกเพื่อดูสัญญาณทั้งหมดของเครื่องฝั่ง ${row.original.side}`}
+                title={t('history.rowTitle', { side: row.original.side })}
                 onClick={() => router.push(`/cars/${row.original.side}/${row.original.bn}`)}
                 className="cursor-pointer hover:bg-surface-2"
               >
@@ -86,21 +102,21 @@ export function HistoryTable() {
         </table>
       </div>
 
-      {isError && <div className="py-[26px] text-center text-[13px] text-crit-soft">โหลดประวัติไม่สำเร็จ</div>}
-      {!isError && noRows && busy && <div className="py-[26px] text-center text-[13px] text-muted">กำลังโหลด…</div>}
-      {!isError && noRows && !busy && canLoadMore && (
-        <div className="py-[26px] text-center text-[13px] text-muted">
-          ยังไม่พบรายการที่ตรงเงื่อนไขในข้อมูลที่โหลดแล้ว ({h.exportCars.length} คัน)
+      {isError && <div className="py-[26px] text-center text-[13px] text-crit-soft">{t('history.loadFailed')}</div>}
+      {!isError && noRows && busy && <div className="py-[26px] text-center text-[13px] text-muted">{t('common.loading')}</div>}
+      {!isError && !busy && canLoadMore && (
+        <div className={`${noRows ? 'py-[26px]' : 'pt-4'} text-center text-[13px] text-muted`}>
+          {t(noRows ? 'history.notFoundLoaded' : 'history.partialLoaded', { n: h.exportCars.length })}
           <div className="mt-2.5">
             <Button variant="ghost" onClick={loadMore}>
-              โหลดเพิ่มแล้วค้นต่อ
+              {t('history.loadMore')}
             </Button>
           </div>
         </div>
       )}
       {!isError && noRows && !busy && !canLoadMore && !more && (
         <div className="py-[26px] text-center text-[13px] text-muted">
-          ไม่พบข้อมูลตามเงื่อนไข
+          {t('history.empty')}
         </div>
       )}
 

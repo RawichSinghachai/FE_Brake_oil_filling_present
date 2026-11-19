@@ -1,4 +1,7 @@
-import { FEATURES, VACUUM_GUN_STANDARD } from '@/lib/constants';
+'use client';
+
+import { FEATURES, PRESSURE_STANDARDS, VACUUM_GUN_STANDARD } from '@/lib/constants';
+import { useT } from '@/i18n/useT';
 import { formatPct } from '@/lib/format';
 import type { CarCurves, FeatureResults } from '@/types/car';
 import { FeatureChart, type ChartSeries } from './FeatureChart';
@@ -21,6 +24,7 @@ interface ReconRowProps {
 
 /** แถวกราฟ 3 ฟีเจอร์ — ชุดเดียวแสดง % diff, หลายชุดแสดง "ซ้อน N" */
 export function ReconRow({ series, showPredict, showStandard = false }: ReconRowProps) {
+  const { t } = useT();
   return (
     <div className="grid gap-[18px] max-[980px]:grid-cols-1 min-[981px]:grid-cols-3">
       {FEATURES.map((f) => {
@@ -41,7 +45,7 @@ export function ReconRow({ series, showPredict, showStandard = false }: ReconRow
                 </span>
               ) : (
                 <span className="text-[12px] tabular-nums text-muted">
-                  {series.length === 1 ? 'รอผล predict' : `ซ้อน ${chartSeries.length}`}
+                  {series.length === 1 ? t('recon.row.waitPredict') : t('recon.row.stacked', { n: chartSeries.length })}
                 </span>
               )}
             </div>
@@ -51,6 +55,7 @@ export function ReconRow({ series, showPredict, showStandard = false }: ReconRow
               showPredict={showPredict}
               legend
               standard={showStandard && f.key === 'vac' ? VACUUM_GUN_STANDARD : undefined}
+              guides={f.key === 'pres' ? PRESSURE_STANDARDS : undefined}
             />
           </div>
         );

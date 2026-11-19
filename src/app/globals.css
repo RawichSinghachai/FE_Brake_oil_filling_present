@@ -31,6 +31,28 @@
   color-scheme: dark;
 }
 
+/* light theme: override ตัวแปรของ @theme (utility ของ Tailwind อ้าง var(--color-*) จึงเปลี่ยนตามอัตโนมัติ)
+   สี series/predict/standard ของกราฟ (s1/s2/s3 ฯลฯ) ใช้ร่วมกันทั้งสองธีม */
+:root[data-theme='light'] {
+  color-scheme: light;
+  --color-page: #f4f4f1;
+  --color-surface: #ffffff;
+  --color-surface-2: #f0efeb;
+  --color-text: #1a1a19;
+  --color-text-2: #4a4944;
+  --color-muted: #6b6a65;
+  --color-grid: #e6e5df;
+  --color-baseline: #cfcec7;
+  --color-border: rgb(0 0 0 / 0.12);
+  --color-good: #0a8a0a;
+  --color-warn: #c98500;
+  --color-serious: #c4542a;
+  --color-crit: #c23030;
+  --color-crit-soft: #b42318;
+  --color-pass-soft: #0a6e0a;
+  --color-pending-soft: #8a5a00;
+}
+
 html {
   background: var(--color-page);
 }
