@@ -96,3 +96,19 @@ button:not(:disabled),
     padding-right: 30px;
   }
 }
+
+/* หน้า /production: จุดกะพริบของจอ WAITING */
+@keyframes prod-pulse {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .prod-dot {
+    animation: none !important;
+  }
+}

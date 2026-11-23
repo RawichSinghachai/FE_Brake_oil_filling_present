@@ -8,6 +8,8 @@ import type { MessageKey } from '@/i18n/messages';
 const TABS = [
   { href: '/', key: 'nav.dashboard' },
   { href: '/3d', key: 'nav.3d' },
+  { href: '/production', key: 'nav.production' },
+  { href: '/settings/alarm', key: 'nav.alarm' },
 ] as const satisfies readonly { href: string; key: MessageKey }[];
 
 /** เมนูสลับหน้าหลัก (Dashboard / 3D) — ใช้ร่วมใน TopBar และหน้า 3D */

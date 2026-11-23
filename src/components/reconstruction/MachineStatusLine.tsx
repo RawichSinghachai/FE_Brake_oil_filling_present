@@ -20,6 +20,8 @@ export function MachineStatusLine() {
       <span className="text-[13px] font-bold text-text">{t('status.title')}</span>
       {ITEMS.map(({ key, label }) => {
         const value = common ? common[key] : null;
+        // ทั้ง 3 ดวงใช้กติกาเดียวกัน: สัญญาณ true = เขียว (ทำงาน) · false = แดง (ไม่ทำงาน) · ยังไม่มีข้อมูล = วงโปร่ง
+        // machine_fault ก็เช่นกัน: ปกติ (false) ไฟขึ้นแดง
         const dot =
           value === null
             ? 'border border-muted'

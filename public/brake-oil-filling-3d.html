@@ -1185,7 +1185,7 @@ function liveFeed(msg) {
   const now = performance.now();
   LIVE.lastMsgAt = now;
   if (!LIVE.userSim) setLive(true);
-  if (msg.common) { LIVE.common = msg.common; if (LIVE.on) { liveFault(!!msg.common.machine_fault); renderProd(); } }
+  if (msg.common) { LIVE.common = msg.common; if (LIVE.on) { liveFault(msg.common.machine_fault === true); renderProd(); } }
   const ts = Date.parse(msg.recorded_at);
   for (const [key, sd] of [['lh', 'LH'], ['rh', 'RH']]) {
     const m = msg[key]; if (!m) continue;
@@ -1257,7 +1257,7 @@ function renderProd() {                                 // แผงข้อม
   const c = LIVE.common, k = LIVE.kpi;
   const dot = (cls, label) => `<span><i class="${cls}"></i>${label}</span>`;
   $('prodStatus').innerHTML = c
-    ? dot(c.continue ? 'on' : '', 'continue') + dot(c.master_on ? 'on' : '', 'Master on') + dot(c.machine_fault ? 'bad' : '', __t('เครื่อง fault', 'machine fault'))
+    ? dot(c.continue ? 'on' : 'bad', 'continue') + dot(c.master_on ? 'on' : 'bad', 'Master on') + dot(c.machine_fault ? 'on' : 'bad', 'machine fault')
     : `<span class="small">${__t('รอสถานะเครื่อง…', 'waiting for machine status…')}</span>`;
   if (!k) { $('prodKpi').innerHTML = `<div class="pk wide"><small>${__t('กำลังโหลดสรุปการผลิต…', 'Loading production summary…')}</small></div>`; return; }
   const pct = k.carsYesterday > 0 ? (k.carsToday - k.carsYesterday) / k.carsYesterday * 100 : 0, L = k.latest;
@@ -1849,7 +1849,7 @@ function setLive(on) {
   $('sigHead').textContent = on ? SIG_LIVE : SIG_SIM;
   $('noteTxt').textContent = on ? NOTE_LIVE : NOTE_SIM;
   hideAlarm();
-  if (on) { if (LIVE.common && LIVE.common.machine_fault) liveFault(true); renderLiveResults(); renderProd(); }
+  if (on) { if (LIVE.common && LIVE.common.machine_fault === true) liveFault(true); renderLiveResults(); renderProd(); }
   else { if (state.fault === 'ALL') state.fault = null; if (results.length) renderResults(); else $('results').innerHTML = EMPTY_RESULTS; $('liveStat').textContent = ''; }
 }
 document.querySelectorAll('#segMode button').forEach(b => b.onclick = () => { LIVE.userSim = b.dataset.v === 'sim'; setLive(b.dataset.v === 'live'); });
