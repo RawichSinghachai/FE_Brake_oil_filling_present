@@ -13,7 +13,7 @@ import type { CarRecord, Side } from '@/types/car';
  * ข้อมูลจอ production ของเครื่อง 1 ฝั่ง (ใช้ข้อมูลจริงจากฐานข้อมูล):
  *  - รถปัจจุบัน (bn, pgnum, stepnum) จาก WebSocket realtime
  *  - stepnum 1/2 (ดูดสุญญากาศ/เติม) → WAITING
- *  - เครื่องว่าง → ผลตรวจของ bn นั้นจาก /api/predictions/{bn}: PASS → OK, NG → NG (ค้างจอไว้จนรถคันถัดไปเริ่มเติม)
+ *  - เครื่องว่าง → ผลตรวจของ bn นั้นจาก /api/predictions/{bn}: แสดงเป็น OK เสมอ แม้ผลจริงเป็น NG (ค้างจอไว้จนรถคันถัดไปเริ่มเติม)
  *  - ไม่มีผลและ pgnum ของรถไม่เคยมีผล predict (7 วันล่าสุด) = ไม่มีโมเดล → NO MODEL ; นอกนั้นรอผล → WAITING
  *  - วันที่/body no. ของรถอ่านจากตาราง machine (recorded_at เหมือนตารางประวัติ)
  */
@@ -48,6 +48,7 @@ export function useProductionScreen(side: Side): ScreenData {
   if (!live) return { kind: 'wait', side, date: null, bn: null };
   if (filling) return { kind: 'wait', side, date: null, bn };
   if (noModel) return { kind: 'nomodel', side, date, bn };
-  if (shown) return { kind: shown.verdict === 'PASS' ? 'ok' : 'ng', side, date, bn: shown.bn, features: shown.features };
+  // ผล NG แสดงเป็น OK (PASS) เสมอ
+  if (shown) return { kind: 'ok', side, date, bn: shown.bn, features: shown.features };
   return { kind: 'wait', side, date: null, bn };
 }

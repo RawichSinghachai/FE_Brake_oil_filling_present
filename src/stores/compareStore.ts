@@ -20,21 +20,18 @@ interface CompareState {
   sets: CompareSet[];
   /** ใช้เฉพาะมุมมอง real-time */
   visibleSides: Record<Side, boolean>;
-  showPredict: boolean;
   nextId: number;
   setMode: (mode: ReconMode) => void;
   addSet: (input: CompareInput) => void;
   updateSet: (id: number, input: CompareInput) => void;
   removeSet: (id: number) => void;
   toggleSide: (side: Side) => void;
-  togglePredict: () => void;
 }
 
 export const useCompareStore = create<CompareState>((set) => ({
   mode: 'live',
   sets: [],
   visibleSides: { LH: true, RH: true },
-  showPredict: true,
   nextId: 1,
 
   setMode: (mode) => set({ mode }),
@@ -58,5 +55,4 @@ export const useCompareStore = create<CompareState>((set) => ({
       return { visibleSides: { ...s.visibleSides, [side]: !s.visibleSides[side] } };
     }),
 
-  togglePredict: () => set((s) => ({ showPredict: !s.showPredict })),
 }));

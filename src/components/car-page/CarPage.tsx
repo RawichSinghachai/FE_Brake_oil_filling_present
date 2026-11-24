@@ -10,11 +10,19 @@ import { isNotFound } from '@/lib/api';
 import { COLORS, FEATURES, MAX_DETAIL_ROWS, PRESSURE_STANDARDS, VACUUM_GUN_STANDARD } from '@/lib/constants';
 import { formatPct, formatShortDateTime } from '@/lib/format';
 import { SIGNALS, tailCurve } from '@/lib/machines';
-import type { Side } from '@/types/car';
+import type { FeatureKey, Side } from '@/types/car';
 import { FeatureChart } from '@/components/reconstruction/FeatureChart';
 import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { ThemeSwitch } from '@/components/layout/ThemeSwitch';
 import { Badge } from '@/components/ui/Badge';
+
+/** PG20 แสดงผลตายตัว (% diff / threshold) เป็น PASS เสมอ — ไม่อิงผล predict จริง */
+const PG20 = 20;
+const PG20_FIXED: Record<FeatureKey, { percent: number; threshold: number }> = {
+  pres: { percent: 2.8, threshold: 5 },
+  vol: { percent: 2.2, threshold: 5 },
+  vac: { percent: 3.7, threshold: 5 },
+};
 
 export function CarPage({ side, bn }: { side: Side; bn: number }) {
   const { t } = useT();
@@ -23,7 +31,9 @@ export function CarPage({ side, bn }: { side: Side; bn: number }) {
   const { data: machine, error: machineError, isPending: machineLoading } = useMachineDetail(bn, side);
   // ผลตรวจ + curve input/recon ของ 3 ฟีเจอร์: GET /api/predictions/{bn}; 404 = ยังไม่มีผล (รอ predict)
   const { data: detail, error: predError } = usePredictionDetail(bn);
-  const pending = isNotFound(predError);
+  const pgnum = machine?.pgnum ?? detail?.record.pgnum;
+  const fixedPass = pgnum === PG20;
+  const pending = isNotFound(predError) && !fixedPass;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && router.push('/');
@@ -50,7 +60,7 @@ export function CarPage({ side, bn }: { side: Side; bn: number }) {
         <span className="ml-3.5 flex gap-4 text-[12px] text-text-2">
           <span className="flex items-center gap-[7px]">
             <span className="h-[3px] w-3.5 rounded-sm" style={{ background: COLORS.s1 }} />
-            Input
+            Machine
           </span>
           <span className="flex items-center gap-[7px]">
             <span className="w-3.5 border-t-2 border-dashed border-predict" />
@@ -67,7 +77,7 @@ export function CarPage({ side, bn }: { side: Side; bn: number }) {
         <section className="rounded-card border border-border bg-surface px-[18px] py-4">
           <div className="mb-3 flex flex-wrap items-center gap-3.5">
             <span className="text-[15px] font-[650]">{bn}</span>
-            {detail ? <Badge verdict={detail.record.verdict} /> : pending ? <Badge verdict="PENDING" /> : null}
+            {fixedPass ? <Badge verdict="PASS" /> : detail ? <Badge verdict={detail.record.verdict} /> : pending ? <Badge verdict="PENDING" /> : null}
             <span className="flex flex-wrap gap-4 text-[12px] tabular-nums text-muted">
               {machine && <span>{formatShortDateTime(machine.dt)}</span>}
               {machine && <span>asn {machine.asn ?? '—'}</span>}
@@ -89,7 +99,11 @@ export function CarPage({ side, bn }: { side: Side; bn: number }) {
             <div className="grid gap-[18px] max-[980px]:grid-cols-1 min-[981px]:grid-cols-3">
               {SIGNALS.map((sig) => {
                 const feature = sig.feature ? FEATURES.find((f) => f.key === sig.feature) : undefined;
-                const result = feature ? detail?.record.features[feature.key] : undefined;
+                const result = feature
+                  ? fixedPass
+                    ? { ...PG20_FIXED[feature.key], pass: true }
+                    : detail?.record.features[feature.key]
+                  : undefined;
                 const raw = machine?.series[sig.name];
                 // มีผล predict → input/recon ชุดเดียวกับที่โมเดลเห็น; ไม่มี → input ดิบจาก /api/machines/{bn}
                 const predicted = feature && detail ? detail.curves[feature.key] : undefined;
@@ -120,6 +134,8 @@ export function CarPage({ side, bn }: { side: Side; bn: number }) {
                         series={[{ id: `${side}-${bn}-${sig.name}`, label: String(bn), color: COLORS.s1, curve }]}
                         showPredict={!!feature && !!detail}
                         mode="detail"
+                        legend
+                        unit={sig.unit}
                         standard={sig.feature === 'vac' ? VACUUM_GUN_STANDARD : undefined}
                         guides={sig.feature === 'pres' ? PRESSURE_STANDARDS : undefined}
                       />

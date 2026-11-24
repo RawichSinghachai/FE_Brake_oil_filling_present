@@ -26,7 +26,7 @@ interface FeatureChartProps {
   feature: { key: string };
   series: ChartSeries[];
   showPredict: boolean;
-  /** legend ซ้อนในกราฟ (ใช้ตอน compare หลายชุด) */
+  /** legend ซ้อนในกราฟ — ชุดเดียว: machine (ข้อมูลจากเครื่องจริง) / predict ; หลายชุด (compare): ชื่อแต่ละชุด */
   legend?: boolean;
   /** compare = แสดงทุกชุดใน tooltip, detail = input vs predict ของชุดเดียว */
   mode?: 'compare' | 'detail';
@@ -34,6 +34,8 @@ interface FeatureChartProps {
   standard?: number;
   /** เส้นประอ้างอิงเฉยๆ (เช่น 250 / 300 ของ pressure) — ไม่ซูม/ไม่เพิ่ม tick ของแกน ; เส้นที่อยู่นอกช่วงกราฟไม่แสดง */
   guides?: readonly number[];
+  /** หน่วยของแกน Y (แสดงมุมซ้ายบน + ต่อท้ายค่าใน tooltip) — ไม่ส่ง = ไม่แสดง */
+  unit?: string;
 }
 
 const TICK = { fill: COLORS.muted, fontSize: 10 };
@@ -60,6 +62,7 @@ export function FeatureChart({
   mode = 'compare',
   standard,
   guides,
+  unit,
 }: FeatureChartProps) {
   // 1 จุดของ curve ≈ 1 วินาที — แกน X เป็นวินาทีนับจากจุดแรก
   const rows = useMemo(() => {
@@ -104,6 +107,7 @@ export function FeatureChart({
 
   // แต่ละชุดยาวไม่เท่ากัน / ยังไม่มี recon → ค่าที่จุดนั้นอาจเป็น undefined (หรือ NaN)
   const fmt = (v: number | undefined) => (typeof v === 'number' && Number.isFinite(v) ? v.toFixed(1) : null);
+  const u = unit ? ` ${unit}` : '';
 
   const renderTip = ({ active, payload }: TooltipProps<number, string>) => {
     const row = active ? (payload?.[0]?.payload as Record<string, number> | undefined) : undefined;
@@ -111,17 +115,17 @@ export function FeatureChart({
     const sec = row.t;
     return (
       <div className="pointer-events-none max-w-[230px] rounded-lg border border-border bg-surface px-[9px] py-[7px] text-[11px] text-text shadow-[0_4px_16px_rgba(0,0,0,0.45)]">
-        <div className="mb-[3px] text-[10px] text-muted">{mode === 'compare' ? `${feature.key} · ${sec}s` : `${sec}s`}</div>
+        <div className="mb-[3px] text-[10px] text-muted">{mode === 'compare' ? `${feature.key} · ${sec} sec` : `${sec} sec`}</div>
         {mode === 'detail' && series[0] ? (
           <>
             {fmt(row.in0) !== null && (
               <TipRow color={series[0].color}>
-                input: <b>{fmt(row.in0)}</b>
+                machine: <b>{fmt(row.in0)}</b>{u}
               </TipRow>
             )}
             {showPredict && fmt(row.re0) !== null && (
               <TipRow color={COLORS.predict}>
-                predict: <b>{fmt(row.re0)}</b>
+                predict: <b>{fmt(row.re0)}</b>{u}
               </TipRow>
             )}
           </>
@@ -132,8 +136,8 @@ export function FeatureChart({
             const pred = showPredict ? fmt(row[`re${k}`]) : null;
             return input === null ? null : (
               <TipRow key={s.id} color={s.color}>
-                {s.label}: <b>{input}</b>
-                {pred !== null && <span style={{ color: COLORS.predict }}> · pred {pred}</span>}
+                {s.label}: <b>{input}</b>{u}
+                {pred !== null && <span style={{ color: COLORS.predict }}> · pred {pred}{u}</span>}
               </TipRow>
             );
           })
@@ -143,9 +147,20 @@ export function FeatureChart({
   };
 
   return (
-    <div className="relative h-[210px]">
+    <div>
+      {legend && series.length > 0 && (
+        <div className="mb-1 flex min-h-[14px] flex-wrap items-center gap-x-3.5 gap-y-0.5 pl-[46px]">
+          {series.length === 1 ? (
+            <LegendRow color={series[0].color} label="machine" />
+          ) : (
+            series.map((s) => <LegendRow key={s.id} color={s.color} label={s.label} />)
+          )}
+          {showPredict && <LegendRow color={COLORS.predict} label="predict" dashed />}
+        </div>
+      )}
+      <div className="relative h-[210px]">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={rows} margin={{ top: 12, right: 10, bottom: 0, left: 0 }}>
+        <LineChart data={rows} margin={{ top: 12, right: 10, bottom: 8, left: 0 }}>
           {yTicks.filter((v) => v !== standard).map((v) => (
             <ReferenceLine key={v} y={v} stroke={COLORS.grid} />
           ))}
@@ -173,9 +188,9 @@ export function FeatureChart({
           <XAxis
             type="number"
             dataKey="t"
+            height={20}
             domain={[0, xMax]}
             ticks={xTicks}
-            tickFormatter={(v: number) => `${v}s`}
             tick={TICK}
             axisLine={false}
             tickLine={false}
@@ -232,14 +247,11 @@ export function FeatureChart({
         </LineChart>
       </ResponsiveContainer>
 
-      {legend && series.length > 0 && (
-        <div className="pointer-events-none absolute left-[46px] top-[15px] rounded-[5px] border border-grid bg-surface/75 px-1 py-[3px]">
-          {series.map((s) => (
-            <LegendRow key={s.id} color={s.color} label={s.label} />
-          ))}
-          {showPredict && <LegendRow color={COLORS.predict} label="predict" dashed />}
-        </div>
+      <span className="pointer-events-none absolute bottom-0 right-2 text-[10px] font-semibold leading-none text-muted">sec</span>
+      {unit && (
+        <span className="pointer-events-none absolute left-1 top-0 text-[10px] font-semibold text-muted">{unit}</span>
       )}
+      </div>
     </div>
   );
 }

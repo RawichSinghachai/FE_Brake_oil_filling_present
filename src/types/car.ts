@@ -19,6 +19,8 @@ export interface FeatureConfig {
   rawName: string;
   /** key ใน `features` ของ response (/api/predictions) */
   apiKey: 'pressure' | 'volume' | 'vacuumgun';
+  /** หน่วยของแกน Y */
+  unit: string;
 }
 
 /** curve ของ 1 ฟีเจอร์: in = ค่าจริง, re = ค่าที่โมเดล reconstruct (1 จุด ≈ 1 วินาที) */

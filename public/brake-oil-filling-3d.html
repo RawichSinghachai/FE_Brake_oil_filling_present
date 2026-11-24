@@ -19,26 +19,19 @@ html,body{margin:0;height:100%;overflow:hidden;background:#d7dde1;font-family:va
 #app canvas{display:block}
 .labels{position:absolute;inset:0;pointer-events:none}
 .tag{font-family:var(--mono);font-size:11px;line-height:1.25;background:rgba(15,20,25,.82);color:#fff;padding:4px 7px 4px 8px;border-left:3px solid var(--amber);border-radius:3px;white-space:nowrap;transform:translateY(-14px)}
-.tag span{display:block;color:#b9c4cc;font-size:10px}
 .glass{background:var(--bg);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
 header.title{position:absolute;left:14px;top:14px;padding:12px 16px 12px;max-width:min(420px,calc(100vw - 380px))}
 .kicker{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--amber)}
 h1{margin:3px 0 2px;font-size:19px;font-weight:600;letter-spacing:.01em}
-.sub{font-size:12.5px;color:var(--mute)}
 #panel{position:absolute;right:14px;top:14px;bottom:14px;width:336px;overflow:auto;padding:14px 14px 10px}
 #panel::-webkit-scrollbar{width:6px}#panel::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}
 .sec{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
 .sec:first-child{border-top:0;margin-top:0;padding-top:0}
 .h{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--mute);text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between}
 .row{display:flex;align-items:center;gap:8px;justify-content:space-between}
-.chip{font-family:var(--mono);font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--amber);color:#1a1404}
 .mono{font-family:var(--mono)}
-.phase{font-size:22px;font-weight:600;margin:6px 0 2px;transition:color .2s}
 .small{font-size:11.5px;color:var(--mute)}
 .small b{color:var(--fg)}
-.timeline{position:relative;display:flex;height:10px;border-radius:5px;overflow:hidden;margin:10px 0 4px;background:#222}
-.timeline i{display:block;height:100%;opacity:.75}
-.timeline .cur{position:absolute;top:-3px;width:2px;height:16px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.4)}
 .tlabels{display:flex;font-family:var(--mono);font-size:9px;color:var(--mute)}
 .tlabels span{overflow:hidden;white-space:nowrap;text-overflow:clip}
 .alarm{margin-top:10px;padding:9px 10px;border-radius:8px;background:rgba(255,75,62,.16);border:1px solid rgba(255,75,62,.55);font-size:12.5px;line-height:1.45}
@@ -84,11 +77,6 @@ td.ok{color:var(--vac)} td.ng{color:#ff8278;font-weight:600}
 .hint{position:absolute;left:14px;top:112px;font-size:11px;color:#2d3a43;background:rgba(255,255,255,.6);padding:4px 8px;border-radius:5px;pointer-events:none}
 #panelToggle{display:none;position:absolute;right:12px;top:12px;z-index:5}
 #loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;color:#33414b;letter-spacing:.08em}
-.mc{background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:8px 10px 8px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
-.mc.sel{border-color:rgba(242,182,50,.7)}
-.mc .phase{font-size:17px;margin:4px 0 1px}
-.mc .timeline{margin:7px 0 0;height:8px}
-.chip.lh{background:#6fd3c7;color:#06201d}
 .h .seg button{padding:2px 8px;font-size:10.5px}
 #xhair{position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;pointer-events:none}
 #xhair::before,#xhair::after{content:"";position:absolute;background:rgba(255,255,255,.92);box-shadow:0 0 0 1px rgba(0,0,0,.35)}
@@ -110,8 +98,7 @@ body.walking .hint{display:none}
 body.walking #dock .legend{display:none}
 body.hudoff #panel,body.hudoff header.title,body.hudoff #panelToggle,body.hudoff .hint,body.hudoff .note{display:none}
 .btns.vt{margin-top:7px;align-items:center}
-#proc{position:absolute;right:364px;top:14px;width:262px;padding:10px 12px 10px}
-body.hudoff #proc{right:14px}
+#alarm{margin-top:10px}
 #proc .h{margin-bottom:4px;align-items:center}
 #proc .h .seg button{padding:2px 8px;font-size:10.5px}
 #pCar{margin-bottom:6px}
@@ -121,19 +108,13 @@ body.hudoff #proc{right:14px}
 .psteps span.on{background:var(--pc,var(--amber));color:#10161a;font-weight:600}
 .psteps span.done{background:rgba(62,207,110,.2);color:#c4f2d3}
 .psteps span.bad{background:rgba(255,75,62,.45);color:#fff;font-weight:600}
-.pnums{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--mute);margin-top:2px}
-.pnums b{font-size:18px;color:var(--fg);margin:0 4px 0 0}
-.pnums small{display:block;font-family:var(--sans);font-size:10.5px}
-.pbar{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;margin:5px 0 8px}
-.pbar i{display:block;height:100%;width:0;background:#e0b43a}
-#proc p{margin:0;font-size:12.5px;line-height:1.5;color:#dfe6ea;min-height:56px}
-@media (max-width:1180px) and (min-width:821px){header.title{max-width:calc(100vw - 670px);min-width:200px}header.title .sub{display:none}}
+@media (max-width:1180px) and (min-width:821px){header.title{max-width:calc(100vw - 670px);min-width:200px}}
 .vtl{font-family:var(--mono);font-size:10.5px;color:var(--mute);letter-spacing:.08em;margin-right:2px}
 @media (max-width:820px){
   #minimap{display:none}
   #walkHelp{font-size:11px;line-height:1.5}
   header.title{max-width:calc(100vw - 110px);padding:9px 12px}
-  h1{font-size:16px}.sub{display:none}
+  h1{font-size:16px}
   #panelToggle{display:block}
   #panel{left:10px;right:10px;top:auto;bottom:10px;width:auto;max-height:46vh}
   #panel.collapsed{display:none}
@@ -141,25 +122,11 @@ body.hudoff #proc{right:14px}
   #dock .legend{display:none}
   #info{left:10px;right:10px;width:auto;bottom:calc(46vh + 20px)}
   .note,.hint{display:none}
-  #proc{right:10px;top:auto;bottom:10px;width:200px;padding:8px 9px}
   .psteps{font-size:9px}
-  #proc p{font-size:11px;min-height:0}
   body.walking #proc{display:none}
 }
 body:not(.embedded) #modeRow, body:not(.embedded) #liveStat {display:none}
 body.live #segSpeed, body.live #simBtns, body.live #leakNote {display:none}
-body:not(.live) #prodSec{display:none}
-.pst{display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:9px;font-size:12px;color:var(--fg)}
-.pst span{display:flex;align-items:center;gap:6px}
-.pst i{display:block;width:8px;height:8px;border-radius:50%;background:#59626b}
-.pst i.on{background:var(--vac);box-shadow:0 0 0 3px rgba(62,207,110,.18)}
-.pst i.bad{background:var(--fill);box-shadow:0 0 0 3px rgba(255,75,62,.18)}
-.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.pk{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:6px 9px}
-.pk small{display:block;font-size:10.5px;color:var(--mute)}
-.pk b{font-family:var(--mono);font-size:17px;font-weight:600}
-.pk .d{font-size:10.5px;font-family:var(--mono)} .pk .d.good{color:var(--vac)} .pk .d.crit{color:#ff8278}
-.pk.wide{grid-column:1 / -1}
 #liveStat{margin:-2px 0 8px;color:var(--mute)}
 #liveStat.ok{color:var(--vac)}
 </style>
@@ -187,42 +154,28 @@ setTimeout(function () {
 <header class="title glass">
   <div class="kicker">TMT BANPHO · BRAKE EVACUATION &amp; FILLING</div>
   <h1>Brake Oil Filling Machine — 3D</h1>
-  <div class="sub">LH / RH ทำงานพร้อมกัน สลับกันคนละคัน · แต่ละเครื่อง ≈ 70 วินาที/คัน → รถเข้าทุก 35 วินาที</div>
 </header>
 <div class="hint">ลากเพื่อหมุน · scroll เพื่อซูม · คลิกที่ชิ้นส่วนเพื่อดูรายละเอียด · กด <b>🚶 เดินแบบเกม</b> เพื่อลงไปเดินในไลน์</div>
 
 <button id="panelToggle" class="glass">☰ แผงควบคุม</button>
 
-<div id="proc" class="glass">
-  <div class="h"><span>ข้างในกระปุกน้ำมันเบรก</span><div class="seg" id="segProc"><button data-v="RH" class="on">RH</button><button data-v="LH">LH</button></div></div>
-  <div class="small mono" id="pCar">—</div>
-  <div class="psteps" id="psteps"><span>1 สวมหัว</span><span>2 ดูดอากาศ</span><span>3 เติมน้ำมัน</span><span>4 ปรับระดับ</span></div>
-  <canvas id="pcv"></canvas>
-  <div class="pnums"><div><small>สุญญากาศในระบบ</small><b id="pVac">0.0</b>kPa</div><div style="text-align:right"><small>น้ำมันที่เติมแล้ว</small><b id="pVol">0</b>mL</div></div>
-  <div class="pbar"><i id="pBar"></i></div>
-  <p id="pTxt"></p>
-</div>
 
 <aside id="panel" class="glass">
-  <div class="sec">
-    <div class="h"><span>สถานะเครื่อง · ทำงานพร้อมกัน สลับคันละเครื่อง</span></div>
-    <div id="mcards"></div>
-    <div id="alarm" class="alarm hidden"></div>
+  <div id="proc" class="sec">
+    <div class="h"><span>ข้างในกระปุกน้ำมันเบรก</span><div class="seg" id="segProc"><button data-v="RH" class="on">RH</button><button data-v="LH">LH</button></div></div>
+    <div class="small mono" id="pCar">—</div>
+    <div class="psteps" id="psteps"><span>1 สวมหัว</span><span>2 ดูดอากาศ</span><span>3 เติมน้ำมัน</span><span>4 ปรับระดับ</span></div>
+    <canvas id="pcv"></canvas>
   </div>
-
-  <div class="sec" id="prodSec">
-    <div class="h"><span>ข้อมูลการผลิต · ข้อมูลจริง</span></div>
-    <div id="prodStatus" class="pst"></div>
-    <div id="prodKpi" class="pgrid"></div>
-  </div>
+  <div id="alarm" class="alarm hidden"></div>
 
   <div class="sec">
     <div class="h"><span id="sigHead">สัญญาณ (1 sample/วินาที) · จำลอง</span>
-      <div class="seg" id="segView"><button data-v="RH" class="on">RH</button><button data-v="LH">LH</button></div></div>
+      </div>
     <div class="legend-mini"><span class="cur">คันปัจจุบันของเครื่อง <b id="viewTag">RH</b></span><span>รูปแบบปกติ</span></div>
-    <div class="card"><div class="top"><span class="name"><i style="background:var(--vac)"></i>Vacuum (gun)</span><span class="val" id="vVac">0.0<small>kPa</small></span></div><canvas id="cVac"></canvas></div>
+    <div class="card"><div class="top"><span class="name"><i style="background:var(--vac)"></i>Vacuum (gun)</span><span class="val" id="vVac">0.0<small>Pa</small></span></div><canvas id="cVac"></canvas></div>
     <div class="card"><div class="top"><span class="name"><i style="background:var(--fill)"></i>Filling pressure</span><span class="val" id="vPr">0<small>kPa</small></span></div><canvas id="cPr"></canvas></div>
-    <div class="card"><div class="top"><span class="name"><i style="background:var(--top)"></i>Filling volume</span><span class="val" id="vVol">0<small>mL</small></span></div><canvas id="cVol"></canvas></div>
+    <div class="card"><div class="top"><span class="name"><i style="background:var(--top)"></i>Filling volume</span><span class="val" id="vVol">0<small>CC</small></span></div><canvas id="cVol"></canvas></div>
   </div>
 
   <div class="sec">
@@ -232,8 +185,6 @@ setTimeout(function () {
     <div class="ctl-row" id="modeRow"><label>โหมดข้อมูล</label>
       <div class="seg" id="segMode"><button data-v="sim" class="on">จำลอง</button><button data-v="live">ข้อมูลจริง</button></div></div>
     <div id="liveStat" class="small mono"></div>
-    <div class="ctl-row"><label>ประเภทรถ (ตำแหน่งกระปุก)</label>
-      <div class="seg" id="segCar"><button data-v="RHD" class="on">RHD</button><button data-v="LHD">LHD</button><button data-v="MIX">ผสม</button></div></div>
     <div class="btns" id="simBtns">
       <button id="btnLeak" class="warn">จำลอง vacuum รั่ว (<span id="leakSide">RH</span>)</button>
       <button id="btnStop" class="danger">E-STOP</button>
@@ -288,25 +239,21 @@ const __t = (th, en) => (LANG === 'en' ? en : th);
 if (LANG === 'en') {
   document.documentElement.lang = 'en';
   const EN_STATIC = {
-    'LH / RH ทำงานพร้อมกัน สลับกันคนละคัน · แต่ละเครื่อง ≈ 70 วินาที/คัน → รถเข้าทุก 35 วินาที': 'LH / RH run at the same time, alternating cars · each machine ≈ 70 s/car → a car arrives every 35 s',
     'ลากเพื่อหมุน · scroll เพื่อซูม · คลิกที่ชิ้นส่วนเพื่อดูรายละเอียด · กด': 'Drag to rotate · scroll to zoom · click a part for details · press',
     '🚶 เดินแบบเกม': '🚶 Game walk',
     'เพื่อลงไปเดินในไลน์': 'to walk down into the line',
     '☰ แผงควบคุม': '☰ Control panel',
     'ข้างในกระปุกน้ำมันเบรก': 'Inside the brake fluid reservoir',
     '1 สวมหัว': '1 Clamp gun', '2 ดูดอากาศ': '2 Evacuate', '3 เติมน้ำมัน': '3 Fill', '4 ปรับระดับ': '4 Top off',
-    'สุญญากาศในระบบ': 'System vacuum', 'น้ำมันที่เติมแล้ว': 'Fluid filled',
-    'สถานะเครื่อง · ทำงานพร้อมกัน สลับคันละเครื่อง': 'Machine status · run together, alternating cars',
     'สัญญาณ (1 sample/วินาที) · จำลอง': 'Signals (1 sample/s) · simulated',
     'คันปัจจุบันของเครื่อง': 'Current car of machine', 'รูปแบบปกติ': 'Normal pattern',
     'ควบคุม': 'Controls', '❚❚ หยุดชั่วคราว': '❚❚ Pause',
-    'ประเภทรถ (ตำแหน่งกระปุก)': 'Car type (reservoir position)', 'ผสม': 'Mixed',
     'จำลอง vacuum รั่ว (': 'Simulate vacuum leak (',
     'ผลการเติมล่าสุด': 'Latest fill results', 'ยังไม่มีรถที่เติมเสร็จ': 'No cars filled yet',
     'ภาพรวม': 'Overview', 'ตาม Console': 'Follow console', 'ถังน้ำมัน': 'Fluid drum', 'มุมข้างไลน์': 'Line side view',
     'แสดงผล': 'Show', 'เสา / โครงหลังคา': 'Pillars / roof frame', 'ป้ายชื่อชิ้นส่วน': 'Part labels',
     'แผงข้อมูล production': 'Production data panel', 'ภาพอธิบายกระปุก': 'Reservoir diagram',
-    'ⓘ ข้อมูล': 'ⓘ Info', 'ข้อมูลการผลิต · ข้อมูลจริง': 'Production data · live', 'โหมดข้อมูล': 'Data mode', 'จำลอง': 'Simulation', 'ข้อมูลจริง': 'Live data', 'กระโดด': 'Jump', 'ย่อตัว': 'Crouch',
+    'ⓘ ข้อมูล': 'ⓘ Info', 'โหมดข้อมูล': 'Data mode', 'จำลอง': 'Simulation', 'ข้อมูลจริง': 'Live data', 'กระโดด': 'Jump', 'ย่อตัว': 'Crouch',
     'v3.2 · โหมดเดิน · ขนาด/ตำแหน่งประมาณจากรูปถ่าย วิดีโอ และ system drawing · ค่าสัญญาณทั้งหมดเป็นข้อมูลจำลอง': 'v3.2 · walk mode · sizes/positions estimated from photos, video and the system drawing · all signal values are simulated',
   };
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -475,9 +422,9 @@ const GLOW = { red: 0xff2a1e, green: 0x2bff6a, clear: 0xffffff, amber: 0xff8a1a,
 const pickables = [];
 function info(obj, key) { obj.userData.info = key; pickables.push(obj); return obj; }
 const labelObjs = [];
-function tag(obj, text, sub, pos) {
+function tag(obj, text, _sub, pos) {   // แสดงเฉพาะชื่อหลัก (ไม่แสดงคำอธิบายรอง)
   const d = document.createElement('div'); d.className = 'tag';
-  d.innerHTML = `<b>${text}</b>${sub ? `<span>${sub}</span>` : ''}`;
+  d.innerHTML = `<b>${text}</b>`;
   const o = new CSS2DObject(d); o.position.copy(pos); obj.add(o); labelObjs.push(o); return o;
 }
 
@@ -1122,11 +1069,11 @@ tag(cars[0].group, __t('PICKUP บน CONVEYOR', 'PICKUP ON CONVEYOR'), __t('ร
 
 /* ================= simulation state ================= */
 // car k is filled by RH when k is even, by LH when k is odd; its machine cycle starts at T = k·TAKT
-const state = { playing: true, speed: 4, carMode: 'RHD', view: 'RH', fault: null, estop: false, leakArmed: { RH: false, LH: false }, labels: true };
+const state = { playing: true, speed: 4, view: 'RH', fault: null, estop: false, leakArmed: { RH: false, LH: false }, labels: true };
 let T = .5;
 const carType = new Map(), cycles = new Map();
 const sideOf = k => (((k % 2) + 2) % 2 === 0 ? 'RH' : 'LH');
-const computeType = k => state.carMode === 'MIX' ? (hash(k * 9.17 + 2) < .3 ? 'LHD' : 'RHD') : state.carMode;
+const computeType = () => 'RHD';
 function typeOf(k) { if (!carType.has(k)) carType.set(k, computeType(k)); return carType.get(k); }
 function machine(sd, TT = T) {        // current car index and in-cycle time of a machine
   const m = Math.floor((TT - OFFS[sd]) / CYCLE);
@@ -1169,7 +1116,7 @@ const results = [];
    ขั้นตอนในภาพ (t ในรอบ 70 วินาทีของโมเดล) แมปจาก stepnum + เวลาที่อยู่ใน step นั้นจริง; สัญญาณ/bn/ผล PASS-NG มาจาก API */
 const EMBEDDED = window.parent !== window;
 const VAC_CAP = 300;                                   // vacuumgun ค่าพุ่งเกินนี้แสดงเป็นเพดาน (เหมือน Dashboard)
-const LIVE = { on: false, userSim: false, lastMsgAt: 0, common: null, kpi: null, verdict: new Map(), rows: [], side: { RH: null, LH: null },
+const LIVE = { on: false, userSim: false, lastMsgAt: 0, common: null, verdict: new Map(), rows: [], side: { RH: null, LH: null },
   exp: { s0: 12, s1: 43, s2: 80, back: 12 } };         // เวลาโดยประมาณ (วินาที) ของ step 0 / 1 / 2 และช่วงกลับ — วัดจากข้อมูลจริง
 function liveNewSide(bn, pgnum, now) { return { bn, pgnum, step: null, stepAt: now, bnAt: now, afterAt: null, seen: { 1: false, 2: false }, samples: [], lastTs: 0, last: null, t: 0, target: 0 }; }
 function liveEnterStep(s, step, at) {
@@ -1185,7 +1132,7 @@ function liveFeed(msg) {
   const now = performance.now();
   LIVE.lastMsgAt = now;
   if (!LIVE.userSim) setLive(true);
-  if (msg.common) { LIVE.common = msg.common; if (LIVE.on) { liveFault(msg.common.machine_fault === true); renderProd(); } }
+  if (msg.common) { LIVE.common = msg.common; if (LIVE.on) liveFault(msg.common.machine_fault === true); }
   const ts = Date.parse(msg.recorded_at);
   for (const [key, sd] of [['lh', 'LH'], ['rh', 'RH']]) {
     const m = msg[key]; if (!m) continue;
@@ -1252,21 +1199,6 @@ function renderLiveResults() {
         `<tr><td>#${r.bn}</td><td>${r.side}</td><td>${r.pgnum}</td><td>${r.volPct.toFixed(1)}%</td><td class="${r.ok ? 'ok' : 'ng'}">${r.ok ? 'PASS' : 'NG'}</td></tr>`).join('')}</table>`
     : `<div class="empty">${__t('ยังไม่มีผลตรวจ', 'No results yet')}</div>`;
 }
-function renderProd() {                                 // แผงข้อมูลการผลิต: สถานะเครื่อง + สรุปผลตรวจวันนี้ (ข้อมูลจริง)
-  if (!LIVE.on) return;
-  const c = LIVE.common, k = LIVE.kpi;
-  const dot = (cls, label) => `<span><i class="${cls}"></i>${label}</span>`;
-  $('prodStatus').innerHTML = c
-    ? dot(c.continue ? 'on' : 'bad', 'continue') + dot(c.master_on ? 'on' : 'bad', 'Master on') + dot(c.machine_fault ? 'on' : 'bad', 'machine fault')
-    : `<span class="small">${__t('รอสถานะเครื่อง…', 'waiting for machine status…')}</span>`;
-  if (!k) { $('prodKpi').innerHTML = `<div class="pk wide"><small>${__t('กำลังโหลดสรุปการผลิต…', 'Loading production summary…')}</small></div>`; return; }
-  const pct = k.carsYesterday > 0 ? (k.carsToday - k.carsYesterday) / k.carsYesterday * 100 : 0, L = k.latest;
-  $('prodKpi').innerHTML =
-    `<div class="pk"><small>${__t('ผลตรวจวันนี้', 'Results today')}</small><b>${k.carsToday}</b> <span class="d ${pct >= 0 ? 'good' : 'crit'}">${pct >= 0 ? '▲' : '▼'} ${Math.abs(pct).toFixed(0)}%</span></div>` +
-    `<div class="pk"><small>Pass rate</small><b>${k.passRate.toFixed(1)}%</b></div>` +
-    `<div class="pk"><small>NG ${__t('วันนี้', 'today')}</small><b>${k.ngToday}</b></div>` +
-    `<div class="pk"><small>${__t('ผลล่าสุด', 'Latest')}</small><b>${L ? L.verdict : '—'}</b> <span class="d ${L && L.verdict === 'NG' ? 'crit' : ''}">${L ? `${L.side} · bn ${L.bn}` : ''}</span></div>`;
-}
 function advance(dts) {
   let Tn = T + dts;
   for (const sd of ['RH', 'LH']) {
@@ -1317,21 +1249,9 @@ controls.addEventListener('start', () => { tween = null; });
 
 /* ================= HUD ================= */
 const $ = id => document.getElementById(id);
-const cards = {};
-for (const sd of ['RH', 'LH']) {
-  const el = document.createElement('div'); el.className = 'mc' + (sd === state.view ? ' sel' : '');
-  el.innerHTML = `<div class="row"><span class="chip ${sd === 'LH' ? 'lh' : ''}">${sd}</span><span class="mono small car"></span><span class="mono small"><b class="tt">0.0</b><span class="ttu"> / 70 s</span></span></div>
-    <div class="phase">—</div>
-    <div class="row small"><span class="mono en"></span><span class="mono">stepnum <b class="st">0</b></span></div>
-    <div class="timeline">${PH.map(p => `<i style="width:${(p.t1 - p.t0) / CYCLE * 100}%;background:${p.c}"></i>`).join('')}<div class="cur"></div></div>`;
-  el.onclick = () => setView(sd);
-  $('mcards').appendChild(el);
-  cards[sd] = { el, car: el.querySelector('.car'), tt: el.querySelector('.tt'), ttu: el.querySelector('.ttu'), ph: el.querySelector('.phase'), en: el.querySelector('.en'), st: el.querySelector('.st'), cur: el.querySelector('.cur') };
-}
 function setView(sd) {
   state.view = sd;
-  for (const k of ['RH', 'LH']) cards[k].el.classList.toggle('sel', k === sd);
-  document.querySelectorAll('#segView button, #segProc button').forEach(x => x.classList.toggle('on', x.dataset.v === sd));
+  document.querySelectorAll('#segProc button').forEach(x => x.classList.toggle('on', x.dataset.v === sd));
   $('viewTag').textContent = sd; $('leakSide').textContent = sd;
   if (FOLLOW.has(camMode)) goCam(camMode);
   updLeakNote();
@@ -1420,8 +1340,8 @@ function drawChartsLive(lm) {                             // กราฟค่�
 const procEl = $('proc'), pcv = $('pcv'), PW = 238, PHh = 196, FL = '#e0b43a', AIRC = '170,205,225';
 const PMAIN = [[66, 126], [66, 150], [226, 150]], PWH = [104, 144, 184, 224], PML = 184;
 const pSteps = [...document.querySelectorAll('#psteps span')];
-let procT = 0, pN = 0;
-function sizeProc() { const d = Math.min(devicePixelRatio, 2); pcv.width = PW * d; pcv.height = PHh * d; pcv._d = d; }
+let procT = 0;
+function sizeProc() { const d = Math.min(devicePixelRatio, 2) * Math.max(1, (pcv.clientWidth || PW) / PW); pcv.width = Math.round(PW * d); pcv.height = Math.round(PHh * d); pcv._d = d; }
 sizeProc();
 function polyTo(g, pts, len) {
   g.beginPath(); g.moveTo(pts[0][0], pts[0][1]); let acc = 0;
@@ -1521,20 +1441,7 @@ function drawProc(v) {
   const lbl = state.estop ? null : ng && t >= 30 ? [__t('✕ ไม่เติม (NG)', '✕ No fill (NG)'), '#ff8278'] : vacOn ? [__t('↑ ดูดอากาศออก', '↑ Air out'), '#3ecf6e'] : ph.key === 'filling' ? [__t('↓ น้ำมันเข้า', '↓ Fluid in'), FL] : ph.key === 'topoff' ? [__t('↓ เติมเพิ่ม', '↓ Top off'), '#4ea3ff'] : null;
   if (lbl) { g.fillStyle = lbl[1]; g.fillText(lbl[0], 92, 10); }
   g.fillStyle = '#8f9ca6'; g.font = `500 8.5px ${SANS}`; g.fillText(__t('ท่อเบรก →', 'Brake line →'), 74, 141);
-  // pressure gauge
-  const cx = 182, cy = 66, r = 34, gv = s.vac < -1 ? s.vac : s.pr;
-  const ang = x => (135 + 270 * clamp01((x + 100) / 600)) * Math.PI / 180;
-  g.fillStyle = 'rgba(255,255,255,.06)'; g.beginPath(); g.arc(cx, cy, r + 4, 0, 7); g.fill();
-  g.lineCap = 'butt'; g.lineWidth = 5; g.strokeStyle = 'rgba(255,255,255,.14)'; g.beginPath(); g.arc(cx, cy, r, ang(-100), ang(500)); g.stroke();
-  g.strokeStyle = '#3ecf6e'; g.beginPath(); g.arc(cx, cy, r, ang(-100), ang(-80)); g.stroke();
-  g.fillStyle = '#8f9ca6'; g.font = `500 8px ${MONO}`; g.textAlign = 'center';
-  g.fillText('0', cx - r + 11, cy); g.fillText('-100', cx - 26, cy + 34); g.fillText('+500', cx + 26, cy + 34);
-  pN += (gv - pN) * .2; const na = ang(pN);
-  g.lineCap = 'round'; g.strokeStyle = '#ff4b3e'; g.lineWidth = 2; g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + Math.cos(na) * (r - 5), cy + Math.sin(na) * (r - 5)); g.stroke();
-  g.fillStyle = '#e7ecef'; g.beginPath(); g.arc(cx, cy, 3, 0, 7); g.fill();
-  g.font = `600 12px ${MONO}`; g.fillText(`${gv > 0 ? '+' : ''}${gv.toFixed(Math.abs(gv) < 100 ? 1 : 0)}`, cx, cy + 15);
-  g.fillStyle = '#8f9ca6'; g.font = `500 8px ${MONO}`; g.fillText('kPa', cx, cy + 25);
-  g.font = `500 9.5px ${SANS}`; g.fillText(__t('แรงดันในระบบเบรก', 'Brake system pressure'), cx, 111);
+  g.textAlign = 'center';
   let badge;
   if (state.estop) badge = ['E-STOP', '#b3261e'];
   else if (ng && t >= 30) badge = [__t('✕ NG · สุญญากาศไม่ถึง', '✕ NG · low vacuum'), '#b3261e'];
@@ -1552,17 +1459,6 @@ function drawProc(v) {
   g.fillStyle = FL; g.fillRect(48, 188, 10, 5); g.fillStyle = '#b9c4cc'; g.fillText(__t('น้ำมันเบรก', 'Brake fluid'), 61, 191);
   g.textAlign = 'center'; g.fillText(__t('ไปยังเบรกทั้ง 4 ล้อ', 'To all 4 wheel brakes'), 164, 191);
 }
-const PTXT = {
-  wait: __t('รอรถคันถัดไปเข้าสถานี ระบบเบรกของรถใหม่ยังว่าง ข้างในมีแต่อากาศ', 'Waiting for the next car to enter the station. The new car\'s brake system is empty — only air inside.'),
-  clamp: __t('สวมหัวเติมลงบนปากกระปุก แล้วล็อกด้วยลมให้แน่น อากาศจะได้ไม่รั่วเข้า', 'The filling gun is placed on the reservoir neck and air-locked tight so no air leaks in.'),
-  vacuum: __t('ดูดอากาศออกจากกระปุก แม่ปั๊ม และท่อเบรกทั้ง 4 ล้อ จนเกือบเป็นสุญญากาศ ถ้ามีอากาศค้างในท่อ เบรกจะนิ่มและหยุดรถได้ไม่ดี', 'Air is pulled out of the reservoir, master cylinder and all 4 brake lines until it is almost a vacuum. Air left in the lines makes the brakes spongy and stops the car poorly.'),
-  filling: __t('ปล่อยน้ำมันเบรกเข้าไป สุญญากาศจะดึงน้ำมันให้ไหลเต็มทุกท่อจนถึงล้อ โดยไม่มีฟองอากาศค้าง', 'Brake fluid is released; the vacuum draws it through every line to the wheels with no trapped air bubbles.'),
-  topoff: __t('เติมเพิ่มอีกเล็กน้อย ให้ระดับน้ำมันในกระปุกขึ้นถึงระดับที่กำหนด', 'A little more fluid is added so the level in the reservoir reaches the target.'),
-  complete: __t('ปลดหัวเติมออก รถคันนี้เติมน้ำมันเบรกเสร็จแล้ว', 'The gun is released. This car\'s brake fluid fill is complete.'),
-  return: __t('เครื่องเติมวิ่งกลับไปรอรถคันถัดไป', 'The filler carriage runs back to wait for the next car.'),
-  ng: __t('ดูดสุญญากาศไม่ถึงเกณฑ์ แปลว่ามีจุดรั่ว เครื่องจึงไม่เติมน้ำมันและหยุดแจ้งเตือน รถคันนี้ต้องแยกไปตรวจ', 'Vacuum did not reach spec, meaning there is a leak. The machine skips filling and raises an alarm. This car must be set aside for inspection.'),
-  estop: __t('กดปุ่มหยุดฉุกเฉินอยู่ ทุกอย่างหยุดทำงาน', 'The emergency stop is pressed. Everything is stopped.'),
-};
 const PIDX = { wait: -1, clamp: 0, vacuum: 1, filling: 2, topoff: 3, complete: 4, return: 4 };
 function updProcText(v) {
   if (procEl.classList.contains('hidden')) return;
@@ -1574,22 +1470,13 @@ function updProcText(v) {
     el.classList.toggle('on', on); el.classList.toggle('done', done); el.classList.toggle('bad', bad && i === 1);
     el.style.setProperty('--pc', on ? ph.c : '');
   });
-  $('pVac').textContent = rv ? rv.vac.toFixed(0) : (s.vac < -1 ? s.vac : 0).toFixed(1);
-  $('pVol').textContent = (rv ? rv.vol : s.vol).toFixed(0);
-  $('pBar').style.width = (100 * clamp01((rv ? rv.vol : s.vol) / (cd.vt + cd.vtop))).toFixed(1) + '%';
-  $('pTxt').textContent = state.estop ? PTXT.estop : bad ? PTXT.ng : PTXT[ph.key];
 }
 $('btnProc').onclick = () => { const hide = !procEl.classList.toggle('hidden'); $('btnProc').classList.toggle('on', hide); };
 
 /* controls */
 $('btnPlay').onclick = () => { state.playing = !state.playing; $('btnPlay').textContent = state.playing ? __t('❚❚ หยุดชั่วคราว', '❚❚ Pause') : __t('▶ เล่นต่อ', '▶ Resume'); $('btnPlay').classList.toggle('on', state.playing); };
 document.querySelectorAll('#segSpeed button').forEach(b => b.onclick = () => { state.speed = +b.dataset.v; document.querySelectorAll('#segSpeed button').forEach(x => x.classList.toggle('on', x === b)); });
-document.querySelectorAll('#segView button, #segProc button').forEach(b => b.onclick = () => setView(b.dataset.v));
-document.querySelectorAll('#segCar button').forEach(b => b.onclick = () => {
-  state.carMode = b.dataset.v; document.querySelectorAll('#segCar button').forEach(x => x.classList.toggle('on', x === b));
-  // only re-type cars whose gun has not been applied yet
-  for (const k of [...carType.keys()]) if (T - k * TAKT < 3.5) carType.set(k, computeType(k));
-});
+document.querySelectorAll('#segProc button').forEach(b => b.onclick = () => setView(b.dataset.v));
 $('btnLeak').onclick = () => {
   const sd = state.view, { k, t } = machine(sd), cd = cycle(k);
   if (t < 29 && !cd.ng) { cd.leak = true; $('leakNote').textContent = __t(`vacuum รั่วในคัน #${k + 1} ของเครื่อง ${sd} — ดูกราฟ Vacuum เทียบเส้นปกติ`, `Vacuum leak on car #${k + 1} of machine ${sd} — compare the Vacuum chart with the normal line`); }
@@ -1603,7 +1490,7 @@ $('btnPillars').onclick = () => { structure.visible = !structure.visible; $('btn
 function toggleHud() { const off = document.body.classList.toggle('hudoff'); $('btnHud').classList.toggle('on', !off); }
 $('btnHud').onclick = toggleHud;
 addEventListener('keydown', e => { if (!walk.on && e.code === 'KeyH' && e.target === document.body) toggleHud(); });
-$('panelToggle').onclick = () => { $('panel').classList.toggle('collapsed'); sizeCharts(); };
+$('panelToggle').onclick = () => { $('panel').classList.toggle('collapsed'); sizeCharts(); sizeProc(); };
 addEventListener('keydown', e => { if (e.code === 'Space' && e.target === document.body && !walk.on) { e.preventDefault(); $('btnPlay').click(); } });
 
 /* picking */
@@ -1625,7 +1512,7 @@ const INFO = {
   gun: ['BRAKE GUN', __t('หัวเติมสวมปากกระปุกน้ำมันเบรก แล้ว clamp ด้วยลม สายที่ต่อเข้าหัวหุ้มปลอกสีน้ำเงิน/เขียวอมฟ้า และปลอกเงิน ห้อยลงถึงพื้น ตาม drawing มีสาย Vacuum G · Filling R · Top-off BL · Clamp B · Un-clamp Y · Air W', 'The filling gun fits onto the brake fluid reservoir neck and is clamped with air. The hoses to the gun are sleeved in blue/teal and silver and hang down to the floor. Per the drawing the lines are Vacuum G · Filling R · Top-off BL · Clamp B · Un-clamp Y · Air W.')],
   ls: ['LIMIT SWITCH RAIL · F3-20', __t('X4A3 LS = Return over-run (กันวิ่งเลย ปกติไม่ควรโดน), X4A4 LS = Synchronize insertion, X4A5 LS = High-speed ไฟเขียวที่สวิตช์ติดเมื่อแขน dog สีเหลืองด้านหลัง carriage ชน', 'X4A3 LS = Return over-run (prevents overtravel; normally never hit), X4A4 LS = Synchronize insertion, X4A5 LS = High-speed. The green light on a switch comes on when the yellow dog arm at the back of the carriage hits it.')],
   car: [__t('รถบน CONVEYOR', 'CAR ON CONVEYOR'), __t('กระบะเปิดฝากระโปรงหน้า วิ่งต่อเนื่องบน slat conveyor รถเข้าทุก 35 วินาที (ระยะห่างประมาณ 6.3 ม. ที่ 0.18 ม./วินาที ในโมเดล) คันคู่เติมด้วยเครื่อง RH คันคี่เติมด้วยเครื่อง LH', 'Pickups with the hood open run continuously on the slat conveyor. A car arrives every 35 seconds (about 6.3 m apart at 0.18 m/s in the model). Even cars are filled by the RH machine, odd cars by the LH machine.')],
-  res: [__t('กระปุกน้ำมันเบรก (master cylinder reservoir)', 'BRAKE FLUID RESERVOIR (master cylinder reservoir)'), __t('จุดที่หัวเติมสวม: รถพวงมาลัยขวา (RHD) อยู่ฝั่งขวา รถพวงมาลัยซ้าย (LHD) อยู่ฝั่งซ้าย เลือกได้ที่ "ประเภทรถ" ทั้งสองเครื่องเติมรถได้ทั้งสองแบบ (ตามใบ Operation ที่มีรูป RHD และ LHD) ถ้ากระปุกอยู่ฝั่งตรงข้าม operator ต้องลากหัวเติมข้ามห้องเครื่อง', 'Where the gun fits: right-hand-drive cars (RHD) have it on the right, left-hand-drive (LHD) on the left; choose under "Car type". Both machines can fill either type (per the Operation sheet showing RHD and LHD). If the reservoir is on the opposite side, the operator must drag the gun across the engine bay.')],
+  res: [__t('กระปุกน้ำมันเบรก (master cylinder reservoir)', 'BRAKE FLUID RESERVOIR (master cylinder reservoir)'), __t('จุดที่หัวเติมสวม: รถพวงมาลัยขวา (RHD) อยู่ฝั่งขวา รถพวงมาลัยซ้าย (LHD) อยู่ฝั่งซ้าย ทั้งสองเครื่องเติมรถได้ทั้งสองแบบ (ตามใบ Operation ที่มีรูป RHD และ LHD) ถ้ากระปุกอยู่ฝั่งตรงข้าม operator ต้องลากหัวเติมข้ามห้องเครื่อง', 'Where the gun fits: right-hand-drive cars (RHD) have it on the right, left-hand-drive (LHD) on the left. Both machines can fill either type (per the Operation sheet showing RHD and LHD). If the reservoir is on the opposite side, the operator must drag the gun across the engine bay.')],
   conv: ['SLAT CONVEYOR', __t('สายพานพื้นพารถเคลื่อนที่ต่อเนื่อง ทางเดินสีน้ำเงินมีแถบเหลืองดำและเลขตำแหน่งอยู่ใต้แนวที่ console วิ่ง', 'A floor conveyor carrying cars continuously. The blue walkway with yellow-black stripes and position numbers lies under the line the console runs along.')],
   pipe: [__t('ท่อ FILL / TOP OFF', 'FILL / TOP OFF PIPE'), __t('ท่อจาก Main unit ขึ้นเพดานไปยังกล่องต้นทางของ cable carrier แต่ละฝั่ง จุดสีแดงวิ่งตอน Filling สีฟ้าตอน Top-off', 'Pipes from the Main unit rise to the ceiling and run to each side\'s cable carrier start box. Red dots run during Filling, blue during Top-off.')],
 };
@@ -1849,7 +1736,7 @@ function setLive(on) {
   $('sigHead').textContent = on ? SIG_LIVE : SIG_SIM;
   $('noteTxt').textContent = on ? NOTE_LIVE : NOTE_SIM;
   hideAlarm();
-  if (on) { if (LIVE.common && LIVE.common.machine_fault === true) liveFault(true); renderLiveResults(); renderProd(); }
+  if (on) { if (LIVE.common && LIVE.common.machine_fault === true) liveFault(true); renderLiveResults(); }
   else { if (state.fault === 'ALL') state.fault = null; if (results.length) renderResults(); else $('results').innerHTML = EMPTY_RESULTS; $('liveStat').textContent = ''; }
 }
 document.querySelectorAll('#segMode button').forEach(b => b.onclick = () => { LIVE.userSim = b.dataset.v === 'sim'; setLive(b.dataset.v === 'live'); });
@@ -1861,7 +1748,6 @@ if (EMBEDDED) {
     if (d.type === 'hello') window.parent.postMessage({ source: 'brake-3d', type: 'ready' }, location.origin);   // Dashboard เพิ่งพร้อม
     else if (d.type === 'live') liveFeed(d.msg);
     else if (d.type === 'history') liveHistory(d);
-    else if (d.type === 'kpi') { LIVE.kpi = d.kpi; renderProd(); }
     else if (d.type === 'results') {
       LIVE.rows = d.rows; LIVE.verdict = new Map(d.rows.map(r => [`${r.side}-${r.bn}`, r.ok]));
       if (LIVE.on) renderLiveResults();
@@ -1988,33 +1874,21 @@ function update(dt) {
   hudAcc += dt;
   if (hudAcc > 1 / 15) {
     hudAcc = 0;
-    for (const sd of ['RH', 'LH']) {
-      const { k, t, cd, ph, lm } = view[sd], c = cards[sd];
-      const ng = cd.ng && (ph.key === 'filling' || ph.key === 'topoff' || ph.key === 'complete');
-      c.ph.textContent = state.estop ? 'E-STOP' : ng ? (ph.key === 'complete' ? 'Unclamp (NG)' : __t('NG · ข้ามการเติม', 'NG · fill skipped')) : ph.th;
-      c.ph.style.color = state.estop || ng || state.fault === sd || state.fault === 'ALL' ? '#ff8278' : ph.c;
-      c.en.textContent = ng ? 'NG BYPASS' : ph.en;
-      c.st.textContent = lm ? (lm.step ?? '—') : ng ? 0 : ph.step;
-      c.tt.textContent = lm ? lm.el.toFixed(0) : t.toFixed(1);
-      c.ttu.textContent = lm ? ' s' : ' / 70 s';
-      c.cur.style.left = (t / CYCLE * 100) + '%';
-      c.car.textContent = lm ? `bn ${lm.bn ?? '—'} · pg${lm.pgnum ?? '—'}` : `${__t('คัน', 'Car')} #${k + 1} · ${typeOf(k)}${cd.leak ? ' · leak' : ''}`;
-    }
     const v = view[state.view];
     if (v.lm) {                                         // live: ค่าจริงล่าสุด (vacuumgun เป็นค่าดิบ ไม่มีหน่วย)
       const L = v.lm.last;
-      $('vVac').innerHTML = (L ? L.vac.toFixed(0) : '—');
+      $('vVac').innerHTML = (L ? L.vac.toFixed(0) : '—') + '<small>Pa</small>';
       $('vPr').innerHTML = (L ? L.pr.toFixed(0) : '—') + '<small>kPa</small>';
-      $('vVol').innerHTML = (L ? L.vol.toFixed(0) : '—') + '<small>mL</small>';
+      $('vVol').innerHTML = (L ? L.vol.toFixed(0) : '—') + '<small>CC</small>';
       drawChartsLive(v.lm);
       const age = (performance.now() - LIVE.lastMsgAt) / 1000, ls = $('liveStat');
       ls.className = 'small mono' + (LIVE.lastMsgAt && age < 6 ? ' ok' : '');
       ls.textContent = !LIVE.lastMsgAt ? __t('○ รอข้อมูลสดจากเครื่อง…', '○ waiting for live data…')
         : age < 6 ? __t('● ข้อมูลสด', '● LIVE') : __t(`○ ไม่มีข้อมูลใหม่ ${age.toFixed(0)} วินาที`, `○ no new data for ${age.toFixed(0)} s`);
     } else {
-      $('vVac').innerHTML = v.s.vac.toFixed(1) + '<small>kPa</small>';
+      $('vVac').innerHTML = v.s.vac.toFixed(1) + '<small>Pa</small>';
       $('vPr').innerHTML = v.s.pr.toFixed(0) + '<small>kPa</small>';
-      $('vVol').innerHTML = v.s.vol.toFixed(0) + '<small>mL</small>';
+      $('vVol').innerHTML = v.s.vol.toFixed(0) + '<small>CC</small>';
       drawCharts(v.cd, v.t);
     }
     updProcText(v);
@@ -2031,7 +1905,7 @@ function loop() {
 }
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight); labelRenderer.setSize(innerWidth, innerHeight); sizeCharts();
+  renderer.setSize(innerWidth, innerHeight); labelRenderer.setSize(innerWidth, innerHeight); sizeCharts(); sizeProc();
 });
 if (innerWidth <= 820) $('panel').classList.add('collapsed');
 loop();

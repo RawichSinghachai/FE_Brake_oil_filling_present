@@ -51,7 +51,7 @@ export const SIDE_COLOR: Record<Side, string> = {
 };
 
 export const FEATURES: readonly FeatureConfig[] = [
-  { key: 'pres', name: 'filling pressure', rawName: 'fillingpressure', apiKey: 'pressure' },
-  { key: 'vol', name: 'filling volume', rawName: 'fillingvolume', apiKey: 'volume' },
-  { key: 'vac', name: 'vacuumgun', rawName: 'vacuumgun', apiKey: 'vacuumgun' },
+  { key: 'pres', name: 'filling pressure', rawName: 'fillingpressure', apiKey: 'pressure', unit: 'kPa' },
+  { key: 'vol', name: 'filling volume', rawName: 'fillingvolume', apiKey: 'volume', unit: 'CC' },
+  { key: 'vac', name: 'vacuumgun', rawName: 'vacuumgun', apiKey: 'vacuumgun', unit: 'Pa' },
 ];

@@ -28,18 +28,20 @@ export interface Signal {
   feature?: FeatureKey;
   /** ค่าที่เกินนี้แสดงผลเป็นค่านี้ (ค่าพุ่ง) */
   max?: number;
+  /** หน่วยของแกน Y (ไม่มี = ไม่แสดง) */
+  unit?: string;
 }
 
 /** 9 signal ของหน้ารายละเอียดรถ (ตาม dashboard.html) */
 export const SIGNALS: readonly Signal[] = [
-  { name: 'FillingPressure', column: '{s}_fillingpressure', feature: 'pres' },
-  { name: 'FillingVolume', column: '{s}_fillingvolume', feature: 'vol' },
-  { name: 'VacuumGun', column: '{s}_vacuumgun', feature: 'vac', max: VACUUM_DISPLAY_MAX },
-  { name: 'VacuumPump', column: '{s}_vacuumpump', max: VACUUM_DISPLAY_MAX },
-  { name: 'PumpVacuumCurrent', column: '{s}_pumpvacuumcurrent' },
-  { name: 'PumpDegassingCurrent', column: 'pumpdegassingcurrent' },
-  { name: 'PumpSupplyCurrent', column: 'pumpsupplycurrent' },
-  { name: 'PumpFillingCurrent', column: 'pumpfillingcurrent' },
+  { name: 'FillingPressure', column: '{s}_fillingpressure', feature: 'pres', unit: 'kPa' },
+  { name: 'FillingVolume', column: '{s}_fillingvolume', feature: 'vol', unit: 'CC' },
+  { name: 'VacuumGun', column: '{s}_vacuumgun', feature: 'vac', max: VACUUM_DISPLAY_MAX, unit: 'Pa' },
+  { name: 'VacuumPump', column: '{s}_vacuumpump', max: VACUUM_DISPLAY_MAX, unit: 'Pa' },
+  { name: 'PumpVacuumCurrent', column: '{s}_pumpvacuumcurrent', unit: 'A' },
+  { name: 'PumpDegassingCurrent', column: 'pumpdegassingcurrent', unit: 'A' },
+  { name: 'PumpSupplyCurrent', column: 'pumpsupplycurrent', unit: 'A' },
+  { name: 'PumpFillingCurrent', column: 'pumpfillingcurrent', unit: 'A' },
   { name: 'StepNum', column: '{s}_stepnum' },
 ];
 

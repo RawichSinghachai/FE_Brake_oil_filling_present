@@ -51,15 +51,14 @@ export const th = {
   'machine.noteFailed': '{name} เกิน threshold → ตัดสินเป็น NG',
 
   'recon.heading': 'Reconstruction overlay — 3 ฟีเจอร์',
-  'recon.legendLive': 'เส้นทึบ = input (สีตาม bn) · เส้นประแดง = predict',
+  'recon.legendLive': 'เส้นทึบ = machine (ข้อมูลจากเครื่องจักร)',
   'recon.legendCompare': 'เส้นทึบ = input (สีตาม bn)',
   'recon.view': 'มุมมอง',
   'recon.mode.live': 'Real-time',
   'recon.mode.compare': 'เปรียบเทียบ',
   'recon.side': 'ฝั่ง',
-  'recon.showPredict': 'แสดงผล predict',
   'recon.footLive':
-    'โหมด Real-time: cycle ปัจจุบันของแต่ละเครื่อง ไม่เกิน {max} จุดล่าสุด และคงไว้จนกว่ารถคันใหม่เข้า (เส้นทึบ = input, เส้นประแดง = predict) · สลับไป "เปรียบเทียบ" เพื่อเลือก bn มาซ้อนทับย้อนหลัง',
+    'โหมด Real-time: cycle ปัจจุบันของแต่ละเครื่อง ไม่เกิน {max} จุดล่าสุด และคงไว้จนกว่ารถคันใหม่เข้า (เส้นทึบ = machine) · สลับไป "เปรียบเทียบ" เพื่อเลือก bn มาซ้อนทับย้อนหลัง',
   'recon.footCompare':
     'โหมดเปรียบเทียบ: เริ่มจากว่าง เลือก bn ที่ต้องการมาซ้อนทับเอง (สูงสุด {maxCompare} ชุด รวมทุกฝั่งในกราฟเดียว) · ข้อมูล input จาก /api/machines/{bn} (ไม่เกิน {max} แถวล่าสุดต่อชุด)',
 
@@ -253,15 +252,14 @@ export const en: Record<MessageKey, string> = {
   'machine.noteFailed': '{name} exceeds threshold → judged NG',
 
   'recon.heading': 'Reconstruction overlay — 3 features',
-  'recon.legendLive': 'Solid = input (colored by bn) · red dashed = predict',
+  'recon.legendLive': 'Solid = machine (data from the machine)',
   'recon.legendCompare': 'Solid = input (colored by bn)',
   'recon.view': 'View',
   'recon.mode.live': 'Real-time',
   'recon.mode.compare': 'Compare',
   'recon.side': 'Side',
-  'recon.showPredict': 'Show predict',
   'recon.footLive':
-    'Real-time mode: current cycle of each machine, up to the latest {max} points, kept until the next car arrives (solid = input, red dashed = predict) · switch to "Compare" to overlay past bn values',
+    'Real-time mode: current cycle of each machine, up to the latest {max} points, kept until the next car arrives (solid = machine) · switch to "Compare" to overlay past bn values',
   'recon.footCompare':
     'Compare mode: starts empty — pick bn values to overlay (up to {maxCompare} sets, both sides in one chart) · input data from /api/machines/{bn} (up to the latest {max} rows per set)',
 

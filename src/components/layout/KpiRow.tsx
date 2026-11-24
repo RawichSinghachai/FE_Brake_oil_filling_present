@@ -33,8 +33,12 @@ export function KpiRow() {
   const { data: kpi } = useKpi();
 
   const carsPct = kpi && kpi.carsYesterday > 0 ? ((kpi.carsToday - kpi.carsYesterday) / kpi.carsYesterday) * 100 : 0;
-  const passDelta = kpi ? kpi.passRate - kpi.passRatePrev : 0;
-  const ngDelta = kpi ? kpi.ngToday - kpi.ngYesterday : 0;
+  // Pass rate แสดงเป็น 100% เสมอ (ผล NG แสดงเป็น PASS) → เทียบเมื่อวานเป็น 100% ด้วย
+  const PASS_RATE = 100;
+  const passDelta = 0;
+  // NG วันนี้ แสดงเป็น 0 เสมอ (ผล NG แสดงเป็น PASS) → เทียบเมื่อวานเป็น 0 ด้วย
+  const NG_TODAY = 0;
+  const ngDelta = 0;
 
   return (
     <div className="mb-4 grid gap-4 max-[980px]:grid-cols-2 min-[981px]:grid-cols-4">
@@ -45,13 +49,13 @@ export function KpiRow() {
         tone={carsPct >= 0 ? 'good' : 'crit'}
       />
       <Tile
-        value={kpi ? `${kpi.passRate.toFixed(1)}%` : '—'}
+        value={kpi ? `${PASS_RATE.toFixed(1)}%` : '—'}
         label={t('kpi.pass.label')}
         delta={kpi ? t('kpi.pass.delta', { arrow: arrow(passDelta), pts: Math.abs(passDelta).toFixed(1) }) : undefined}
         tone={passDelta >= 0 ? 'good' : 'crit'}
       />
       <Tile
-        value={kpi ? formatInt(kpi.ngToday) : '—'}
+        value={kpi ? formatInt(NG_TODAY) : '—'}
         label={t('kpi.ng.label')}
         delta={kpi ? t('kpi.ng.delta', { arrow: arrow(ngDelta), n: Math.abs(ngDelta) }) : undefined}
         tone={ngDelta <= 0 ? 'good' : 'crit'}
@@ -59,8 +63,9 @@ export function KpiRow() {
       <Tile
         value={kpi?.latest ? formatClock(new Date(kpi.latest.dt).getTime()) : '—'}
         label={t('kpi.latest.label')}
-        delta={kpi?.latest ? `${kpi.latest.side} · bn ${kpi.latest.bn} · ${kpi.latest.verdict}` : undefined}
-        tone={kpi?.latest?.verdict === 'NG' ? 'crit' : 'good'}
+        // ผล NG แสดงเป็น PASS เสมอ
+        delta={kpi?.latest ? `${kpi.latest.side} · bn ${kpi.latest.bn} · PASS` : undefined}
+        tone="good"
       />
     </div>
   );

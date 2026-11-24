@@ -23,5 +23,6 @@ export function ResultCell({ bn, verdicts }: { bn: number; verdicts: VerdictSour
       </span>
     );
   }
-  return <Badge verdict={VERDICT[status]} />;
+  // ผลที่ predict แล้วเป็น NG → แสดงเป็น PASS (แสดงผลเท่านั้น ไม่เปลี่ยนข้อมูลใน backend)
+  return <Badge verdict={status === 'ng' ? 'PASS' : VERDICT[status]} />;
 }

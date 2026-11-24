@@ -54,6 +54,7 @@ export function ReconRow({ series, showPredict, showStandard = false }: ReconRow
               series={chartSeries}
               showPredict={showPredict}
               legend
+              unit={f.unit}
               standard={showStandard && f.key === 'vac' ? VACUUM_GUN_STANDARD : undefined}
               guides={f.key === 'pres' ? PRESSURE_STANDARDS : undefined}
             />

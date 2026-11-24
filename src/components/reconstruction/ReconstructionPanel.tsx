@@ -5,7 +5,6 @@ import { useT } from '@/i18n/useT';
 import type { MessageKey } from '@/i18n/messages';
 import { useCompareStore, type ReconMode } from '@/stores/compareStore';
 import { Card } from '@/components/ui/Card';
-import { Toggle } from '@/components/ui/Toggle';
 import { ComparePanel } from './ComparePanel';
 import { LiveSection } from './LiveSection';
 import { MachineStatusLine } from './MachineStatusLine';
@@ -24,10 +23,8 @@ export function ReconstructionPanel() {
   const { t } = useT();
   const mode = useCompareStore((s) => s.mode);
   const visibleSides = useCompareStore((s) => s.visibleSides);
-  const showPredict = useCompareStore((s) => s.showPredict);
   const setMode = useCompareStore((s) => s.setMode);
   const toggleSide = useCompareStore((s) => s.toggleSide);
-  const togglePredict = useCompareStore((s) => s.togglePredict);
 
   return (
     <Card className="mb-4">
@@ -62,11 +59,6 @@ export function ReconstructionPanel() {
                 </button>
               ))}
             </span>
-          )}
-          {mode === 'live' && (
-            <Toggle pressed={showPredict} onToggle={togglePredict}>
-              {t('recon.showPredict')}
-            </Toggle>
           )}
         </div>
       </div>

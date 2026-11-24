@@ -4,7 +4,6 @@ import { useLivePrediction } from '@/hooks/usePrediction';
 import { useT } from '@/i18n/useT';
 import { COLORS } from '@/lib/constants';
 import { tailCurve } from '@/lib/machines';
-import { useCompareStore } from '@/stores/compareStore';
 import { useLiveStore } from '@/stores/liveStore';
 import type { CarCurves, Side } from '@/types/car';
 import { ReconRow } from './ReconRow';
@@ -12,13 +11,12 @@ import { ReconRow } from './ReconRow';
 /**
  * มุมมอง real-time ของ 1 เครื่อง — ขับด้วย bn จาก WebSocket
  *  - ระหว่าง cycle: plot ค่าสดที่สะสมของ bn นั้น (เฉพาะ bn ปัจจุบัน)
- *  - cycle จบ (GET /api/predictions/{bn} ได้ผล): แทนด้วย input + predict จาก backend
+ *  - cycle จบ (GET /api/predictions/{bn} ได้ผล): แทนด้วย input จาก backend (ไม่วางเส้น predict บนกราฟ real-time; % diff ยังแสดง)
  *  - แสดงไม่เกิน MAX_DETAIL_ROWS จุดล่าสุด และคงข้อมูลคันเดิมไว้จนกว่า bn เปลี่ยน
  *  - bn เปลี่ยน: เริ่มรถคันใหม่ทันที (liveStore ล้าง trace, query เปลี่ยนตาม bn)
  */
 export function LiveSection({ side }: { side: Side }) {
   const { t } = useT();
-  const showPredict = useCompareStore((s) => s.showPredict);
   const trace = useLiveStore((s) => s.trace[side]);
   const bn = trace?.bn ?? null;
   const { detail, pending, isError } = useLivePrediction(bn);
@@ -66,7 +64,7 @@ export function LiveSection({ side }: { side: Side }) {
               features: done ? detail.record.features : undefined,
             },
           ]}
-          showPredict={showPredict && done}
+          showPredict={false}
           showStandard
         />
       ) : (
