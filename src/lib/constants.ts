@@ -7,8 +7,10 @@ export const MAX_COMPARE = 5;
 export const HISTORY_PAGE_SIZE = 10;
 /** หน้ารายละเอียดรถ: แสดงไม่เกินกี่จุด/แถวต่อกราฟ (1 แถว ≈ 1 รอบอ่านค่า) — เกินแล้วเอาล่าสุด */
 export const MAX_DETAIL_ROWS = 150;
-/** vacuumgun / vacuumpump: ค่าที่พุ่งเกินนี้แสดงผลเป็นค่านี้ (ทั้ง LH และ RH) */
-export const VACUUM_DISPLAY_MAX = 300;
+/** vacuumgun: ค่าที่พุ่งเกินนี้แสดงผลเป็นค่านี้ (ทั้ง LH และ RH) */
+export const VACUUM_DISPLAY_MAX = 1200;
+/** vacuumpump: เพดานแสดงผล (ทั้ง LH และ RH) */
+export const VACUUM_PUMP_DISPLAY_MAX = 300;
 /** เส้น standard ของ vacuumgun (ตีเส้นในกราฟ vacuumgun ที่ไม่ได้ plot ซ้อนกัน) */
 export const VACUUM_GUN_STANDARD = 130;
 /** เส้นประอ้างอิงของกราฟ filling pressure (ตีทุกกราฟ pressure: Dashboard, หน้ารายละเอียดรถ, หน้า 3D) */

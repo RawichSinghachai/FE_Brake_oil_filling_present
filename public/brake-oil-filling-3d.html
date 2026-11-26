@@ -1115,7 +1115,7 @@ const results = [];
    ใช้เมื่อเปิดผ่านหน้า /3d ของ Dashboard (iframe). stepnum จริง: 0 = รอ/สวมหัว, 1 = ดูดสุญญากาศ, 2 = เติม
    ขั้นตอนในภาพ (t ในรอบ 70 วินาทีของโมเดล) แมปจาก stepnum + เวลาที่อยู่ใน step นั้นจริง; สัญญาณ/bn/ผล PASS-NG มาจาก API */
 const EMBEDDED = window.parent !== window;
-const VAC_CAP = 300;                                   // vacuumgun ค่าพุ่งเกินนี้แสดงเป็นเพดาน (เหมือน Dashboard)
+const VAC_CAP = 1200;                                  // vacuumgun ค่าพุ่งเกินนี้แสดงเป็นเพดาน (เหมือน Dashboard)
 const LIVE = { on: false, userSim: false, lastMsgAt: 0, common: null, verdict: new Map(), rows: [], side: { RH: null, LH: null },
   exp: { s0: 12, s1: 43, s2: 80, back: 12 } };         // เวลาโดยประมาณ (วินาที) ของ step 0 / 1 / 2 และช่วงกลับ — วัดจากข้อมูลจริง
 function liveNewSide(bn, pgnum, now) { return { bn, pgnum, step: null, stepAt: now, bnAt: now, afterAt: null, seen: { 1: false, 2: false }, samples: [], lastTs: 0, last: null, t: 0, target: 0 }; }

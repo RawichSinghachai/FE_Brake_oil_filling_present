@@ -1,4 +1,4 @@
-import { MAX_DETAIL_ROWS, VACUUM_DISPLAY_MAX } from './constants';
+import { MAX_DETAIL_ROWS, VACUUM_DISPLAY_MAX, VACUUM_PUMP_DISPLAY_MAX } from './constants';
 import type { ApiMachine, ApiMachineDetail } from '@/types/api';
 import type { CarCurves, CurveSet, FeatureKey, MachineCar, Side } from '@/types/car';
 
@@ -37,7 +37,7 @@ export const SIGNALS: readonly Signal[] = [
   { name: 'FillingPressure', column: '{s}_fillingpressure', feature: 'pres', unit: 'kPa' },
   { name: 'FillingVolume', column: '{s}_fillingvolume', feature: 'vol', unit: 'CC' },
   { name: 'VacuumGun', column: '{s}_vacuumgun', feature: 'vac', max: VACUUM_DISPLAY_MAX, unit: 'Pa' },
-  { name: 'VacuumPump', column: '{s}_vacuumpump', max: VACUUM_DISPLAY_MAX, unit: 'Pa' },
+  { name: 'VacuumPump', column: '{s}_vacuumpump', max: VACUUM_PUMP_DISPLAY_MAX, unit: 'Pa' },
   { name: 'PumpVacuumCurrent', column: '{s}_pumpvacuumcurrent', unit: 'A' },
   { name: 'PumpDegassingCurrent', column: 'pumpdegassingcurrent', unit: 'A' },
   { name: 'PumpSupplyCurrent', column: 'pumpsupplycurrent', unit: 'A' },
