@@ -10,7 +10,7 @@ export const MAX_DETAIL_ROWS = 150;
 /** vacuumgun: ค่าที่พุ่งเกินนี้แสดงผลเป็นค่านี้ (ทั้ง LH และ RH) */
 export const VACUUM_DISPLAY_MAX = 1200;
 /** vacuumpump: เพดานแสดงผล (ทั้ง LH และ RH) */
-export const VACUUM_PUMP_DISPLAY_MAX = 300;
+export const VACUUM_PUMP_DISPLAY_MAX = 1200;
 /** เส้น standard ของ vacuumgun (ตีเส้นในกราฟ vacuumgun ที่ไม่ได้ plot ซ้อนกัน) */
 export const VACUUM_GUN_STANDARD = 130;
 /** เส้นประอ้างอิงของกราฟ filling pressure (ตีทุกกราฟ pressure: Dashboard, หน้ารายละเอียดรถ, หน้า 3D) */
