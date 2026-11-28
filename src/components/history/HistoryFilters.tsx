@@ -95,7 +95,6 @@ export function HistoryFilters({ cars, note }: { cars: MachineCar[]; note: strin
         >
           <option value="">{t('common.all')}</option>
           <option value="pass">{t('filter.pass')}</option>
-          <option value="ng">{t('filter.ng')}</option>
           <option value="pending">{t('common.pendingPredict')}</option>
         </select>
       </Field>

@@ -106,7 +106,7 @@ function useHistoryCars(params: MachineParams, page: number, result: ResultFilte
   const { t } = useT();
   // pass / ng: ตาราง predict บอกว่ารถ (side, bn) ไหนผ่าน/ไม่ผ่าน (backend กรองให้ ครอบคลุมทุกรถ ไม่ต้องไล่อ่าน machine ย้อนหลัง)
   //   → รายการรถมาจากตาราง predict แต่ "ข้อมูลที่แสดง" (เวลา recorded_at / asn / pgnum) ดึงจาก machine ของรถแต่ละคัน เหมือนตารางปกติ
-  const predMode = result === 'pass' || result === 'ng';
+  const predMode = result === 'pass';
   // pending (รอ predict): ไม่มี endpoint → สแกน machines แล้วตัดรถที่มีผลแล้วออก
   const filtering = result === 'pending';
   const [budget, setBudget] = useState(SCAN_CHUNKS);
@@ -124,7 +124,7 @@ function useHistoryCars(params: MachineParams, page: number, result: ResultFilte
         ...params,
         dt_from: fromMs === null ? undefined : new Date(fromMs - BOUNDARY_MS).toISOString(),
         dt_to: toMs === null ? undefined : new Date(toMs + BOUNDARY_MS).toISOString(),
-        overall_pass: result === 'pass',
+        // ทุกผลแสดงเป็น PASS → "ผ่าน" = รถทุกคันที่มีผล predict (ไม่กรอง overall_pass จาก backend)
       }),
     enabled: predMode,
     placeholderData: keepPreviousData,

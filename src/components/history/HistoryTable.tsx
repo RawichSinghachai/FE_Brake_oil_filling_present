@@ -44,10 +44,10 @@ export function HistoryTable() {
   // กรอง PASS/NG: รายการรถทั้งหมดมาจากผล predict ที่ตรงกับตัวกรองอยู่แล้ว → ใช้ผลนั้นเลย (ไม่ต้องถามช่วงเวลาซ้ำ)
   // ไม่กรอง / รอ predict: ถามผลของรถในหน้านี้ด้วย 1 request (ช่วงเวลา = รถเก่าสุดของหน้า)
   const resultFilter = useHistoryFilterStore((s) => s.filters.result);
-  const known = resultFilter === 'pass' || resultFilter === 'ng';
+  const known = resultFilter === 'pass';
   const pageVerdicts = usePageVerdicts(known ? EMPTY : shownRows);
   const knownVerdicts = useMemo(
-    () => ({ data: new Map(shownRows.map((r) => [r.bn, resultFilter === 'pass' ? ('PASS' as const) : ('NG' as const)])), isError: false }),
+    () => ({ data: new Map(shownRows.map((r) => [r.bn, 'PASS' as const])), isError: false }),
     [shownRows, resultFilter],
   );
   const verdicts = known ? knownVerdicts : pageVerdicts;

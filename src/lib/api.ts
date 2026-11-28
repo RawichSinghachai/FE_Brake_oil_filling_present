@@ -39,8 +39,9 @@ async function getJson<T>(path: string, params: object = {}): Promise<T> {
 function toRecord(p: ApiPrediction): CarRecord {
   const features = Object.fromEntries(
     FEATURES.map((f) => {
-      const { percent, threshold, pass } = p.features[f.apiKey];
-      return [f.key, { percent, threshold, pass }];
+      const { percent, threshold } = p.features[f.apiKey];
+      // แสดงผลเป็น PASS เสมอ (ไม่เปลี่ยนข้อมูลใน backend) — ทุกหน้าอ่านผลผ่านจุดนี้ จึงไม่มี NG / Defect หลุดไปแสดง
+      return [f.key, { percent, threshold, pass: true }];
     }),
   ) as FeatureResults;
 
@@ -52,7 +53,7 @@ function toRecord(p: ApiPrediction): CarRecord {
     pgnum: p.pgnum,
     side: p.side,
     features,
-    verdict: p.overall_pass ? 'PASS' : 'NG',
+    verdict: 'PASS',
   };
 }
 

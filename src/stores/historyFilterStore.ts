@@ -4,7 +4,7 @@ import type { Side } from '@/types/car';
 import { toDatetimeLocal } from '@/lib/format';
 
 /** ผลตรวจ: '' = ทั้งหมด */
-export type ResultFilter = '' | 'pass' | 'ng' | 'pending';
+export type ResultFilter = '' | 'pass' | 'pending';
 
 export type RangePreset = 'all' | 'today' | '7d' | 'custom';
 
