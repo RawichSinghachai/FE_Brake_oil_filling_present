@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { MAX_DETAIL_ROWS } from '@/lib/constants';
+import { MAX_DETAIL_ROWS, MAX_LIVE_SECONDS } from '@/lib/constants';
 import type { Side } from '@/types/car';
 import type { LiveBySide, LiveTrace, RealtimeCommon, RealtimeMessage, RealtimeSide, WsStatus } from '@/types/ws';
 
@@ -32,6 +32,7 @@ function nextTrace(prev: LiveTrace | null, cur: RealtimeSide, recordedAt: string
       bn: cur.bn,
       pgnum: cur.pgnum,
       recordedAt,
+      startedAt: Date.parse(recordedAt),
       pres: [cur.filling_pressure],
       vol: [cur.filling_volume],
       vac: [cur.vacuumgun],
@@ -39,6 +40,8 @@ function nextTrace(prev: LiveTrace | null, cur: RealtimeSide, recordedAt: string
   }
   // backend ส่งข้อความซ้ำ (recorded_at เดิม) → ไม่นับเป็นจุดใหม่
   if (prev.recordedAt === recordedAt) return null;
+  // bn เดิมรับข้อมูลสดมาเกิน MAX_LIVE_SECONDS → ตัด ไม่แสดงข้อมูลใหม่ใน real-time จนกว่า bn เปลี่ยน
+  if (Date.parse(recordedAt) - prev.startedAt > MAX_LIVE_SECONDS * 1000) return null;
   return {
     ...prev,
     pgnum: cur.pgnum,
@@ -58,15 +61,20 @@ export const useLiveStore = create<LiveState>((set) => ({
   lastMessage: null,
   setWsStatus: (wsStatus) => set({ wsStatus }),
   handleMessage: (msg) =>
-    set((s) => ({
-      // ข้อความที่ขาดฝั่งใดฝั่งหนึ่ง = คงค่าเดิมของฝั่งนั้นไว้
-      live: { LH: msg.lh ?? s.live.LH, RH: msg.rh ?? s.live.RH },
-      trace: {
-        LH: msg.lh ? (nextTrace(s.trace.LH, msg.lh, msg.recorded_at) ?? s.trace.LH) : s.trace.LH,
-        RH: msg.rh ? (nextTrace(s.trace.RH, msg.rh, msg.recorded_at) ?? s.trace.RH) : s.trace.RH,
-      },
-      common: msg.common ?? s.common,
-      lastUpdate: Date.now(),
-      lastMessage: msg,
-    })),
+    set((s) => {
+      // continue = false → หยุดแสดงข้อมูลสด (ค่าในการ์ด / กราฟ real-time / หน้า 3D) ค้างค่าล่าสุดไว้
+      // อัปเดตเฉพาะสถานะเครื่อง (common) เพื่อให้ไฟสถานะ/alarm ยังทำงาน และกลับมาแสดงต่อเองเมื่อ continue = true
+      if (msg.common?.continue === false) return { common: msg.common };
+      return {
+        // ข้อความที่ขาดฝั่งใดฝั่งหนึ่ง = คงค่าเดิมของฝั่งนั้นไว้
+        live: { LH: msg.lh ?? s.live.LH, RH: msg.rh ?? s.live.RH },
+        trace: {
+          LH: msg.lh ? (nextTrace(s.trace.LH, msg.lh, msg.recorded_at) ?? s.trace.LH) : s.trace.LH,
+          RH: msg.rh ? (nextTrace(s.trace.RH, msg.rh, msg.recorded_at) ?? s.trace.RH) : s.trace.RH,
+        },
+        common: msg.common ?? s.common,
+        lastUpdate: Date.now(),
+        lastMessage: msg,
+      };
+    }),
 }));

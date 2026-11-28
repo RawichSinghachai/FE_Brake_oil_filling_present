@@ -36,6 +36,8 @@ export interface LiveTrace {
   pgnum: number;
   /** recorded_at ของจุดล่าสุด (ไว้กันข้อความซ้ำ) */
   recordedAt: string;
+  /** epoch ms ของข้อความแรกของ bn นี้ (ไว้ตัดเมื่อเกิน MAX_LIVE_SECONDS) */
+  startedAt: number;
   pres: number[];
   vol: number[];
   vac: number[];

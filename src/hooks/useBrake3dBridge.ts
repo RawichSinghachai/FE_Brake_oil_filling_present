@@ -138,8 +138,13 @@ export function useBrake3dBridge(frameRef: RefObject<HTMLIFrameElement | null>) 
       }
     };
 
+    // continue = false → ให้ iframe ค้างภาพ (ดู liveStore.handleMessage ที่หยุดส่งข้อมูลสดแล้ว)
+    const sendPause = (paused: boolean) => post({ type: 'pause', paused });
     const unsubscribe = useLiveStore.subscribe((s, prev) => {
-      if (ready.current && s.lastMessage !== prev.lastMessage) sendLive(s.lastMessage);
+      if (!ready.current) return;
+      const paused = s.common?.continue === false;
+      if (paused !== (prev.common?.continue === false)) sendPause(paused);
+      if (s.lastMessage !== prev.lastMessage) sendLive(s.lastMessage);
     });
 
     const onMessage = (e: MessageEvent) => {
@@ -148,6 +153,7 @@ export function useBrake3dBridge(frameRef: RefObject<HTMLIFrameElement | null>) 
       ready.current = true;
       sentBn.current = { LH: null, RH: null };
       sendLive(useLiveStore.getState().lastMessage);
+      sendPause(useLiveStore.getState().common?.continue === false);
       post({ type: 'results', rows: resultsRef.current });
       if (kpiRef.current) post({ type: 'kpi', kpi: kpiRef.current });
     };

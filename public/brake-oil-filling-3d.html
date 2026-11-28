@@ -1115,14 +1115,26 @@ const results = [];
    ใช้เมื่อเปิดผ่านหน้า /3d ของ Dashboard (iframe). stepnum จริง: 0 = รอ/สวมหัว, 1 = ดูดสุญญากาศ, 2 = เติม
    ขั้นตอนในภาพ (t ในรอบ 70 วินาทีของโมเดล) แมปจาก stepnum + เวลาที่อยู่ใน step นั้นจริง; สัญญาณ/bn/ผล PASS-NG มาจาก API */
 const EMBEDDED = window.parent !== window;
+const LIVE_MAX_S = 150;                                // กราฟ real-time รับข้อมูลของ bn เดียวได้ไม่เกินกี่วินาที (เหมือน MAX_LIVE_SECONDS ของ Dashboard)
 const VAC_CAP = 1200;                                  // vacuumgun ค่าพุ่งเกินนี้แสดงเป็นเพดาน (เหมือน Dashboard)
-const LIVE = { on: false, userSim: false, lastMsgAt: 0, common: null, verdict: new Map(), rows: [], side: { RH: null, LH: null },
+const LIVE = { on: false, userSim: false, paused: false, pausedAt: 0, lastMsgAt: 0, common: null, verdict: new Map(), rows: [], side: { RH: null, LH: null },
   exp: { s0: 12, s1: 43, s2: 80, back: 12 } };         // เวลาโดยประมาณ (วินาที) ของ step 0 / 1 / 2 และช่วงกลับ — วัดจากข้อมูลจริง
 function liveNewSide(bn, pgnum, now) { return { bn, pgnum, step: null, stepAt: now, bnAt: now, afterAt: null, seen: { 1: false, 2: false }, samples: [], lastTs: 0, last: null, t: 0, target: 0 }; }
 function liveEnterStep(s, step, at) {
   s.step = step; s.stepAt = at;
   if (step === 1 || step === 2) s.seen[step] = true;
   if (step === 0 && s.seen[2]) s.afterAt = at;
+}
+function livePause(on) {                                // continue = false → ค้างภาพ/ค่า/นาฬิกาสายพานไว้ ; true → เดินต่อ (ไม่นับเวลาที่หยุด)
+  if (LIVE.paused === on) return;
+  const now = performance.now();
+  if (on) LIVE.pausedAt = now;
+  else {
+    const gap = now - LIVE.pausedAt;
+    for (const sd of ['RH', 'LH']) { const s = LIVE.side[sd]; if (!s) continue; s.stepAt += gap; s.bnAt += gap; if (s.afterAt !== null) s.afterAt += gap; }
+    LIVE.lastMsgAt += gap; liveStepAt = now;
+  }
+  LIVE.paused = on;
 }
 function liveFault(on) {
   if (on && state.fault !== 'ALL') { state.fault = 'ALL'; showAlarm(__t('<b>MACHINE FAULT</b> · เครื่องแจ้ง fault (ข้อมูลจริง)', '<b>MACHINE FAULT</b> · the machine reports a fault (live data)')); }
@@ -1144,6 +1156,7 @@ function liveFeed(msg) {
     s.last = { vac: Math.min(m.vacuumgun, VAC_CAP), pr: m.filling_pressure, vol: m.filling_volume };
     if (!(ts <= s.lastTs)) {                            // ข้ามข้อความซ้ำ (recorded_at เดิม)
       if (ts) s.lastTs = ts;
+      if ((now - s.bnAt) / 1000 > LIVE_MAX_S) continue;   // bn นี้รับข้อมูลมาเกิน 150 วินาที → ไม่เพิ่มจุดใหม่ในกราฟ
       s.samples.push({ el: (now - s.bnAt) / 1000, step, ...s.last });
       if (s.samples.length > 400) s.samples.shift();
     }
@@ -1162,6 +1175,7 @@ function liveHistory(d) {                               // ค่ารายว
 }
 let liveStepAt = performance.now();
 function liveStep() {                                   // แมป stepnum จริง → เวลา t ในรอบของโมเดล (ทุกเฟรม)
+  if (LIVE.paused) return;
   const now = performance.now(), E = LIVE.exp;
   const dt = Math.min((now - liveStepAt) / 1000, 2); liveStepAt = now;   // ใช้เวลาจริง (ไม่ผูกกับ fps)
   for (const sd of ['RH', 'LH']) {
@@ -1747,6 +1761,7 @@ if (EMBEDDED) {
     const d = e.data; if (!d || d.source !== 'brake-dashboard') return;
     if (d.type === 'hello') window.parent.postMessage({ source: 'brake-3d', type: 'ready' }, location.origin);   // Dashboard เพิ่งพร้อม
     else if (d.type === 'live') liveFeed(d.msg);
+    else if (d.type === 'pause') livePause(!!d.paused);
     else if (d.type === 'history') liveHistory(d);
     else if (d.type === 'results') {
       LIVE.rows = d.rows; LIVE.verdict = new Map(d.rows.map(r => [`${r.side}-${r.bn}`, r.ok]));
@@ -1867,7 +1882,7 @@ function update(dt) {
     if (tween.k >= 1) tween = null;
   }
 
-  procT += halted ? 0 : dt;
+  procT += halted || (LIVE.on && LIVE.paused) ? 0 : dt;
   drawProc(view[state.view]);
 
   // HUD
@@ -1882,8 +1897,9 @@ function update(dt) {
       $('vVol').innerHTML = (L ? L.vol.toFixed(0) : '—') + '<small>CC</small>';
       drawChartsLive(v.lm);
       const age = (performance.now() - LIVE.lastMsgAt) / 1000, ls = $('liveStat');
-      ls.className = 'small mono' + (LIVE.lastMsgAt && age < 6 ? ' ok' : '');
-      ls.textContent = !LIVE.lastMsgAt ? __t('○ รอข้อมูลสดจากเครื่อง…', '○ waiting for live data…')
+      ls.className = 'small mono' + (!LIVE.paused && LIVE.lastMsgAt && age < 6 ? ' ok' : '');
+      ls.textContent = LIVE.paused ? __t('⏸ หยุดแสดงผล (continue = false)', '⏸ paused (continue = false)')
+        : !LIVE.lastMsgAt ? __t('○ รอข้อมูลสดจากเครื่อง…', '○ waiting for live data…')
         : age < 6 ? __t('● ข้อมูลสด', '● LIVE') : __t(`○ ไม่มีข้อมูลใหม่ ${age.toFixed(0)} วินาที`, `○ no new data for ${age.toFixed(0)} s`);
     } else {
       $('vVac').innerHTML = v.s.vac.toFixed(1) + '<small>Pa</small>';

@@ -7,6 +7,8 @@ export const MAX_COMPARE = 5;
 export const HISTORY_PAGE_SIZE = 10;
 /** หน้ารายละเอียดรถ: แสดงไม่เกินกี่จุด/แถวต่อกราฟ (1 แถว ≈ 1 รอบอ่านค่า) — เกินแล้วเอาล่าสุด */
 export const MAX_DETAIL_ROWS = 150;
+/** กราฟ real-time: รถ 1 คัน (bn) รับข้อมูลสดได้ไม่เกินกี่วินาที (นับจากข้อความแรกของ bn นั้น) — เกินแล้วตัด ไม่เพิ่มจุดใหม่จนกว่า bn เปลี่ยน */
+export const MAX_LIVE_SECONDS = 150;
 /** vacuumgun: ค่าที่พุ่งเกินนี้แสดงผลเป็นค่านี้ (ทั้ง LH และ RH) */
 export const VACUUM_DISPLAY_MAX = 1200;
 /** vacuumpump: เพดานแสดงผล (ทั้ง LH และ RH) */
